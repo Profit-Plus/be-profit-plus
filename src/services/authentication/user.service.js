@@ -52,12 +52,6 @@ function findRoleByLoginCredentialId(loginCredentialsId) {
             levelName: true,
             teamName: true,
             unitsName: true,
-            // If unitsName is from a related model, include it here:
-            // units: {
-            //   select: {
-            //     unitsName: true,
-            //   },
-            // },
           },
     });
 }
