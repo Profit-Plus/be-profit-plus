@@ -3,12 +3,16 @@ const { database } = require('../../helpers/utils/db/database');
 const { hashToken } = require('../../helpers/utils/authentication/hashtoken');
 
 /* This method will called when whe create a new refresh token */
-function addRefreshTokenToWhiteList( {jti, refreshToken, userId} ) {
+function addRefreshTokenToWhiteList( {jti, refreshToken, loginCredentialsId} ) {
     return database.refreshToken.create({
         data: {
             id: jti,
             hashedToken: hashToken(refreshToken),
-            userId
+            loginCredentials: {
+                connect: { 
+                    loginCredentialsId
+                }
+            }
         }
     });
 }
