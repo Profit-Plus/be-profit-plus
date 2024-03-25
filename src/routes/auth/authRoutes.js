@@ -6,5 +6,6 @@ const { authenticationMiddleware } = require('../../middlewares/authMiddlewares/
 authRouter.post('/porto/register',  authController.registerController);
 authRouter.post('/porto/login',  authController.loginController);
 authRouter.get('/porto/dashboard', authenticationMiddleware.authenticateUser,  authController.dashboardController);
+authRouter.post('/porto/refresh-tokens', authController.refreshTokensController);
 
 module.exports = authRouter;
