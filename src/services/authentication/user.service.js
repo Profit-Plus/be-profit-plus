@@ -3,14 +3,14 @@ const bcrypt = require('bcrypt');
 const { database } =require('../../helpers/utils/db/database');
 
 function findLoginCredentialsByEmail(email) {
-    return database.loginCredentials.findUnique({
+    return database.login_credentials.findUnique({
         where: { email }
     });
 }
 
 function createloginCredentialsByEmailAndPassword(user) {
     user.password = bcrypt.hashSync(user.password, 12);
-    return database.loginCredentials.create({
+    return database.login_credentials.create({
         data: user
     });
 }
@@ -19,16 +19,16 @@ function createNewUsers({unitsName, teamName, levelName, loginCredentialsId}) {
     return database.users.create({
         data: {
             units: {
-                connect: {unitsName: unitsName}
+                connect: {units_name: unitsName}
             },
             levels: {
-                connect: {levelName: levelName}
+                connect: {level_name: levelName}
             },
             teams: {
-                connect: {teamName: teamName}
+                connect: {team_name: teamName}
             },
-            loginCredentials: {
-                connect: {loginCredentialsId: loginCredentialsId}
+            login_credentials: {
+                connect: {login_credentials_id: loginCredentialsId}
             },
         }
     });
@@ -43,15 +43,15 @@ function findUserById(id) {
 function findRoleByLoginCredentialId(loginCredentialsId) {
     return database.users.findUnique({
         where: {
-            loginCredentialsId: loginCredentialsId,
-            loginCredentials: {
-              loginCredentialsId: loginCredentialsId,
-            },
+            login_credentials_id: loginCredentialsId,
+            login_credentials: {
+              login_credentials_id: loginCredentialsId,
+            }
           },
           select: {
-            levelName: true,
-            teamName: true,
-            unitsName: true,
+            level_name: true,
+            team_name: true,
+            units_name: true,
           },
     });
 }

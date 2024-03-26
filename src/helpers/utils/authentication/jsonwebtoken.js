@@ -5,8 +5,8 @@ const jsonwebtoken = require('jsonwebtoken');
 /* This function is also generating the token based on user's role */
 function generateAccessToken(user, role) {
     return jsonwebtoken.sign({
-        userId : user.loginCredentialsId,
-        userLevel: role.levelName,
+        userId : user.login_credentials_id,
+        userLevel: role.level_name,
     }, process.env.JWT_ACCESS_SECRET, {expiresIn: '3m'});
 }
 
@@ -15,8 +15,8 @@ function generateAccessToken(user, role) {
 /* If the token expired user have to re-log in to the system */
 function generateRefreshToken(user, role, jti) {
     return jsonwebtoken.sign ({
-        userId : user.id,
-        userLevel: role.level,
+        userId : user.login_credentials_id,
+        userLevel: role.level_name,
     }, process.env.JWT_REFRESH_SECRET, {expiresIn: '12h'});
 }
 

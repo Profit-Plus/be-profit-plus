@@ -10,9 +10,9 @@ const bcrypt = require('bcrypt');
 async function registerController (req, res, next) {
     try {
         /* Request body */
-        const { email, password, userName, unit, team, level } = req.body;
+        const { email, password, user_name, unit, team, level } = req.body;
         /* Check if input is invalid */
-        if (!email || !password || !unit || !team || !level) {
+        if (!email || !password || !unit || !team || !level || !user_name) {
             res.status(400).json(webResponses.errorResponse('Invalid input! Fields cannot be empty'));
             throw new Error('There are several fields empty!');
         }
@@ -25,21 +25,23 @@ async function registerController (req, res, next) {
         }
 
         /* If no error occurs, perform post operation to database and hold the id */
-        const loginCredentials = await userService.createloginCredentialsByEmailAndPassword({ email, password, userName});
-        const roles = userService.findRoleByLoginCredentialId(loginCredentials.loginCredentialsId);
+        const loginCredentials = await userService.createloginCredentialsByEmailAndPassword({ email, password, user_name});
+        const roles = userService.findRoleByLoginCredentialId(loginCredentials.login_credentials_id);
+
+        console.log(roles.levels);
 
         /* Store credentials as a new users */
         await userService.createNewUsers( {
             unitsName: unit,
             teamName: team,
             levelName: level,
-            loginCredentialsId: loginCredentials.loginCredentialsId
+            loginCredentialsId: loginCredentials.login_credentials_id
         });
 
         /* Generate accessToken and refreshToken */
         const jti = uuidv4();
-        const { accessToken, refreshToken } = generateTokens(loginCredentials, roles, jti);
-        await authService.addRefreshTokenToWhiteList( {jti, refreshToken, loginCredentialsId: loginCredentials.loginCredentialsId});
+        const { accessToken, refreshToken } = generateTokens(loginCredentials.login_credentials_id, roles, jti);
+        await authService.addRefreshTokenToWhiteList( {jti, refreshToken, loginCredentialsId: loginCredentials.login_credentials_id});
 
         res.status(200).json(webResponses.successResponse('Generating tokens', {accessToken, refreshToken}));
 
@@ -76,13 +78,10 @@ async function loginController(req, res, next) {
 
         /* Generate tokens if there is no error occured */
         const jti = uuidv4();
-        const userRole = await userService.findRoleByLoginCredentialId(existingUser.loginCredentialsId);
+        const userRole = await userService.findRoleByLoginCredentialId(existingUser.login_credentials_id);
         const { accessToken, refreshToken } = generateTokens(existingUser, userRole, jti);
-        await authService.addRefreshTokenToWhiteList({ jti, refreshToken, loginCredentialsId: existingUser.loginCredentialsId});
+        await authService.addRefreshTokenToWhiteList({ jti, refreshToken, loginCredentialsId: existingUser.login_credentials_id});
 
-        /* Store access token and refresh token to local storage of the browser */
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
         res.status(200).json(webResponses.successResponse('Generating tokens', {accessToken, refreshToken}));
 
     } catch (error) {
@@ -92,7 +91,7 @@ async function loginController(req, res, next) {
 
 async function dashboardController(req, res, next) {
     try {
-        if (req.role !== 'SUPERADMIN') {
+        if (req.role !== 'SUPERVISOR') {
             res.status(400).json(webResponses.errorResponse('Access Denied!'));
         } else {
             const authorization = true;
