@@ -1,8 +1,8 @@
-import { database } from '../../helpers/utils/db/database';
+const { database } = require('../../helpers/utils/db/database');
 
-function createPic(pic) {
+function createPic(data) {
     return database.pic.create({
-        data: pic
+        data: data
     });
 }
 
@@ -16,12 +16,12 @@ function findPic(picId) {
     });
 }
 
-function updatePic(pic) {
+function updatePic(picId, data) {
     return database.pic.update({
         where: {
-            id: pic.id
+            id: picId
         },
-        data: pic
+        data: data
     });
 }
 
@@ -33,7 +33,7 @@ function deletePic(picId) {
     });
 }
 
-module.exports = {
+module.exports =  {
     createPic,
     findAllPics,
     findPic,
