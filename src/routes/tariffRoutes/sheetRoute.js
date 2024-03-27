@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const productController = require('../../controllers/tarifController/sheetController');
+const productController = require('../../controllers/tariffControllers/sheetController');
 
 router.get('/', productController.getProducts);
 router.get('/:id', productController.getProductById);

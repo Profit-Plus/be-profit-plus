@@ -1,10 +1,8 @@
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
+const { database } = require('../../helpers/utils/db/database');
 
 const productService = {
   async getProducts() {
-    return await prisma.product.findMany({
+    return await database.product.findMany({
       select: {
         id: true,
         name: true,
@@ -13,7 +11,7 @@ const productService = {
   },
 
   async getProductById(id) {
-    return await prisma.product.findUnique({
+    return await database.product.findUnique({
       where: {
         id: parseInt(id),
       },
@@ -25,7 +23,7 @@ const productService = {
   },
 
   async createProduct(data) {
-    return await prisma.product.create({
+    return await database.product.create({
       data: {
         name: data.name,
         // Add other fields as necessary
@@ -38,7 +36,7 @@ const productService = {
   },
 
   async updateProduct(id, data) {
-    return await prisma.product.update({
+    return await database.product.update({
       where: {
         id: parseInt(id),
       },
@@ -54,7 +52,7 @@ const productService = {
   },
 
   async deleteProduct(id) {
-    return await prisma.product.delete({
+    return await database.product.delete({
       where: {
         id: parseInt(id),
       },

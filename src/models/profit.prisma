@@ -490,13 +490,14 @@ model categories {
 // Define the "data" table
 model data {
     id           Int          @id @default(autoincrement())
-    quantity     Int
-    frequency    Int
-    unit         String
-    excess       Float
-    code         String
-    event_module String
-    grade        String
+    event_module String      
+    nature       String?
+    pic          String?
+    description  String?
+    source       sourceEnum?
+    unit         String?
+    code         String?
+    grade        String?
     create_at    DateTime     @default(now())
     update_at    DateTime     @updatedAt
     delete_at    DateTime?
@@ -509,11 +510,11 @@ model data {
 model components {
     id           Int       @id @default(autoincrement())
     name         String
-    item         String
-    unit         Int
-    specs        String
-    priceperunit Float
-    quantity     Int
+    item         String?
+    unit         Int?
+    specs        String?
+    priceperunit Float?
+    quantity     Int?
     create_at    DateTime  @default(now())
     update_at    DateTime  @updatedAt
     delete_at    DateTime?
@@ -541,4 +542,9 @@ enum type_enum {
     CAPEX
     OPEX
     CoGS
+}
+
+enum sourceEnum {
+  Enterprise
+  Product
 }

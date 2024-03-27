@@ -1,4 +1,4 @@
-const productService = require('../../services/tarifServices/sheetServices');
+const productService = require('../../services/tariffServices/sheetService');
 const { successResponse, errorResponse } = require('../../helpers/web/webResponses');
 
 const productController = {

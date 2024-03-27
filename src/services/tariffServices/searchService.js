@@ -1,9 +1,8 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const { database } = require('../../helpers/utils/db/database');
 
 module.exports = {
     search: async (query) => {
-        const products = await prisma.product.findMany({
+        const products = await database.product.findMany({
             where: {
                 name: {
                     contains: query
@@ -11,7 +10,7 @@ module.exports = {
             }
         });
 
-        const categories = await prisma.categories.findMany({
+        const categories = await database.categories.findMany({
             where: {
                 category: {
                     contains: query
@@ -19,7 +18,7 @@ module.exports = {
             }
         });
 
-        const components = await prisma.components.findMany({
+        const components = await database.components.findMany({
             where: {
                 name: {
                     contains: query

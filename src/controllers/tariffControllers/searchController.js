@@ -1,4 +1,4 @@
-const searchService = require('../../services/tarifServices/searchServices');
+const searchService = require('../../services/tariffServices/searchService');
 const { successResponse, errorResponse } = require('../../helpers/web/webResponses');
 
 module.exports = {
