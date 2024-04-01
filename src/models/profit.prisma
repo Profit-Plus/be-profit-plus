@@ -426,11 +426,10 @@ model st_targeting_user {
 
 // schema tarif
 
-// Define the "package" table
 model packages {
     id               Int           @id @default(autoincrement())
     name             String
-    category         category_enum
+    category         category_enum // Main feature/Add on
     target_sales     Int           @default(10)
     payback_period   Int           @default(1)
     operational_time Int           @default(12)
@@ -443,11 +442,20 @@ model packages {
     update_at        DateTime      @updatedAt
     delete_at        DateTime?
 
-    // Define relationships
-    product           product            @relation(fields: [productId], references: [id])
-    productId         Int
-    Offering_Packages offering_package[]
-    Totals            total[]
+    product           product            @relation(fields: [product_id], references: [id])
+    product_id        Int
+    offering_packages offering_package[]
+    totals            total[]
+    data_package      data_package[]
+}
+
+model offering {
+    id         Int    @id @default(autoincrement())
+    offer_name String
+
+    offering_packages offering_package[]
+    product           product            @relation(fields: [product_id], references: [id])
+    product_id        Int
 }
 
 model offering_package {
@@ -459,54 +467,55 @@ model offering_package {
     @@id([package_id, offering_id])
 }
 
-// Define the "offering" table
-model offering {
-    id                Int                @id @default(autoincrement())
-    offer_name        String
-    offering_packages offering_package[]
-    product           product            @relation(fields: [product_id], references: [id])
-    product_id        Int
-}
-
-// Define the "type" table
 model type {
-    id         String       @id @default(uuid())
-    type       type_enum
+    id   String    @id @default(uuid())
+    type type_enum
+
     product    product      @relation(fields: [product_id], references: [id])
     product_id Int
     categories categories[]
     totals     total[]
 }
 
-// Define the "category" table
 model categories {
     id       Int    @id @default(autoincrement())
-    type_id  String
     category String
-    type     type   @relation(fields: [type_id], references: [id])
-    datas    data[]
+
+    type    type   @relation(fields: [type_id], references: [id])
+    type_id String
+    data    data[]
 }
 
-// Define the "data" table
 model data {
-    id           Int          @id @default(autoincrement())
-    event_module String      
-    nature       String?
-    pic          String?
+    id           Int       @id @default(autoincrement())
+    event_module String
     description  String?
-    source       sourceEnum?
     unit         String?
     code         String?
     grade        String?
-    create_at    DateTime     @default(now())
-    update_at    DateTime     @updatedAt
+    create_at    DateTime  @default(now())
+    update_at    DateTime  @updatedAt
     delete_at    DateTime?
-    category     categories   @relation(fields: [category_id], references: [id])
+
+    category     categories     @relation(fields: [category_id], references: [id])
     category_id  Int
     components   components[]
+    data_package data_package[]
 }
 
-// Define the "components" table
+model data_package {
+    data        data     @relation(fields: [data_id], references: [id])
+    data_id     Int
+    package     packages @relation(fields: [package_id], references: [id])
+    package_id  Int
+    quantity    Int?
+    frequency   Int?
+    excess      Float?
+    information String?
+
+    @@id([data_id, package_id])
+}
+
 model components {
     id           Int       @id @default(autoincrement())
     name         String
@@ -518,11 +527,12 @@ model components {
     create_at    DateTime  @default(now())
     update_at    DateTime  @updatedAt
     delete_at    DateTime?
-    data         data      @relation(fields: [data_id], references: [id])
-    data_id      Int
+
+    data    data @relation(fields: [data_id], references: [id])
+    data_id Int
 }
 
-// Define the "total" table
+// Total cost for each type (capex/opex/cogs) in a package
 model total {
     package    packages @relation(fields: [package_id], references: [id])
     package_id Int
@@ -544,7 +554,9 @@ enum type_enum {
     CoGS
 }
 
-enum sourceEnum {
-  Enterprise
-  Product
+enum tariff_status_enum {
+    Accepted
+    Rejected
+    NeedApproval
+    None
 }
