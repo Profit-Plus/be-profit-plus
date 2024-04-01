@@ -1,59 +1,68 @@
-const productService = require('../../services/tariffServices/sheetService');
-const { successResponse, errorResponse } = require('../../helpers/web/webResponses');
+const sheetService = require('../../services/tariffServices/sheetService');
+const webResponses = require('../../helpers/web/webResponses');
 
-const productController = {
-  async getProducts(req, res) {
+async function getSheet(req, res) {
     try {
-      const products = await productService.getProducts();
-      res.json(successResponse('Products retrieved successfully', products));
+        const sheet = await sheetService.getSheet();
+        res.json(webResponses.successResponse('Sheet fetched successfully', sheet));
     } catch (error) {
-      res.status(500).json(errorResponse('Internal Server Error'));
+        console.error(error);
+        res.status(500).json(webResponses.errorResponse('Failed to fetch sheet'));
     }
-  },
+}
 
-  async getProductById(req, res) {
-    const { id } = req.params;
+async function getSheetById(req, res) {
+    const id = req.params.id;
     try {
-      const product = await productService.getProductById(id);
-      if (!product) {
-        return res.status(404).json(errorResponse('Product not found'));
-      }
-      res.json(successResponse('Product retrieved successfully', product));
+        const sheet = await sheetService.getSheetById(parseInt(id));
+        if (!sheet) {
+            return res.status(404).json(webResponses.errorResponse('Sheet not found'));
+        }
+        res.json(webResponses.successResponse('Sheet fetched successfully', sheet));
     } catch (error) {
-      res.status(500).json(errorResponse('Internal Server Error'));
+        console.error(error);
+        res.status(500).json(webResponses.errorResponse('Failed to fetch sheet'));
     }
-  },
+}
 
-  async createProduct(req, res) {
-    const data = req.body;
+async function createSheet(req, res) {
+    const { name } = req.body;
     try {
-      const product = await productService.createProduct(data);
-      res.status(201).json(successResponse('Product created successfully', product));
+        const createdSheet = await sheetService.createSheet(name);
+        res.json(webResponses.successResponse('Sheet created successfully', createdSheet));
     } catch (error) {
-      res.status(500).json(errorResponse('Internal Server Error'));
+        console.error(error);
+        res.status(500).json(webResponses.errorResponse('Failed to create sheet'));
     }
-  },
+}
 
-  async updateProduct(req, res) {
-    const { id } = req.params;
-    const data = req.body;
+async function updateSheet(req, res) {
+    const id = req.params.id;
+    const { name } = req.body;
     try {
-      const product = await productService.updateProduct(id, data);
-      res.json(successResponse('Product updated successfully', product));
+        const updatedSheet = await sheetService.updateSheet(parseInt(id), name);
+        res.json(webResponses.successResponse('Sheet updated successfully', updatedSheet));
     } catch (error) {
-      res.status(500).json(errorResponse('Internal Server Error'));
+        console.error(error);
+        res.status(500).json(webResponses.errorResponse('Failed to update sheet'));
     }
-  },
+}
 
-  async deleteProduct(req, res) {
-    const { id } = req.params;
+async function deleteSheet(req, res) {
+    const id = req.params.id;
     try {
-      await productService.deleteProduct(id);
-      res.json(successResponse('Product deleted successfully'));
+        await sheetService.deleteSheet(parseInt(id));
+        res.json(webResponses.successResponse('Sheet deleted successfully'));
     } catch (error) {
-      res.status(500).json(errorResponse('Internal Server Error'));
+        console.error(error);
+        res.status(500).json(webResponses.errorResponse('Failed to delete sheet'));
     }
-  },
-};
+}
 
-module.exports = productController;
+module.exports = {
+    getSheet,
+    getSheetById,
+    createSheet,
+    updateSheet,
+    deleteSheet
+}

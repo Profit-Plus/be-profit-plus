@@ -1,63 +1,51 @@
 const { database } = require('../../helpers/utils/db/database');
 
-const productService = {
-  async getProducts() {
-    return await database.product.findMany({
-      select: {
-        id: true,
-        name: true,
-      },
+async function getSheet(){
+    return database.product.findMany({
+        select: {
+            id: true,
+            name: true,
+        },
     });
-  },
+}
 
-  async getProductById(id) {
-    return await database.product.findUnique({
-      where: {
-        id: parseInt(id),
-      },
-      select: {
-        id: true,
-        name: true,
-      },
+async function getSheetById(id){
+    console.log(id + " prisma")
+    return database.product.findUnique({
+        where: {
+            id,
+        },
     });
-  },
+}
 
-  async createProduct(data) {
-    return await database.product.create({
-      data: {
-        name: data.name,
-        // Add other fields as necessary
-      },
-      select: {
-        id: true,
-        name: true,
-      },
+
+async function createSheet(name){
+    return database.product.create({
+        data: {
+            name
+        },
     });
-  },
+}
 
-  async updateProduct(id, data) {
-    return await database.product.update({
-      where: {
-        id: parseInt(id),
-      },
-      data: {
-        name: data.name,
-        // Add other fields as necessary
-      },
-      select: {
-        id: true,
-        name: true,
-      },
+async function updateSheet(id, name){
+    return database.product.update({
+        where: { id },
+        data: {
+            name
+        },
     });
-  },
+}
 
-  async deleteProduct(id) {
-    return await database.product.delete({
-      where: {
-        id: parseInt(id),
-      },
+async function deleteSheet(id){
+    return database.product.delete({
+        where: { id },
     });
-  },
-};
+}
 
-module.exports = productService;
+module.exports = {
+    getSheet,
+    getSheetById,
+    createSheet,
+    updateSheet,
+    deleteSheet
+}
