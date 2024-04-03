@@ -1,7 +1,7 @@
 /* Basic properties for express, body-parser, and controllers route */
 const express = require('express')
 const bodyParser = require('body-parser');
-const productViewRouter = require('./routes/porto/productView');
+const productViewRouter = require('./routes/porto/productViewRoutes');
 const authRouter = require('./routes/auth/authRoutes');
 
 /* Necessary variables */

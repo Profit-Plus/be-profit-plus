@@ -7,19 +7,28 @@ function addNewProduct(product) {
             product_description: product.product_description,
             product_year: product.product_year,
             product_features: product.product_features,
-            product_evidence_dir: product.product_evidence_dir,
-            product_evidence_tariff_dir: product.product_evidence_tariff_dir,
-            product_logo_dir: product.product_logo_dir,
-            product_playbook_dir: product.product_playbook_dir,
             product_profile_link: product.product_profile_link,
             product_website_label: product.product_website_label,
             taxonomy: {
-                create: {
+                connect: {
                     taxonomy_name: product.taxonomy_name
                 }
             }
         }
     })
+}
+
+function addNewProductLogo(logo) {
+    return database.product_logo.create({
+        data: {
+            product_logo_dir: logo.product_logo_dir,
+            product: {
+                connect: {
+                    product_name: logo.product_name
+                }
+            }
+        }
+    });
 }
 
 function addProductMainUse({product_name, main_use_name}) {
@@ -56,15 +65,23 @@ function addNewProductService(productService) {
                 }
             }
         }
-    })
+    });
+}
+
+function addNewTaxonomy(taxonomy) {
+    return database.taxonomy.create({
+        data: {
+            taxonomy_name: taxonomy.taxonomy_name
+        }
+    });
 }
 
 module.exports = {
     addNewProduct,
+    addNewProductLogo,
     addNewMainUse,
     addProductMainUse,
     addNewProductService,
-    addNewTaxonomy,
-    addNewUnit
+    addNewTaxonomy
 }
 
