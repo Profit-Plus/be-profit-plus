@@ -29,5 +29,14 @@
     "mysql": "^2.18.1",
     "prisma": "^5.11.0",
     "uuid": "^9.0.1"
+  },
+  "prisma": {
+    "schema": "src/models/porto.prisma"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.29",
+    "prisma": "^5.11.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
   }
 }
