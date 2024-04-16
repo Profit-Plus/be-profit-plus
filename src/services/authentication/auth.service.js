@@ -3,19 +3,20 @@ const { database } = require('../../helpers/utils/db/database');
 const { hashToken } = require('../../helpers/utils/authentication/hashtoken');
 
 /* This method will called when whe create a new refresh token */
-function addRefreshTokenToWhiteList( {jti, refreshToken, userId} ) {
-    return database.refreshToken.create({
+function addRefreshTokenToWhiteList( {jti, refreshToken, loginCredentialsId} ) {
+    return database.refresh_token.create({
         data: {
             id: jti,
-            hashedToken: hashToken(refreshToken),
-            userId
-        }
+            hashed_token: hashToken(refreshToken),
+            login_credentials: {
+                connect: { login_credentials_id: loginCredentialsId}
+            }
     });
 }
 
 /* This method called to check whether the token sent by existing client in database or not */
 function findRefreshTokenById(id) {
-    return database.refreshToken.findUnique({
+    return database.refresh_token.findUnique({
         where: {
             id
         }
@@ -24,7 +25,7 @@ function findRefreshTokenById(id) {
 
 /* Delete token after usage */
 function deleteRefreshToken(id) {
-    return database.refreshToken.update({
+    return database.refresh_token.update({
         where: {
             id
         },
@@ -35,7 +36,7 @@ function deleteRefreshToken(id) {
 }
 
 function revokeTokens(userId) {
-    return database.refreshToken.updateMany({
+    return database.refresh_token.updateMany({
         where: {
             userId
         },

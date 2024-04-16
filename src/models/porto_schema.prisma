@@ -1,0 +1,175 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// --------------- Schema of Product Guide --------------- 
+model product {
+    // Keys section
+    product_name                String      @id
+    taxonomy_name               String    //  Foreign key of taxonomy
+
+    // ordinary fields section
+    product_year                Int
+    product_description         String
+    product_features            String
+    product_profile_link        String
+    product_website_label       String
+
+    // Relations section
+    taxonomy                taxonomy              @relation(fields: [taxonomy_name], references: [taxonomy_name])
+    product_main_use        product_main_use[]
+    product_service         product_service[]
+    product_gallery         product_gallery[]
+    product_tariff_evidence product_tariff_evidence?
+    product_evidence        product_evidence?
+    product_playbook        product_playbook?
+    product_logo            product_logo?
+    unit_in_charge          unit_in_charge?
+}
+
+model taxonomy {
+    taxonomy_name   String      @id 
+    product         product[]
+}
+
+model unit_in_charge {
+    unit_in_charge_name     String      @id
+    units_name              String
+    product_name            String      @unique
+    unit                    units       @relation(fields: [units_name], references: [units_name])
+    product                 product     @relation(fields: [product_name], references: [product_name])
+}
+
+model main_use {
+    main_use_name           String      @id
+    product_main_use        product_main_use[]
+}
+
+model product_main_use {
+    product_main_use_id         Int         @id @default(autoincrement())
+    product                     product     @relation(fields: [product_name], references: [product_name])
+    main_use                    main_use    @relation(fields: [main_use_name], references: [main_use_name])
+    product_name                String //  Foreign key of product
+    main_use_name               String //  Foreign key of main_use
+}
+
+model product_service {
+    product_service_id          Int         @id @default(autoincrement())
+    product                     product     @relation(fields: [product_name], references: [product_name])
+    product_name                String //  Foreign key of product
+    product_service_name        String
+    product_service_description String
+}
+
+model product_gallery {
+    product_gallery             Int         @id @default(autoincrement())
+    product                     product     @relation(fields: [product_name], references: [product_name])
+    product_name                String //  Foreign key of product
+    product_gallery_dir         String
+}
+
+model product_logo {
+    product_logo_id             Int         @id @default(autoincrement())
+    product_name                String      @unique
+    product_logo_dir            String
+
+    // Relations section
+    product                     product     @relation(fields: [product_name], references: [product_name])
+}
+
+model product_evidence {
+    product_evidence_id  Int         @id @default(autoincrement())
+    product_name         String      @unique
+    product_evidence_dir String
+
+    // Relations section
+    product              product     @relation(fields: [product_name], references: [product_name])
+}
+
+model product_tariff_evidence {
+    product_tariff_evidence_id  Int         @id @default(autoincrement())
+    product_name                String      @unique
+    product_tariff_evidence_dir String
+
+    // Relations section
+    product                     product     @relation(fields: [product_name], references: [product_name])
+}
+
+model product_playbook {
+    product_playbook_id     Int         @id @default(autoincrement())
+    product_name            String      @unique
+    product_playbook_dir    String
+
+    // Relations section
+    product                     product     @relation(fields: [product_name], references: [product_name])
+}
+
+// --------------- Schema of Authentication --------------- 
+model users {
+    user_id              Int               @id @default(autoincrement())
+    unit_leader          unit_leader? // 1 to 1 relation with unit_leader
+    units                units             @relation(fields: [units_name], references: [units_name]) // 1 to Many relation with units
+    levels               levels            @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
+    login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id]) // 1 to 1 relation with login_credentials
+    teams                teams             @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
+    units_name           String // foreign key of units
+    level_name           String // foreign key of levels
+    login_credentials_id String            @unique // foreign key of login_credentials
+    team_name            String //  Foreign key of teams
+}
+
+model login_credentials {
+    login_credentials_id String          @id @default(uuid())
+    users                users?
+    refresh_token        refresh_token[]
+    user_name            String
+    email                String          @unique
+    password             String
+}
+
+model refresh_token {
+    id                   String            @id @unique @default(uuid())
+    hashed_token         String
+    login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id], onDelete: Cascade)
+    login_credentials_id String
+    revoked              Boolean           @default(false)
+    created_at           DateTime          @default(now())
+    updated_at           DateTime          @updatedAt
+}
+
+model units {
+    units_name      String       @id @unique
+    unit_in_charge  unit_in_charge[]
+    users           users[] // 1 to many relation with users
+    unit_leader     unit_leader? // 1 to 1 relation with unit_leader
+}
+
+model teams {
+    team_name String  @id @unique
+    users     users[] //   1 to many relation with users
+}
+
+// Add new entity named unit_leader
+model unit_leader {
+    leader_id  Int    @id @default(autoincrement())
+    user_id    Int    @unique //  Foreign key of user
+    units_name String @unique // Foreign key of unit
+    users      users  @relation(fields: [user_id], references: [user_id])
+    units      units  @relation(fields: [units_name], references: [units_name])
+}
+
+model levels {
+    level_name String  @id @unique
+    users      users[]
+}

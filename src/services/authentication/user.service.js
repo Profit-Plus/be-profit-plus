@@ -2,27 +2,64 @@
 const bcrypt = require('bcrypt');
 const { database } =require('../../helpers/utils/db/database');
 
-function findUserByEmail(email) {
-    return database.user.findUnique({
+function findLoginCredentialsByEmail(email) {
+    return database.login_credentials.findUnique({
         where: { email }
     });
 }
 
-function createUserByEmailAndPassword(user) {
+function createloginCredentialsByEmailAndPassword(user) {
     user.password = bcrypt.hashSync(user.password, 12);
-    return database.user.create({
+    return database.login_credentials.create({
         data: user
     });
 }
 
+function createNewUsers({unitsName, teamName, levelName, loginCredentialsId}) {
+    return database.users.create({
+        data: {
+            units: {
+                connect: {units_name: unitsName}
+            },
+            levels: {
+                connect: {level_name: levelName}
+            },
+            teams: {
+                connect: {team_name: teamName}
+            },
+            login_credentials: {
+                connect: {login_credentials_id: loginCredentialsId}
+            },
+        }
+    });
+}
+
 function findUserById(id) {
-    return database.user.findUnique({
+    return database.users.findUnique({
         where: { id }
     });
 }
 
+function findRoleByLoginCredentialId(loginCredentialsId) {
+    return database.users.findUnique({
+        where: {
+            login_credentials_id: loginCredentialsId,
+            login_credentials: {
+              login_credentials_id: loginCredentialsId,
+            }
+          },
+          select: {
+            level_name: true,
+            team_name: true,
+            units_name: true,
+          },
+    });
+}
+
 module.exports = {
-    findUserByEmail,
-    createUserByEmailAndPassword,
-    findUserById
+    findLoginCredentialsByEmail,
+    createNewUsers,
+    createloginCredentialsByEmailAndPassword,
+    findUserById,
+    findRoleByLoginCredentialId
 };
