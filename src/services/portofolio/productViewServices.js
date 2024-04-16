@@ -7,10 +7,14 @@ function addNewProduct(product) {
             product_description: product.product_description,
             product_year: product.product_year,
             product_features: product.product_features,
+            product_evidence_dir: product.product_evidence_dir,
+            product_evidence_tariff_dir: product.product_evidence_tariff_dir,
+            product_logo_dir: product.product_logo_dir,
+            product_playbook_dir: product.product_playbook_dir,
             product_profile_link: product.product_profile_link,
             product_website_label: product.product_website_label,
             taxonomy: {
-                connect: {
+                create: {
                     taxonomy_name: product.taxonomy_name
                 }
             }

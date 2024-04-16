@@ -1,6 +1,16 @@
 /* Basic properties for express, body-parser, and controllers route */
+require("dotenv").config();
 const express = require('express')
 const bodyParser = require('body-parser');
+const authRouter = require('./routes/auth/authRoutes');
+const picRouter = require('./routes/projectMonitoring/picRoutes');
+
+// Tarif Route  
+const searchRoute = require('./routes/tariffRoutes/searchRoute');
+const sheetRoute = require('./routes/tariffRoutes/searchRoute');
+const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
+
+// Porto Route
 const productViewRouter = require('./routes/porto/productViewRoutes');
 const authRouter = require('./routes/auth/authRoutes');
 
@@ -13,6 +23,15 @@ main.use(bodyParser.urlencoded ({
     extended: false
 }));
 
+main.use(authRouter);
+main.use(picRouter);
+
+// Tarif Use route
+main.use('/tariff/search', searchRoute);
+main.use('/tariff/sheet', sheetRoute);
+main.use('/tariff/masterPackage', masterPackageRoute);
+
+// Porto Use route
 main.use(productViewRouter);
 main.use(authRouter);
 

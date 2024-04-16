@@ -11,6 +11,7 @@ function addRefreshTokenToWhiteList( {jti, refreshToken, loginCredentialsId} ) {
             login_credentials: {
                 connect: { login_credentials_id: loginCredentialsId}
             }
+        }
     });
 }
 
