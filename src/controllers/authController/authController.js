@@ -91,7 +91,7 @@ async function loginController(req, res, next) {
 
 async function dashboardController(req, res, next) {
     try {
-        if (req.role !== 'SUPERVISOR') {
+        if (req.role !== 'SUPERADMIN') {
             res.status(400).json(webResponses.errorResponse('Access Denied!'));
         } else {
             const authorization = true;

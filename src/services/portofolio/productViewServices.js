@@ -22,6 +22,19 @@ function addNewProduct(product) {
     })
 }
 
+function addNewProductLogo(logo) {
+    return database.product_logo.create({
+        data: {
+            product_logo_dir: logo.product_logo_dir,
+            product: {
+                connect: {
+                    product_name: logo.product_name
+                }
+            }
+        }
+    });
+}
+
 function addProductMainUse({product_name, main_use_name}) {
     return database.product_main_use.create({
         data: {
@@ -56,15 +69,23 @@ function addNewProductService(productService) {
                 }
             }
         }
-    })
+    });
+}
+
+function addNewTaxonomy(taxonomy) {
+    return database.taxonomy.create({
+        data: {
+            taxonomy_name: taxonomy.taxonomy_name
+        }
+    });
 }
 
 module.exports = {
     addNewProduct,
+    addNewProductLogo,
     addNewMainUse,
     addProductMainUse,
     addNewProductService,
-    addNewTaxonomy,
-    addNewUnit
+    addNewTaxonomy
 }
 
