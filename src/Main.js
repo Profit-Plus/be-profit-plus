@@ -9,6 +9,7 @@ const picRouter = require('./routes/projectMonitoring/picRoutes');
 const searchRoute = require('./routes/tariffRoutes/searchRoute');
 const sheetRoute = require('./routes/tariffRoutes/searchRoute');
 const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
+const dashboardOverview = require('./routes/tariffRoutes/dashboardOverviewRoute');
 
 // Porto Route
 const productViewRouter = require('./routes/porto/productViewRoutes');
@@ -30,6 +31,7 @@ main.use(picRouter);
 main.use('/tariff/search', searchRoute);
 main.use('/tariff/sheet', sheetRoute);
 main.use('/tariff/masterPackage', masterPackageRoute);
+main.use('/tariff/dashboardOverview', dashboardOverview);
 
 // Porto Use route
 main.use(productViewRouter);
