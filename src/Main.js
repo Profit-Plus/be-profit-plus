@@ -5,6 +5,15 @@ const bodyParser = require('body-parser');
 const authRouter = require('./routes/auth/authRoutes');
 const picRouter = require('./routes/projectMonitoring/picRoutes');
 
+// Tarif Route  
+const searchRoute = require('./routes/tariffRoutes/searchRoute');
+const sheetRoute = require('./routes/tariffRoutes/searchRoute');
+const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
+
+// Porto Route
+const productViewRouter = require('./routes/porto/productViewRoutes');
+const authRouter = require('./routes/auth/authRoutes');
+
 /* Necessary variables */
 const PORT = process.env.PORT || 3001;
 const main = express();
@@ -16,6 +25,15 @@ main.use(bodyParser.urlencoded ({
 
 main.use(authRouter);
 main.use(picRouter);
+
+// Tarif Use route
+main.use('/tariff/search', searchRoute);
+main.use('/tariff/sheet', sheetRoute);
+main.use('/tariff/masterPackage', masterPackageRoute);
+
+// Porto Use route
+main.use(productViewRouter);
+main.use(authRouter);
 
 main.listen(PORT, () => {
     console.log('Server is running! port: ' + PORT);

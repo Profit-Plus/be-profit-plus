@@ -17,6 +17,7 @@ function generateRefreshToken(user, role, jti) {
     return jsonwebtoken.sign ({
         userId : user.login_credentials_id,
         userLevel: role.level_name,
+        jti
     }, process.env.JWT_REFRESH_SECRET, {expiresIn: '12h'});
 }
 
