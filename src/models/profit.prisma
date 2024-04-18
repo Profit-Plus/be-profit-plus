@@ -12,7 +12,7 @@ datasource db {
 model pic {
     id         String   @id @default(uuid())
     name       String
-    phone      String
+    phone      String   @unique
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
     created_by String
@@ -143,7 +143,7 @@ model project_close_out {
 }
 
 model document {
-    id            String   @id @default(uuid())    
+    id            String   @id @default(uuid())
     original_name String // Original Document name when uploaded
     document_name String // Renamed Document after upload
     document_type String // Ex: NDE Penetapan, MoM Readiness dll
@@ -167,7 +167,7 @@ model document {
     nde_confirmation        project_ongoing?   @relation("NDE_CONFIRMATION")
     baa                     project_ongoing?   @relation("BAA")
     bast                    project_ongoing?   @relation("BAST")
-    
+
     nde_project_drop        project_drop?      @relation("NDE_PROJECT_DROP")
 
     mom_reconciles          project_close_out? @relation("NDE_REVENUE_RECOGNITION")
@@ -178,18 +178,20 @@ model document {
 }
 
 model notification {
-    id         Int      @id @default(autoincrement())
-    user_id    String // Relate to User Table
-    sender     String // Relate to User Table
-    header     String
-    content    String
-    category   String
-    url        String
-    read       Boolean
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
-    created_by String
-    updated_by String
+    id          Int      @id @default(autoincrement())
+    receiver    users    @relation(name: "RECEIVER", fields: [receiver_id], references: [user_id])
+    receiver_id Int
+    sender      users    @relation(name: "SENDER", fields: [sender_id], references: [user_id])
+    sender_id   Int
+    header      String
+    content     String
+    category    String
+    url         String
+    read        Boolean
+    created_at  DateTime @default(now())
+    updated_at  DateTime @updatedAt
+    created_by  String
+    updated_by  String
 }
 
 model comment {
@@ -252,6 +254,10 @@ model users {
     level_name           String // foreign key of levels
     login_credentials_id String            @unique // foreign key of login_credentials
     team_name            String //  Foreign key of teams
+
+    // Relationship
+    user_as_sender   notification[] @relation("SENDER")
+    user_as_receiver notification[] @relation("RECEIVER")
 }
 
 model login_credentials {
