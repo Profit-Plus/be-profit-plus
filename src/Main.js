@@ -2,7 +2,6 @@
 require("dotenv").config();
 const express = require('express')
 const bodyParser = require('body-parser');
-const authRouter = require('./routes/auth/authRoutes');
 const picRouter = require('./routes/projectMonitoring/picRoutes');
 
 // Tarif Route  

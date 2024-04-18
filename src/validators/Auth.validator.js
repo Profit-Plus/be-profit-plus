@@ -1,7 +1,7 @@
 const register = {
     type: 'object',
     properties: {
-        email: { type: 'string',maxLength: 68, minLength: 9 , format: 'email', nullable: false },
+        email: { type: 'string',maxLength: 68, minLength: 9, nullable: false },
         password: { type: 'string', minLength: 8, maxLength: 18, nullable: false },
         user_name: { type: 'string', minLength: 3, maxLength: 68, nullable: false },
         unit: { type: 'string', minLength: 1, maxLength: 68, nullable: true },

@@ -4,16 +4,21 @@ const { generateTokens } = require('../../helpers/utils/authentication/jsonwebto
 const webResponses = require('../../helpers/web/webResponses');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
+const Ajv = require('ajv');
+const AuthValidator = require('../../validators/Auth.validator.js');
+
+const ajv = new Ajv();
+
 
 /* registerController handles user registration operation */
 /* Endpoint: '/profitplus/porto/registration/' */
 async function registerController (req, res, next) {
     try {
         /* Request body */
-        const { email, password, user_name, unit, team, level } = req.body;
+        const registerValidate = ajv.compile(AuthValidator.register);
         /* Check if input is invalid */
-        if (!email || !password || !unit || !team || !level || !user_name) {
-            res.status(400).json(webResponses.errorResponse('Invalid input! Fields cannot be empty'));
+        if (!registerValidate(req.body)) {
+            res.status(400).json(webResponses.errorResponse('Invalid input! '+registerValidate.errors[0].message));
             throw new Error('There are several fields empty!');
         }
 
