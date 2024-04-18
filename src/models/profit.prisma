@@ -13,6 +13,7 @@ model pic {
     id         String   @id @default(uuid())
     name       String
     phone      String   @unique
+    role       String // ex: LIRA, External
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
     created_by String
@@ -156,19 +157,19 @@ model document {
     updated_by    String
 
     // Relationship
-    nde_request             project_init?      @relation("NDE_REQUEST")
-    mom_req                 project_init?      @relation("MOM_REQ")
-    lir_requirement         project_init?      @relation("LIR_REQUIREMENT")
-    nde_determination       project_init?      @relation("NDE_DETERMINATION")
-    
-    nde_req_cfu_to_mid      project_ongoing?   @relation("NDE_REQ_CFU_TO_MID")
-    nde_req_mid_to_tcuc     project_ongoing?   @relation("NDE_REQ_MID_TO_TCUC")
-    mom_readiness           project_ongoing?   @relation("MOM_READINESS")
-    nde_confirmation        project_ongoing?   @relation("NDE_CONFIRMATION")
-    baa                     project_ongoing?   @relation("BAA")
-    bast                    project_ongoing?   @relation("BAST")
+    nde_request       project_init? @relation("NDE_REQUEST")
+    mom_req           project_init? @relation("MOM_REQ")
+    lir_requirement   project_init? @relation("LIR_REQUIREMENT")
+    nde_determination project_init? @relation("NDE_DETERMINATION")
 
-    nde_project_drop        project_drop?      @relation("NDE_PROJECT_DROP")
+    nde_req_cfu_to_mid  project_ongoing? @relation("NDE_REQ_CFU_TO_MID")
+    nde_req_mid_to_tcuc project_ongoing? @relation("NDE_REQ_MID_TO_TCUC")
+    mom_readiness       project_ongoing? @relation("MOM_READINESS")
+    nde_confirmation    project_ongoing? @relation("NDE_CONFIRMATION")
+    baa                 project_ongoing? @relation("BAA")
+    bast                project_ongoing? @relation("BAST")
+
+    nde_project_drop project_drop? @relation("NDE_PROJECT_DROP")
 
     mom_reconciles          project_close_out? @relation("NDE_REVENUE_RECOGNITION")
     nde_revenue_recognition project_close_out? @relation("MOM_RECONCILES")
