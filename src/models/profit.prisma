@@ -197,7 +197,8 @@ model notification {
 
 model comment {
     id         Int      @id @default(autoincrement())
-    user_id    String
+    user       users    @relation(fields: [user_id], references: [user_id])
+    user_id    Int
     comment    String
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -259,6 +260,7 @@ model users {
     // Relationship
     user_as_sender   notification[] @relation("SENDER")
     user_as_receiver notification[] @relation("RECEIVER")
+    comments         comment[]
 }
 
 model login_credentials {
