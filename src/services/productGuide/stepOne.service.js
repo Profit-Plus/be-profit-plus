@@ -92,8 +92,36 @@ function addNewProductTaxonomy(taxonomy) {
     });
 }
 
+/**
+ * 
+ * @returns 
+ */
 function getProductTaxonomy() {
     return database.taxonomy.findMany();
+}
+
+/**
+ * Create new product service
+ * @param {JSON} product 
+ * @param {Object} services 
+ * @returns async function to perform operation
+ */
+function createProductServices(services) {
+    return database.product_service.createMany({
+        data: services
+    });
+}
+
+/**
+ * Create new product service
+ * @param {JSON} product 
+ * @param {Object} services 
+ * @returns async function to perform operation
+ */
+function createProductMainUse(mainUse) {
+    return database.product_main_use.createMany({
+        data: mainUse
+    });
 }
 
 /**
@@ -192,6 +220,8 @@ module.exports = {
     getProductUnit,
     addNewProductTaxonomy,
     getProductTaxonomy,
+    createProductServices,
+    createProductMainUse,
     productAvailability,
     addProductGallery,
     updateProductFileDir

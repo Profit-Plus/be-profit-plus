@@ -132,6 +132,48 @@ async function getProductUnit(req, res, next) {
 }
 
 /**
+ * @function addProductServices to upload some services of a product
+ * @endpoint http://localhost:3001/profitplus/porto/add-new-services
+ * @param {JSON} req 
+ * @param {JSON} res 
+ * @param {Object} next 
+ */
+async function addProductServices(req, res, next) {
+    try {
+        /* Request Body */
+        const {services} = req.body;
+
+        /* adding a new services in product_services */
+        const addServices = await stepOneService.createProductServices(services);
+        res.status(200).json(webResponses.successResponse('New services added!', services));
+    } catch (error) {
+        res.status(500).json(webResponses.errorResponse('Internal server error!'));
+        throw error;
+    }
+}
+
+/**
+ * @function addProductMainUse to upload some main uses of a product
+ * @endpoint http://localhost:3001/profitplus/porto/add-new-mainuse
+ * @param {JSON} req 
+ * @param {JSON} res 
+ * @param {Object} next 
+ */
+async function addProductMainUse(req, res, next) {
+    try {
+        /* Request body */
+        const {mainUse} = req.body;
+
+        /* adding a new main use in product_main_use */
+        const addMainUse = await stepOneService.createProductMainUse(mainUse);
+        res.status(200).json(webResponses.successResponse('New services added!', mainUse));
+    } catch (error) {
+        res.status(500).json(webResponses.errorResponse('Internal server error!'));
+        throw error;
+    }
+}
+
+/**
  * @function uploadProductGallery to upload some picture's of product
  * Can be implemented and modified for any cases that need to upload multiple files
  * 
@@ -309,6 +351,8 @@ module.exports = {
     getProductTaxonomy,
     addNewProductUnit,
     getProductUnit,
+    addProductServices,
+    addProductMainUse,
     uploadProductGallery,
     uploadProductFile
 }

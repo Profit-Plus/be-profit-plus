@@ -8,6 +8,8 @@ productGuideRouter.post('/profitplus/porto/upload-product-gallery', productGuide
 productGuideRouter.post('/profitplus/porto/upload-file', productGuideController.uploadProductFile);
 productGuideRouter.post('/profitplus/porto/add-new-taxonomy', productGuideController.addNewProductTaxonomy);
 productGuideRouter.post('/profitplus/porto/add-new-unit', productGuideController.addNewProductUnit);
+productGuideRouter.post('/profitplus/porto/add-new-services', productGuideController.addProductServices);
+productGuideRouter.post('/profitplus/porto/add-new-mainuse', productGuideController.addProductMainUse);
 
 productGuideRouter.get('/profitplus/porto/get-taxonomy', productGuideController.getProductTaxonomy);
 productGuideRouter.get('/profitplus/porto/get-unit', productGuideController.getProductUnit);
