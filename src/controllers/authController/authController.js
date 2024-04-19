@@ -5,38 +5,38 @@ const webResponses = require('../../helpers/web/webResponses');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 
-/* registerController handles user registration operation */
-/* Endpoint: '/profitplus/porto/registration/' */
+/**
+ * @function registerController to handles user registration operation
+ * @endpoint http://localhost:3001/profitplus/register/
+ * @param {JSON} req  
+ * @param {Object} next
+ * @return {JSON} res 
+ */
 async function registerController (req, res, next) {
     try {
         /* Request body */
-        const { email, password, user_name, unit, team, level } = req.body;
+        const requestBody = req.body;
         /* Check if input is invalid */
-        if (!email || !password || !unit || !team || !level || !user_name) {
+        if (!requestBody.email || !requestBody.password || !requestBody.unit || !requestBody.team || !requestBody.level || !requestBody.userName) {
             res.status(400).json(webResponses.errorResponse('Invalid input! Fields cannot be empty'));
             throw new Error('There are several fields empty!');
         }
 
         /* Check if the email has been used before */
-        const existingEmail = await userService.findLoginCredentialsByEmail(email);
+        const existingEmail = await userService.findLoginCredentialsByEmail(requestBody.email);
         if (existingEmail) {
             res.status(400).json(webResponses.errorResponse('Email has been used!'));
             throw new Error('Multiple email is detected!');
         }
 
         /* If no error occurs, perform post operation to database and hold the id */
-        const loginCredentials = await userService.createloginCredentialsByEmailAndPassword({ email, password, user_name});
+        const loginCredentials = await userService.createloginCredentialsByEmailAndPassword(requestBody);
         const roles = userService.findRoleByLoginCredentialId(loginCredentials.login_credentials_id);
 
         console.log(roles.levels);
 
         /* Store credentials as a new users */
-        await userService.createNewUsers( {
-            unitsName: unit,
-            teamName: team,
-            levelName: level,
-            loginCredentialsId: loginCredentials.login_credentials_id
-        });
+        const createNewUser = await userService.createNewUsers(requestBody, loginCredentials);
 
         /* Generate accessToken and refreshToken */
         const jti = uuidv4();
@@ -50,8 +50,13 @@ async function registerController (req, res, next) {
     }
 }
 
-/* loginController handles user login operation */
-/* Endpoint: '/profitplus/porto/login/' */
+/**
+ * @function loginController to handles user login operation
+ * @endpoint http://localhost:3001/profitplus/login
+ * @param {JSON} req  
+ * @param {Object} next
+ * @return {JSON} res 
+ */
 async function loginController(req, res, next) {
     try {
         /* Request body */
@@ -89,6 +94,13 @@ async function loginController(req, res, next) {
     }
 }
 
+/**
+ * @function dashboardController to test the authentication API
+ * @endpoint http://localhost:3001/profitplus/porto/dashboard
+ * @param {JSON} req  
+ * @param {Object} next
+ * @return {JSON} res 
+ */
 async function dashboardController(req, res, next) {
     try {
         if (req.role !== 'SUPERADMIN') {
@@ -97,12 +109,18 @@ async function dashboardController(req, res, next) {
             const authorization = true;
             res.status(400).json(webResponses.successResponse('Access Granted!', 'Authorization: ' + authorization));
         }
-        
     } catch (error) {
         console.log(error);
     }
 }
 
+/**
+ * @function dashboardController to refresh a new token whenever the access token is expired
+ * @endpoint http://localhost:3001/profitplus/porto/dashboard
+ * @param {JSON} req  
+ * @param {Object} next
+ * @return {JSON} res 
+ */
 async function refreshTokensController(req, res, next) {
     try {
         /* Check if refreshToken is valid and exist in our database */
@@ -142,6 +160,9 @@ async function refreshTokensController(req, res, next) {
     }
 }
 
+/**
+ *  Exporting all functions
+ */
 module.exports = { 
     registerController,
     loginController,

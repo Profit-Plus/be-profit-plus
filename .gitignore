@@ -1,7 +1,5 @@
 /node_modules
 .env
-
-/prisma
 /server_data
 /src/models/migrations
-
+/prisma
