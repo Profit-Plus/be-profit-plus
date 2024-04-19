@@ -5,7 +5,7 @@ const webResponses = require('../../helpers/web/webResponses');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const Ajv = require('ajv');
-const AuthValidator = require('../../validators/Auth.validator.js');
+const AuthValidator = require('../../validators/Auth.validator');
 
 const ajv = new Ajv();
 
@@ -23,23 +23,25 @@ async function registerController (req, res, next) {
         }
 
         /* Check if the email has been used before */
-        const existingEmail = await userService.findLoginCredentialsByEmail(email);
+        const existingEmail = await userService.findLoginCredentialsByEmail(req.body.email);
         if (existingEmail) {
             res.status(400).json(webResponses.errorResponse('Email has been used!'));
             throw new Error('Multiple email is detected!');
         }
 
+        const {email, password, user_name} = req.body;
+
         /* If no error occurs, perform post operation to database and hold the id */
-        const loginCredentials = await userService.createloginCredentialsByEmailAndPassword({ email, password, user_name});
+        const loginCredentials = await userService.createloginCredentialsByEmailAndPassword({email, password, user_name});
         const roles = userService.findRoleByLoginCredentialId(loginCredentials.login_credentials_id);
 
         console.log(roles.levels);
 
         /* Store credentials as a new users */
         await userService.createNewUsers( {
-            unitsName: unit,
-            teamName: team,
-            levelName: level,
+            unitsName: req.body.unit,
+            teamName: req.body.team,
+            levelName: req.body.level,
             loginCredentialsId: loginCredentials.login_credentials_id
         });
 

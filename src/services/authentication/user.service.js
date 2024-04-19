@@ -10,7 +10,7 @@ function findLoginCredentialsByEmail(email) {
 
 function createloginCredentialsByEmailAndPassword(user) {
     user.password = bcrypt.hashSync(user.password, 12);
-    return database.login_credentials.create({
+    return database.login_credentials.create({  
         data: user
     });
 }
