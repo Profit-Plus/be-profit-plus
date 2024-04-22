@@ -2,7 +2,8 @@
 require("dotenv").config();
 const express = require('express')
 const bodyParser = require('body-parser');
-const authRouter = require('./routes/auth/authRoutes');
+
+// GTOM Route
 const picRouter = require('./routes/projectMonitoring/picRoutes');
 
 // Tarif Route  
@@ -23,7 +24,7 @@ main.use(bodyParser.urlencoded ({
     extended: false
 }));
 
-main.use(authRouter);
+// GTOM Use route
 main.use(picRouter);
 
 // Tarif Use route
