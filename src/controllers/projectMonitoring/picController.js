@@ -1,15 +1,25 @@
 const picService = require('../../services/projectMonitoring/pic.service');
 const webResponses = require('../../helpers/web/webResponses');
 const { v4: uuidv4 } = require('uuid');
+const Ajv = require('ajv');
+const picValidator = require('../../validators/PIC.validator');
 
-async function createPicController(req, res, next) {
+const ajv = new Ajv();
+
+async function createPIC(req, res) {
     try {
-        const { name, phone } = req.body;
+        const createPicValidate = ajv.compile(picValidator.createPIC);
 
-        if (!name || !phone) {
-            res.status(400).json(webResponses.errorResponse('Invalid input! Fields cannot be empty'));
+        if (!createPicValidate(req.body)) {     
+            let prop = createPicValidate.errors[0].instancePath;
+            if (prop) prop = '\'' + createPicValidate.errors[0].instancePath.replace('/', '') + '\' ';
+            const errMessage = prop + createPicValidate.errors[0].message;
+
+            res.status(400).json(webResponses.errorResponse('Invalid input! '+ errMessage));
             throw new Error('There are several fields empty!');
-        }
+        }        
+
+        const {name, phone, role} = req.body;
 
         const id = uuidv4();
 
@@ -17,6 +27,7 @@ async function createPicController(req, res, next) {
             id: id,
             name: name,
             phone: phone,
+            role: role,
             created_by: "",
             updated_by: ""
         });
@@ -27,7 +38,7 @@ async function createPicController(req, res, next) {
     }
 }
 
-async function getAllPicsController(req, res, next) {
+async function getAllPICs(req, res) {
     const pic = await picService.findAllPics();
 
     if (pic) {
@@ -38,7 +49,7 @@ async function getAllPicsController(req, res, next) {
     }
 }
 
-async function getPicController(req, res, next) {
+async function getPIC(req, res) {
     const picId = req.params.id;
 
     const pic = await picService.findPic(picId);
@@ -51,18 +62,26 @@ async function getPicController(req, res, next) {
     }
 }
 
-async function updatePicController(req, res, next) {
-    const { name, phone } = req.body;
-    const picId = req.params.id;
+async function updatePIC(req, res) {
+    const updatePicValidate = ajv.compile(picValidator.updatePIC);
 
-    if (!name || !phone) {
-        res.status(400).json(webResponses.errorResponse('Invalid input! Fields cannot be empty'));
+    if (!updatePicValidate(req.body)) {     
+        let prop = updatePicValidate.errors[0].instancePath;
+        if (prop) prop = '\'' + updatePicValidate.errors[0].instancePath.replace('/', '') + '\' ';
+        const errMessage = prop + updatePicValidate.errors[0].message;
+
+        res.status(400).json(webResponses.errorResponse('Invalid input! '+ errMessage));
         throw new Error('There are several fields empty!');
-    }
+    }        
+    
+    const { name, phone, role } = req.body;
+    
+    const picId = req.params.id;
 
     const pic = await picService.updatePic(picId, {
         name: name,
-        phone: phone
+        phone: phone,
+        role: role
     });
 
     if (pic) {
@@ -73,7 +92,7 @@ async function updatePicController(req, res, next) {
     }
 }
 
-async function deletePicController(req, res, next) {
+async function deletePIC(req, res) {
     const picId = req.params.id;
 
     const pic = await picService.findPic(picId);    
@@ -89,9 +108,9 @@ async function deletePicController(req, res, next) {
 }
 
 module.exports = {
-    createPicController,
-    getPicController,
-    getAllPicsController,
-    updatePicController,
-    deletePicController
+    createPIC,
+    getPIC,
+    getAllPICs,
+    updatePIC,
+    deletePIC
 }
