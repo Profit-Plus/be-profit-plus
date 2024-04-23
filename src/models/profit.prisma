@@ -10,12 +10,12 @@ datasource db {
 
 // Schema GTOM
 model pic {
-    id         String   @id @default(uuid())
+    id         String        @id @default(uuid())
     name       String
-    phone      String   @unique
-    role       String // ex: LIRA, External
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    phone      String        @unique
+    role       pic_role_enum // ex: LIRA, External
+    created_at DateTime      @default(now())
+    updated_at DateTime      @updatedAt
     created_by String
     updated_by String
 
@@ -23,6 +23,12 @@ model pic {
     pic_external   project[]      @relation("EXTERNAL_PIC")
     pic_segment    project[]      @relation("SEGMENT_PIC")
     pic_midfielder project_init[]
+}
+
+enum pic_role_enum {
+    LIRA
+    external
+    midfielder
 }
 
 model customer {
@@ -42,10 +48,10 @@ model project {
     solution              project_solution  @relation(fields: [solution_id], references: [id])
     solution_id           String            @unique
     topic                 String
-    status                String
+    status                project_status    @default(initiation)
     pic_external          pic               @relation(name: "EXTERNAL_PIC", fields: [pic_external_id], references: [id])
     pic_external_id       String
-    segment               String
+    segment               segment_enum
     pic_segment           pic               @relation(name: "SEGMENT_PIC", fields: [pic_segment_id], references: [id])
     pic_segment_id        String
     project_init          project_init      @relation(fields: [project_init_id], references: [id])
@@ -64,6 +70,20 @@ model project {
     updated_by            String
 }
 
+enum project_status {
+    initiation
+    ongoing
+    close_out
+    hold
+    drop
+}
+
+enum segment_enum {
+    DGS
+    DPS
+    DSS
+}
+
 model project_init {
     id                         String   @id @default(uuid())
     nde_request                document @relation(name: "NDE_REQUEST", fields: [nde_request_id], references: [id])
@@ -74,7 +94,7 @@ model project_init {
     pic_midfielder_id          String
     mom_req                    document @relation(name: "MOM_REQ", fields: [mom_req_id], references: [id])
     mom_req_id                 String   @unique
-    helix                      String
+    helix                      helix_enum
     lir_requirement            document @relation(name: "LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
     lir_requirement_id         String   @unique
     requester                  String
@@ -88,6 +108,15 @@ model project_init {
 
     // Relationship
     project project?
+}
+
+enum helix_enum {
+    academy
+    business
+    goverment
+    community
+    tech_prov
+    subsidiary
 }
 
 model project_ongoing {
@@ -207,12 +236,12 @@ model comment {
 }
 
 model project_solution {
-    id            String @id @default(uuid())
+    id            String   @id @default(uuid())
     solution_name String
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
-    created_by String
-    updated_by String
+    created_at    DateTime @default(now())
+    updated_at    DateTime @updatedAt
+    created_by    String
+    updated_by    String
 
     // Relationship
     project         project?
