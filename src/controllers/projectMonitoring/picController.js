@@ -20,7 +20,7 @@ async function createPIC(req, res) {
 
         const id = uuidv4();
 
-        const pic = await picService.createPic({
+        const pic = await picService.createPIC({
             id: id,
             name: name,
             phone: phone,
@@ -42,14 +42,26 @@ async function createPIC(req, res) {
 
 async function getAllPICs(req, res) {
     try {
-        const pic = await picService.findAllPics();
+        const getAllPICsValidate = ajv.compile(picValidator.getAllPICs);
 
-        if (pic) {
-            res.status(200).json(webResponses.successResponse('PICs data fetched successfully!', pic));
+        const params = {
+            page: Number(req.query.page),
+            limit: Number(req.query.limit),
+            search: req.query.search ?? '',
+            sort: req.query.sort ?? 'created_at',
+            order: req.query.order ?? 'desc',
+            role: req.query.role
         }
-        else {
-            res.status(404).json(webResponses.successResponse('PIC not found!'));
-        }
+
+        if (!params.page || params.page < 1) params.page = 1;
+        if (!params.limit || params.limit < 1) params.limit = 10;
+        if (params.role && !getAllPICsValidate(params)) {
+            return res.status(400).json(webResponses.errorResponse('Invalid input! ' + formatErrorMessage(getAllPICsValidate.errors[0])));
+        }        
+
+        const pic = await picService.findAllPICs(params);
+
+        res.status(200).json(webResponses.successResponsePage('PICs data fetched successfully!', pic.page, pic.limit, pic.total, pic.data));
     } catch (e) {
         console.log(e);
         throw e;
@@ -60,13 +72,13 @@ async function getPIC(req, res) {
     try {
         const picId = req.params.id;
 
-        const pic = await picService.findPic(picId);
+        const pic = await picService.findPIC(picId);
 
         if (pic) {
             res.status(200).json(webResponses.successResponse('PIC data fetched successfully!', pic));
         }
         else {
-            res.status(404).json(webResponses.successResponse('PIC not found!'));
+            res.status(404).json(webResponses.errorResponse('PIC not found!'));
         }
     } catch (e) {
         console.log(e)
@@ -79,14 +91,14 @@ async function updatePIC(req, res) {
         const updatePicValidate = ajv.compile(picValidator.updatePIC);
 
         if (!updatePicValidate(req.body)) {
-            return res.status(400).json(webResponses.errorResponse('Invalid input! ' + formatErrorMessage(updatePicValidate.errros[0])));
+            return res.status(400).json(webResponses.errorResponse('Invalid input! ' + formatErrorMessage(updatePicValidate.errors[0])));
         }
 
         const { name, phone, role } = req.body;
 
         const picId = req.params.id;
 
-        const pic = await picService.updatePic(picId, {
+        const pic = await picService.updatePIC(picId, {
             name: name,
             phone: phone,
             role: role
@@ -96,7 +108,7 @@ async function updatePIC(req, res) {
             res.status(200).json(webResponses.successResponse('PIC updated successfully!', pic));
         }
         else {
-            res.status(404).json(webResponses.successResponse('PIC not found!'));
+            res.status(404).json(webResponses.errorResponse('PIC not found!'));
         }
     } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
@@ -109,17 +121,22 @@ async function updatePIC(req, res) {
 }
 
 async function deletePIC(req, res) {
-    const picId = req.params.id;
+    try {
+        const picId = req.params.id;
 
-    const pic = await picService.findPic(picId);
+        const pic = await picService.findPIC(picId);
 
-    if (pic) {
-        await picService.deletePic(picId);
+        if (pic) {
+            await picService.deletePIC(picId);
 
-        res.status(200).json(webResponses.successResponse('PIC deleted successfully!', pic));
-    }
-    else {
-        res.status(404).json(webResponses.successResponse('PIC not found!'));
+            res.status(200).json(webResponses.successResponse('PIC deleted successfully!', pic));
+        }
+        else {
+            res.status(404).json(webResponses.errorResponse('PIC not found!'));
+        }
+    } catch (e) {
+        console.log(e);
+        throw e;
     }
 }
 

@@ -1,22 +1,54 @@
 const { database } = require('../../helpers/utils/db/database');
 
-function createPic(data) {
+function createPIC(data) {
     return database.pic.create({
         data: data
     });
 }
 
-function findAllPics() {
-    return database.pic.findMany();
+async function findAllPICs(params) {
+    const condition = {        
+        OR: [
+            {
+                name: { contains: params.search }
+            },
+            {
+                phone: { contains: params.search }
+            },
+        ],
+        role: {
+            equals: params.role
+        }
+    };
+
+    const total = await database.pic.count({
+        where: condition
+    });
+
+    const data = await database.pic.findMany({
+        skip: params.limit * (params.page - 1),
+        take: params.limit,
+        orderBy: {
+            [params.sort]: params.order
+        },
+        where: condition
+    });
+
+    return {
+        page: params.page,
+        limit: params.limit,
+        total: total,
+        data: data
+    }
 }
 
-function findPic(picId) {
+function findPIC(picId) {
     return database.pic.findUnique({
         where: { id: picId }
     });
 }
 
-function updatePic(picId, data) {
+function updatePIC(picId, data) {
     return database.pic.update({
         where: {
             id: picId
@@ -25,7 +57,7 @@ function updatePic(picId, data) {
     });
 }
 
-function deletePic(picId) {
+function deletePIC(picId) {
     return database.pic.delete({
         where: {
             id: picId
@@ -33,11 +65,11 @@ function deletePic(picId) {
     });
 }
 
-module.exports =  {
-    createPic,
-    findAllPics,
-    findPic,
-    updatePic,
-    deletePic
+module.exports = {
+    createPIC,
+    findAllPICs,
+    findPIC,
+    updatePIC,
+    deletePIC
 };
 
