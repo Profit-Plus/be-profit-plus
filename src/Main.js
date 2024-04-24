@@ -4,7 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser');
 
 // GTOM Route
-const picRouter = require('./routes/projectMonitoring/picRoutes');
+const picRouter = require('./routes/projectMonitoring/picRoute');
 const customerRouter = require('./routes/projectMonitoring/customerRoute');
 
 // Tarif Route  

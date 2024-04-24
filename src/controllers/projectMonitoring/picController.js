@@ -25,8 +25,8 @@ async function createPIC(req, res) {
             name: name,
             phone: phone,
             role: role,
-            created_by: "",
-            updated_by: ""
+            created_by: req.user_id,
+            updated_by: req.user_id
         });
 
         res.status(200).json(webResponses.successResponse('PIC created successfully!', pic));
@@ -57,7 +57,7 @@ async function getAllPICs(req, res) {
         if (!params.limit || params.limit < 1) params.limit = 10;
         if (params.role && !getAllPICsValidate(params)) {
             return res.status(400).json(webResponses.errorResponse('Invalid input! ' + formatErrorMessage(getAllPICsValidate.errors[0])));
-        }        
+        }
 
         const pic = await picService.findAllPICs(params);
 
@@ -101,7 +101,8 @@ async function updatePIC(req, res) {
         const pic = await picService.updatePIC(picId, {
             name: name,
             phone: phone,
-            role: role
+            role: role,
+            updated_by: req.user_id
         });
 
         if (pic) {
