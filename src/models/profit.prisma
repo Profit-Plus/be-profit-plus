@@ -32,7 +32,8 @@ enum pic_role_enum {
 }
 
 model customer {
-    name       String   @id @unique
+    id         Int      @id @default(autoincrement())
+    name       String   @unique
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
     created_by String
@@ -85,23 +86,23 @@ enum segment_enum {
 }
 
 model project_init {
-    id                         String   @id @default(uuid())
-    nde_request                document @relation(name: "NDE_REQUEST", fields: [nde_request_id], references: [id])
-    nde_request_id             String   @unique
+    id                         String     @id @default(uuid())
+    nde_request                document   @relation(name: "NDE_REQUEST", fields: [nde_request_id], references: [id])
+    nde_request_id             String     @unique
     midfielder                 String
     related_unit               String
-    pic_midfielder             pic      @relation(fields: [pic_midfielder_id], references: [id])
+    pic_midfielder             pic        @relation(fields: [pic_midfielder_id], references: [id])
     pic_midfielder_id          String
-    mom_req                    document @relation(name: "MOM_REQ", fields: [mom_req_id], references: [id])
-    mom_req_id                 String   @unique
+    mom_req                    document   @relation(name: "MOM_REQ", fields: [mom_req_id], references: [id])
+    mom_req_id                 String     @unique
     helix                      helix_enum
-    lir_requirement            document @relation(name: "LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
-    lir_requirement_id         String   @unique
+    lir_requirement            document   @relation(name: "LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
+    lir_requirement_id         String     @unique
     requester                  String
     impact                     String
     potential_employee_trained Int
-    nde_determination          document @relation(name: "NDE_DETERMINATION", fields: [nde_determination_id], references: [id])
-    nde_determination_id       String   @unique
+    nde_determination          document   @relation(name: "NDE_DETERMINATION", fields: [nde_determination_id], references: [id])
+    nde_determination_id       String     @unique
     tariff                     Int
     potential_revenue          Int
     is_approved                Boolean

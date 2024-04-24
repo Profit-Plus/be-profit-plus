@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 
 // GTOM Route
 const picRouter = require('./routes/projectMonitoring/picRoutes');
+const customerRouter = require('./routes/projectMonitoring/customerRoute');
 
 // Tarif Route  
 const searchRoute = require('./routes/tariffRoutes/searchRoute');
@@ -26,6 +27,7 @@ main.use(bodyParser.urlencoded ({
 
 // GTOM Use route
 main.use(picRouter);
+main.use(customerRouter);
 
 // Tarif Use route
 main.use('/tariff/search', searchRoute);
