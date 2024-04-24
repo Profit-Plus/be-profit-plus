@@ -4,7 +4,7 @@ const picController = require('../../controllers/projectMonitoring/picController
 const { authenticationMiddleware } = require('../../middlewares/authMiddlewares/authMiddleware')
 
 // Use Auth Middleware
-// picRouter.use('/pics', authenticationMiddleware.authenticateUser);
+picRouter.use('/pics', authenticationMiddleware.authenticateUser);
 
 // Define Routes
 picRouter.post('/pics', picController.createPIC);
