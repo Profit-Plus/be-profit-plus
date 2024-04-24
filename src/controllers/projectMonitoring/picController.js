@@ -1,5 +1,5 @@
 const { Prisma } = require('@prisma/client');
-const picService = require('../../services/projectMonitoring/pic.service');
+const picService = require('../../services/projectMonitoring/picService');
 const webResponses = require('../../helpers/web/webResponses');
 const { v4: uuidv4 } = require('uuid');
 const Ajv = require('ajv');
