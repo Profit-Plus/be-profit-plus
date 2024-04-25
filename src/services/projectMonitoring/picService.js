@@ -27,7 +27,7 @@ async function findAllPICs(params) {
             where: condition
         }),
         database.pic.count({ where: condition })
-    ])    
+    ]);
 
     return {
         page: params.page,

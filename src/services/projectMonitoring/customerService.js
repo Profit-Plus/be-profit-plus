@@ -8,23 +8,20 @@ function createCustomer(data) {
 
 async function findAllCustomers(params) {
     const condition = {
-        name: {
-            contains: params.search
-        }
+        name: { contains: params.search }
     };
 
-    const total = await database.customer.count({
-        where: condition
-    });
-
-    const data = await database.customer.findMany({
-        skip: params.limit * (params.page - 1),
-        take: params.limit,
-        orderBy: {
-            [params.sort]: params.order
-        },
-        where: condition
-    });
+    const [data, total] = await database.$transaction([
+        database.customer.findMany({
+            skip: params.limit * (params.page - 1),
+            take: params.limit,
+            orderBy: {
+                [params.sort]: params.order
+            },
+            where: condition
+        }),
+        database.customer.count({ where: condition })
+    ]);
 
     return {
         page: params.page,
