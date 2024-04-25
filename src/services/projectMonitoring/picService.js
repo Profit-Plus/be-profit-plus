@@ -7,32 +7,27 @@ function createPIC(data) {
 }
 
 async function findAllPICs(params) {
-    const condition = {        
+    const condition = {
         OR: [
-            {
-                name: { contains: params.search }
-            },
-            {
-                phone: { contains: params.search }
-            },
+            { name: { contains: params.search } },
+            { phone: { contains: params.search } },
         ],
         role: {
             equals: params.role
         }
-    };
+    };    
 
-    const total = await database.pic.count({
-        where: condition
-    });
-
-    const data = await database.pic.findMany({
-        skip: params.limit * (params.page - 1),
-        take: params.limit,
-        orderBy: {
-            [params.sort]: params.order
-        },
-        where: condition
-    });
+    const [data, total] = await database.$transaction([
+        database.pic.findMany({
+            skip: params.limit * (params.page - 1),
+            take: params.limit,
+            orderBy: {
+                [params.sort]: params.order
+            },
+            where: condition
+        }),
+        database.pic.count({ where: condition })
+    ])    
 
     return {
         page: params.page,
