@@ -178,8 +178,7 @@ model document {
     id            String   @id @default(uuid())
     original_name String // Original Document name when uploaded
     document_name String // Renamed Document after upload
-    document_type String // Ex: NDE Penetapan, MoM Readiness dll
-    encoding      String // Ex: 7bit
+    document_type document_type // Ex: nde, mom, bast, report etc.
     mime_type     String // Ex: image/jpeg    
     location      String
     created_at    DateTime @default(now())
@@ -204,6 +203,16 @@ model document {
     report_project          project_close_out? @relation("REPORT_PROJECT")
     nde_report_project      project_close_out? @relation("NDE_REPORT_PROJECT")
     nps                     project_close_out? @relation("NPS")
+}
+
+enum document_type {
+    nde
+    mom
+    requirement
+    baa
+    bast
+    report
+    nps
 }
 
 model notification {
