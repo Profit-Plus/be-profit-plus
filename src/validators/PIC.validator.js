@@ -7,7 +7,7 @@ const createPIC = {
     },
     required: ['name', 'phone', 'role'],
     additionalProperties: false,
-}
+};
 
 const updatePIC = {
     type: 'object',
@@ -17,7 +17,7 @@ const updatePIC = {
         role: { type: 'string', enum: ["LIRA", "external", "midfielder"], nullable: false },
     },
     additionalProperties: false,
-}
+};
 
 const getAllPICs = {
     type: 'object',
@@ -25,7 +25,7 @@ const getAllPICs = {
         role: { type: 'string', enum: ["LIRA", "external", "midfielder"], nullable: false },
     },
     additionalProperties: true,
-}
+};
 
 module.exports = {
     createPIC,

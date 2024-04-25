@@ -4,7 +4,7 @@ const webResponses = require('../../helpers/web/webResponses');
 const { v4: uuidv4 } = require('uuid');
 const Ajv = require('ajv');
 const picValidator = require('../../validators/PIC.validator');
-const { formatErrorMessage } = require('../../helpers/utils/validator/formatError')
+const { formatErrorMessage } = require('../../helpers/utils/validator/formatError');
 
 const ajv = new Ajv();
 
@@ -81,7 +81,7 @@ async function getPIC(req, res) {
             res.status(404).json(webResponses.errorResponse('PIC not found!'));
         }
     } catch (e) {
-        console.log(e)
+        console.log(e);
         throw e;
     }
 }
@@ -147,4 +147,4 @@ module.exports = {
     getAllPICs,
     updatePIC,
     deletePIC
-}
+};

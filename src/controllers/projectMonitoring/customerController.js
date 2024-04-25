@@ -3,7 +3,7 @@ const customerService = require('../../services/projectMonitoring/customerServic
 const webResponses = require('../../helpers/web/webResponses');
 const Ajv = require('ajv');
 const customerValidator = require('../../validators/Customer.validator');
-const { formatErrorMessage } = require('../../helpers/utils/validator/formatError')
+const { formatErrorMessage } = require('../../helpers/utils/validator/formatError');
 
 const ajv = new Ajv();
 
@@ -69,7 +69,7 @@ async function getCustomer(req, res) {
             res.status(404).json(webResponses.errorResponse('Customer not found!'));
         }
     } catch (e) {
-        console.log(e)
+        console.log(e);
         throw e;
     }
 }
@@ -133,4 +133,4 @@ module.exports = {
     getAllCustomers,
     updateCustomer,
     deleteCustomer
-}
+};

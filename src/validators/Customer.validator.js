@@ -5,6 +5,6 @@ const createOrUpdateCustomer = {
     },
     required: ['name'],
     additionalProperties: false,
-}
+};
 
 module.exports = { createOrUpdateCustomer };

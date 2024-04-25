@@ -28,7 +28,7 @@ async function findAllCustomers(params) {
         limit: params.limit,
         total: total,
         data: data
-    }
+    };
 }
 
 function findCustomer(customerId) {

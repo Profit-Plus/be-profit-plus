@@ -34,7 +34,7 @@ async function findAllPICs(params) {
         limit: params.limit,
         total: total,
         data: data
-    }
+    };
 }
 
 function findPIC(picId) {
