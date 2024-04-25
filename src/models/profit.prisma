@@ -1,6 +1,7 @@
 // Database configuration properties
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -16,8 +17,7 @@ model pic {
     role       pic_role_enum // ex: LIRA, External
     created_at DateTime      @default(now())
     updated_at DateTime      @updatedAt
-    created_by String
-    updated_by String
+    deleted_at DateTime?
 
     // Relationship
     pic_external   project[]      @relation("EXTERNAL_PIC")
@@ -32,43 +32,45 @@ enum pic_role_enum {
 }
 
 model customer {
-    id         Int      @id @default(autoincrement())
-    name       String   @unique
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
-    created_by String
-    updated_by String
+    id         Int       @id @default(autoincrement())
+    name       String    @unique
+    created_at DateTime  @default(now())
+    updated_at DateTime  @updatedAt
+    deleted_at DateTime?
 }
 
 model project {
-    id                    String            @id @default(uuid())
+    id                    String             @id @default(uuid())
     start_date            DateTime
     end_date              DateTime
-    subscription_duration Int
+    subscription_duration Int?
     customer              String
-    solution              project_solution  @relation(fields: [solution_id], references: [id])
-    solution_id           String            @unique
+    solution              project_solution?  @relation(fields: [solution_id], references: [id])
+    solution_id           String?            @unique
     topic                 String
-    status                project_status    @default(initiation)
-    pic_external          pic               @relation(name: "EXTERNAL_PIC", fields: [pic_external_id], references: [id])
+    status                project_status     @default(initiation)
+    pic_external          pic                @relation(name: "EXTERNAL_PIC", fields: [pic_external_id], references: [id])
     pic_external_id       String
     segment               segment_enum
-    pic_segment           pic               @relation(name: "SEGMENT_PIC", fields: [pic_segment_id], references: [id])
+    pic_segment           pic                @relation(name: "SEGMENT_PIC", fields: [pic_segment_id], references: [id])
     pic_segment_id        String
-    project_init          project_init      @relation(fields: [project_init_id], references: [id])
-    project_init_id       String            @unique
-    project_ongoing       project_ongoing   @relation(fields: [project_ongoing_id], references: [id])
-    project_ongoing_id    String            @unique
-    project_drop          project_drop      @relation(fields: [project_drop_id], references: [id])
-    project_drop_id       String            @unique
-    project_close_out     project_close_out @relation(fields: [project_close_out_id], references: [id])
-    project_close_out_id  String            @unique
+    project_init          project_init?      @relation(fields: [project_init_id], references: [id])
+    project_init_id       String?            @unique
+    project_ongoing       project_ongoing?   @relation(fields: [project_ongoing_id], references: [id])
+    project_ongoing_id    String?            @unique
+    project_drop          project_drop?      @relation(fields: [project_drop_id], references: [id])
+    project_drop_id       String?            @unique
+    project_close_out     project_close_out? @relation(fields: [project_close_out_id], references: [id])
+    project_close_out_id  String?            @unique
     passcode              String
     comments              comment[]
-    created_at            DateTime          @default(now())
-    updated_at            DateTime          @updatedAt
-    created_by            String
-    updated_by            String
+    created_at            DateTime           @default(now())
+    updated_at            DateTime           @updatedAt
+    created_by            users?             @relation(name: "CREATOR", fields: [creator_id], references: [user_id])
+    creator_id            Int?
+    updated_by            users?             @relation(name: "UPDATER", fields: [updater_id], references: [user_id])
+    updater_id            Int?
+    deleted_at            DateTime?
 }
 
 enum project_status {
@@ -87,25 +89,25 @@ enum segment_enum {
 
 model project_init {
     id                         String     @id @default(uuid())
-    nde_request                document   @relation(name: "NDE_REQUEST", fields: [nde_request_id], references: [id])
-    nde_request_id             String     @unique
+    nde_request                document?  @relation(name: "NDE_REQUEST", fields: [nde_request_id], references: [id])
+    nde_request_id             String?    @unique
     midfielder                 String
     related_unit               String
     pic_midfielder             pic        @relation(fields: [pic_midfielder_id], references: [id])
     pic_midfielder_id          String
-    mom_req                    document   @relation(name: "MOM_REQ", fields: [mom_req_id], references: [id])
-    mom_req_id                 String     @unique
+    mom_req                    document?  @relation(name: "MOM_REQ", fields: [mom_req_id], references: [id])
+    mom_req_id                 String?    @unique
     helix                      helix_enum
-    lir_requirement            document   @relation(name: "LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
-    lir_requirement_id         String     @unique
+    lir_requirement            document?  @relation(name: "LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
+    lir_requirement_id         String?    @unique
     requester                  String
     impact                     String
     potential_employee_trained Int
-    nde_determination          document   @relation(name: "NDE_DETERMINATION", fields: [nde_determination_id], references: [id])
-    nde_determination_id       String     @unique
+    nde_determination          document?  @relation(name: "NDE_DETERMINATION", fields: [nde_determination_id], references: [id])
+    nde_determination_id       String?    @unique
     tariff                     Int
     potential_revenue          Int
-    is_approved                Boolean
+    is_approved                Boolean    @default(false)
 
     // Relationship
     project project?
@@ -121,70 +123,69 @@ enum helix_enum {
 }
 
 model project_ongoing {
-    id                     String   @id @default(uuid())
-    nde_req_cfu_to_mid     document @relation(name: "NDE_REQ_CFU_TO_MID", fields: [nde_req_cfu_to_mid_id], references: [id])
-    nde_req_cfu_to_mid_id  String   @unique
-    nde_req_mid_to_tcuc    document @relation(name: "NDE_REQ_MID_TO_TCUC", fields: [nde_req_mid_to_tcuc_id], references: [id])
-    nde_req_mid_to_tcuc_id String   @unique
+    id                     String    @id @default(uuid())
+    nde_req_cfu_to_mid     document? @relation(name: "NDE_REQ_CFU_TO_MID", fields: [nde_req_cfu_to_mid_id], references: [id])
+    nde_req_cfu_to_mid_id  String?   @unique
+    nde_req_mid_to_tcuc    document? @relation(name: "NDE_REQ_MID_TO_TCUC", fields: [nde_req_mid_to_tcuc_id], references: [id])
+    nde_req_mid_to_tcuc_id String?   @unique
     UIC                    String
     start_access           DateTime
     end_access             DateTime
-    mom_readiness          document @relation(name: "MOM_READINESS", fields: [mom_readiness_id], references: [id])
-    mom_readiness_id       String   @unique
-    nde_confirmation       document @relation(name: "NDE_CONFIRMATION", fields: [nde_confirmation_id], references: [id])
-    nde_confirmation_id    String   @unique
-    baa                    document @relation(name: "BAA", fields: [baa_id], references: [id])
-    baa_id                 String   @unique
-    bast                   document @relation(name: "BAST", fields: [bast_id], references: [id])
-    bast_id                String   @unique
-    is_approved            Boolean
+    mom_readiness          document? @relation(name: "MOM_READINESS", fields: [mom_readiness_id], references: [id])
+    mom_readiness_id       String?   @unique
+    nde_confirmation       document? @relation(name: "NDE_CONFIRMATION", fields: [nde_confirmation_id], references: [id])
+    nde_confirmation_id    String?   @unique
+    baa                    document? @relation(name: "BAA", fields: [baa_id], references: [id])
+    baa_id                 String?   @unique
+    bast                   document? @relation(name: "BAST", fields: [bast_id], references: [id])
+    bast_id                String?   @unique
+    is_approved            Boolean   @default(false)
 
     // Relationship
     project project?
 }
 
 model project_drop {
-    id                  String   @id @default(uuid())
-    nde_project_drop    document @relation(name: "NDE_PROJECT_DROP", fields: [nde_project_drop_id], references: [id])
-    nde_project_drop_id String   @unique
-    is_approved         Boolean
+    id                  String    @id @default(uuid())
+    nde_project_drop    document? @relation(name: "NDE_PROJECT_DROP", fields: [nde_project_drop_id], references: [id])
+    nde_project_drop_id String?   @unique
+    is_approved         Boolean   @default(false)
 
     // Relationship
     project project?
 }
 
 model project_close_out {
-    id                         String   @id @default(uuid())
-    mom_reconciles             document @relation(name: "MOM_RECONCILES", fields: [mom_reconciles_id], references: [id])
-    mom_reconciles_id          String   @unique
-    nde_revenue_recognition    document @relation(name: "NDE_REVENUE_RECOGNITION", fields: [nde_revenue_recognition_id], references: [id])
-    nde_revenue_recognition_id String   @unique
+    id                         String    @id @default(uuid())
+    mom_reconciles             document? @relation(name: "MOM_RECONCILES", fields: [mom_reconciles_id], references: [id])
+    mom_reconciles_id          String?   @unique
+    nde_revenue_recognition    document? @relation(name: "NDE_REVENUE_RECOGNITION", fields: [nde_revenue_recognition_id], references: [id])
+    nde_revenue_recognition_id String?   @unique
     employee_trained           Int
     revenue_in                 Int
-    report_project             document @relation(name: "REPORT_PROJECT", fields: [report_project_id], references: [id])
-    report_project_id          String   @unique
-    nde_report_project         document @relation(name: "NDE_REPORT_PROJECT", fields: [nde_report_project_id], references: [id])
-    nde_report_project_id      String   @unique
-    nps                        document @relation(name: "NPS", fields: [nps_id], references: [id])
-    nps_id                     String   @unique
+    report_project             document? @relation(name: "REPORT_PROJECT", fields: [report_project_id], references: [id])
+    report_project_id          String?   @unique
+    nde_report_project         document? @relation(name: "NDE_REPORT_PROJECT", fields: [nde_report_project_id], references: [id])
+    nde_report_project_id      String?   @unique
+    nps                        document? @relation(name: "NPS", fields: [nps_id], references: [id])
+    nps_id                     String?   @unique
     delivery_year              String
-    is_approved                Boolean
+    is_approved                Boolean   @default(false)
 
     // Relationship
     project project?
 }
 
 model document {
-    id            String   @id @default(uuid())
+    id            String        @id @default(uuid())
     original_name String // Original Document name when uploaded
     document_name String // Renamed Document after upload
     document_type document_type // Ex: nde, mom, bast, report etc.
     mime_type     String // Ex: image/jpeg    
     location      String
-    created_at    DateTime @default(now())
-    updated_at    DateTime @updatedAt
-    created_by    String
-    updated_by    String
+    created_at    DateTime      @default(now())
+    updated_at    DateTime      @updatedAt
+    deleted_at    DateTime?
 
     // Relationship
     nde_request             project_init?      @relation("NDE_REQUEST")
@@ -216,42 +217,39 @@ enum document_type {
 }
 
 model notification {
-    id          Int      @id @default(autoincrement())
-    receiver    users    @relation(name: "RECEIVER", fields: [receiver_id], references: [user_id])
+    id          Int       @id @default(autoincrement())
+    receiver    users     @relation(name: "RECEIVER", fields: [receiver_id], references: [user_id])
     receiver_id Int
-    sender      users    @relation(name: "SENDER", fields: [sender_id], references: [user_id])
-    sender_id   Int
+    sender      users?    @relation(name: "SENDER", fields: [sender_id], references: [user_id])
+    sender_id   Int?
     header      String
     content     String
     category    String
     url         String
-    read        Boolean
-    created_at  DateTime @default(now())
-    updated_at  DateTime @updatedAt
-    created_by  String
-    updated_by  String
+    read        Boolean   @default(false)
+    created_at  DateTime  @default(now())
+    updated_at  DateTime  @updatedAt
+    deleted_at  DateTime?
 }
 
 model comment {
-    id         Int      @id @default(autoincrement())
-    user       users    @relation(fields: [user_id], references: [user_id])
+    id         Int       @id @default(autoincrement())
+    user       users     @relation(fields: [user_id], references: [user_id])
     user_id    Int
     comment    String
-    project    project  @relation(fields: [project_id], references: [id])
+    project    project   @relation(fields: [project_id], references: [id])
     project_id String
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
-    created_by String
-    updated_by String
+    created_at DateTime  @default(now())
+    updated_at DateTime  @updatedAt
+    deleted_at DateTime?
 }
 
 model project_solution {
-    id            String   @id @default(uuid())
+    id            String    @id @default(uuid())
     solution_name String
-    created_at    DateTime @default(now())
-    updated_at    DateTime @updatedAt
-    created_by    String
-    updated_by    String
+    created_at    DateTime  @default(now())
+    updated_at    DateTime  @updatedAt
+    deleted_at    DateTime?
 
     // Relationship
     project         project?
@@ -311,15 +309,18 @@ model users {
     levels               levels            @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
     login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id]) // 1 to 1 relation with login_credentials
     teams                teams             @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
+    display_name         String            @default("User")
     units_name           String // foreign key of units
     level_name           String // foreign key of levels
     login_credentials_id String            @unique // foreign key of login_credentials
-    team_name            String //  Foreign key of teams
+    team_name            String //  Foreign key of teams    
 
-    // Relationship
+    // Relationships
     user_as_sender   notification[] @relation("SENDER")
     user_as_receiver notification[] @relation("RECEIVER")
-    comments         comment[]
+    user_as_creator  project[]      @relation("CREATOR")
+    user_as_updater  project[]      @relation("UPDATER")
+    comment          comment[]
 }
 
 model login_credentials {
