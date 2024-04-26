@@ -326,8 +326,7 @@ model users {
 model login_credentials {
     login_credentials_id String          @id @default(uuid())
     users                users?
-    refresh_token        refresh_token[]
-    user_name            String
+    refresh_token        refresh_token[]    
     email                String          @unique
     password             String
 }

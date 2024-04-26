@@ -29,10 +29,10 @@ async function registerController (req, res, next) {
             throw new Error('Multiple email is detected!');
         }
 
-        const {email, password, user_name} = req.body;
+        const {email, password, display_name} = req.body;
 
         /* If no error occurs, perform post operation to database and hold the id */
-        const loginCredentials = await userService.createloginCredentialsByEmailAndPassword({email, password, user_name});
+        const loginCredentials = await userService.createloginCredentialsByEmailAndPassword({email, password});
         const roles = userService.findRoleByLoginCredentialId(loginCredentials.login_credentials_id);
 
         console.log(roles.levels);
@@ -42,6 +42,7 @@ async function registerController (req, res, next) {
             unitsName: req.body.unit,
             teamName: req.body.team,
             levelName: req.body.level,
+            displayName: req.body.display_name,
             loginCredentialsId: loginCredentials.login_credentials_id
         });
 

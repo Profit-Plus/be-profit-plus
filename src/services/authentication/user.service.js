@@ -15,7 +15,7 @@ function createloginCredentialsByEmailAndPassword(user) {
     });
 }
 
-function createNewUsers({unitsName, teamName, levelName, loginCredentialsId}) {
+function createNewUsers({unitsName, teamName, levelName, displayName, loginCredentialsId}) {
     return database.users.create({
         data: {
             units: {
@@ -27,6 +27,7 @@ function createNewUsers({unitsName, teamName, levelName, loginCredentialsId}) {
             teams: {
                 connect: {team_name: teamName}
             },
+            display_name: displayName,
             login_credentials: {
                 connect: {login_credentials_id: loginCredentialsId}
             },

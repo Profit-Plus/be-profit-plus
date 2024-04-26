@@ -3,12 +3,12 @@ const register = {
     properties: {
         email: { type: 'string',maxLength: 68, minLength: 9, nullable: false },
         password: { type: 'string', minLength: 8, maxLength: 18, nullable: false },
-        user_name: { type: 'string', minLength: 3, maxLength: 68, nullable: false },
+        display_name: { type: 'string', minLength: 3, maxLength: 68, nullable: false },
         unit: { type: 'string', minLength: 1, maxLength: 68, nullable: true },
         team: { type: 'string', minLength: 1, maxLength: 68, nullable: true },
         level: { type: 'string', minLength: 1, maxLength: 68, nullable: true },
     },
-    required: ['email', 'password', 'user_name'],
+    required: ['email', 'password'],
     additionalProperties: false,
 };
 
