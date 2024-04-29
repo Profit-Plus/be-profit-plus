@@ -9,19 +9,19 @@ function createProductTemplate(product) {
     return database.$transaction([
         database.product.create({
             data: {
-                product_name: product.product_name
+                product_name: product.productName
             }
         }),
         database.unit_in_charge.create({
             data: {
-                product_name: product.product_name
+                product_name: product.productName
             }
         }),
         database.product_files.create({
             data: {
-                product_name: product.product_name
+                product_name: product.productName
             }
-        })
+        }),
     ]);
 }
 
@@ -34,27 +34,27 @@ function updateProductDetail(product) {
     return database.$transaction([
         database.product.update({
             where: {
-                product_name: product.product_name
+                product_name: product.productName
             },
             data: {
-                product_description: product.product_description,
-                product_profile_link: product.profile_link,
-                product_website_label: product.website_link,
+                product_description: product.productDescription,
+                product_profile_link: product.productProfileLink,
+                product_website_label: product.productWebsiteLabel,
                 taxonomy: {
                     connect: {
-                        taxonomy_name: product.taxonomy_name
+                        taxonomy_name: product.productTaxonomy
                     }
                 }
             }
         }),
         database.unit_in_charge.update({
             where: {
-                product_name: product.product_name
+                product_name: product.productName
             },
             data: {
                 unit: {
                     connect: {
-                        units_name: product.unit_name
+                        units_name: product.unitName
                     }
                 }
             }
@@ -70,13 +70,22 @@ function updateProductDetail(product) {
 function addNewProductUnit(unit) {
     return database.units.create({
         data: {
-            units_name: unit.unit_name
+            units_name: unit.unitName
         }
     });
 }
 
 function getProductUnit() {
-    return database.units.findMany();
+    return database.units.findMany({
+        where: {
+            NOT: {
+                units_name: 'UNDEFINED'
+            }
+        },
+        select: {
+            units_name: true
+        }
+    });
 }
 
 /**
@@ -87,7 +96,7 @@ function getProductUnit() {
 function addNewProductTaxonomy(taxonomy) {
     return database.taxonomy.create({
         data: {
-            taxonomy_name: taxonomy.taxonomy_name
+            taxonomy_name: taxonomy.taxonomyName
         }
     });
 }
@@ -97,42 +106,45 @@ function addNewProductTaxonomy(taxonomy) {
  * @returns 
  */
 function getProductTaxonomy() {
-    return database.taxonomy.findMany();
-}
-
-/**
- * Create new product service
- * @param {JSON} product 
- * @param {Object} services 
- * @returns async function to perform operation
- */
-function createProductServices(services) {
-    return database.product_service.createMany({
-        data: services
-    });
-}
-
-/**
- * Create new product service
- * @param {JSON} product 
- * @param {Object} services 
- * @returns async function to perform operation
- */
-function createProductMainUse(mainUse) {
-    return database.product_main_use.createMany({
-        data: mainUse
-    });
-}
-
-/**
- * Get the product with the certain product_name to check the availibity 
- * @param {Request} product 
- * @returns row with the certain product_name
- */
-function productAvailability(product) {
-    return database.product.findUnique({
+    return database.taxonomy.findMany({
         where: {
-            product_name: product.product_name
+            NOT: {
+                taxonomy_name: 'UNDEFINED'
+            }
+        },
+        select: {
+            taxonomy_name: true
+        }
+    });
+}
+
+/**
+ * Create new product service
+ * @param {JSON} product 
+ * @param {Object} services 
+ * @returns async function to perform operation
+ */
+function createProductServices(productName, services) {
+    return database.product_service.createMany({
+        data: {
+            product_name: productName,
+            product_service_name: services.serviceName,
+            product_service_description: services.description
+        }
+    });
+}
+
+/**
+ * Create new product service
+ * @param {JSON} product 
+ * @param {Object} services 
+ * @returns async function to perform operation
+ */
+function addProductMainUse(productName, mainUse) {
+    return database.product_main_use.createMany({
+        data: {
+            product_name: productName,
+            main_use_name: mainUse.mainUseName 
         }
     });
 }
@@ -157,7 +169,7 @@ function addProductGallery(productName, dirArray) {
         } catch (error) {
             throw error;
         }
-    }
+    };
 }
 
 /**
@@ -207,7 +219,7 @@ function updateProductFileDir(productName, documentType, productDocumentDir) {
         } catch (error) {
             throw error;
         }
-    }
+    };
 }
 
 /**
@@ -221,8 +233,7 @@ module.exports = {
     addNewProductTaxonomy,
     getProductTaxonomy,
     createProductServices,
-    createProductMainUse,
-    productAvailability,
+    addProductMainUse,
     addProductGallery,
     updateProductFileDir
 }

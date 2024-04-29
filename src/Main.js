@@ -2,7 +2,8 @@
 const express = require('express')
 const bodyParser = require('body-parser');
 const authRouter = require('./routes/auth/auth.routes');
-const productGuideRouter = require('./routes/productGuide/productGuide.routes');
+const stepOneRouter = require('./routes/productGuide/stepOne.routes');
+const stepThreeRouter = require('./routes/productGuide/stepThree.routes');
 
 /* Necessary variables */
 const PORT = process.env.PORT || 3001;
@@ -14,7 +15,8 @@ main.use(bodyParser.urlencoded ({
 }));
 
 main.use(authRouter);
-main.use(productGuideRouter);
+main.use(stepOneRouter);
+main.use(stepThreeRouter);
 
 main.listen(PORT, () => {
     console.log('Server is running! port: ' + PORT);
