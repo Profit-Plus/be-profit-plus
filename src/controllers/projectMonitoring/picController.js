@@ -2,18 +2,15 @@ const { Prisma } = require('@prisma/client');
 const picService = require('../../services/projectMonitoring/picService');
 const webResponses = require('../../helpers/web/webResponses');
 const { v4: uuidv4 } = require('uuid');
-const Ajv = require('ajv');
 const picValidator = require('../../validators/PIC.validator');
 const { formatErrorMessage } = require('../../helpers/utils/validator/formatError');
 
-const ajv = new Ajv();
-
 async function createPIC(req, res) {
-    try {
-        const createPicValidate = ajv.compile(picValidator.createPIC);
+    try {                        
+        const isCreatePICValid = picValidator.isCreatePICValid();
 
-        if (!createPicValidate(req.body)) {
-            return res.status(400).json(webResponses.errorResponse('Invalid input! ' + formatErrorMessage(createPicValidate.errors[0])));
+        if (!isCreatePICValid(req.body)) {                 
+            return res.status(400).json(webResponses.errorResponse(formatErrorMessage(isCreatePICValid.errors[0])));
         }
 
         const { name, phone, role } = req.body;
@@ -25,8 +22,6 @@ async function createPIC(req, res) {
             name: name,
             phone: phone,
             role: role,
-            created_by: req.user_id,
-            updated_by: req.user_id
         });
 
         res.status(200).json(webResponses.successResponse('PIC created successfully!', pic));
@@ -41,8 +36,8 @@ async function createPIC(req, res) {
 }
 
 async function getAllPICs(req, res) {
-    try {
-        const getAllPICsValidate = ajv.compile(picValidator.getAllPICs);
+    try {        
+        const isGetAllPICValid = picValidator.isGetAllPICValid();
 
         const params = {
             page: Number(req.query.page),
@@ -50,13 +45,15 @@ async function getAllPICs(req, res) {
             search: req.query.search ?? '',
             sort: req.query.sort ?? 'created_at',
             order: req.query.order ?? 'desc',
-            role: req.query.role
-        }
+            role: req.query.role,            
+            start_date: req.query.start_date,
+            end_date: req.query.end_date
+        }        
 
         if (!params.page || params.page < 1) params.page = 1;
-        if (!params.limit || params.limit < 1) params.limit = 10;
-        if (params.role && !getAllPICsValidate(params)) {
-            return res.status(400).json(webResponses.errorResponse('Invalid input! ' + formatErrorMessage(getAllPICsValidate.errors[0])));
+        if (!params.limit || params.limit < 1) params.limit = 10;        
+        if (!isGetAllPICValid(params)) {
+            return res.status(400).json(webResponses.errorResponse(formatErrorMessage(isGetAllPICValid.errors[0])));
         }
 
         const pic = await picService.findAllPICs(params);
@@ -88,10 +85,10 @@ async function getPIC(req, res) {
 
 async function updatePIC(req, res) {
     try {
-        const updatePicValidate = ajv.compile(picValidator.updatePIC);
+        const updatePicValidate = picValidator.isUpdatePICValid();
 
         if (!updatePicValidate(req.body)) {
-            return res.status(400).json(webResponses.errorResponse('Invalid input! ' + formatErrorMessage(updatePicValidate.errors[0])));
+            return res.status(400).json(webResponses.errorResponse(formatErrorMessage(updatePicValidate.errors[0])));
         }
 
         const { name, phone, role } = req.body;
@@ -101,8 +98,7 @@ async function updatePIC(req, res) {
         const pic = await picService.updatePIC(picId, {
             name: name,
             phone: phone,
-            role: role,
-            updated_by: req.user_id
+            role: role            
         });
 
         if (pic) {
