@@ -1,26 +1,21 @@
 const { Prisma } = require('@prisma/client');
 const customerService = require('../../services/projectMonitoring/customerService');
 const webResponses = require('../../helpers/web/webResponses');
-const Ajv = require('ajv');
 const customerValidator = require('../../validators/Customer.validator');
 const { formatErrorMessage } = require('../../helpers/utils/validator/formatError');
 
-const ajv = new Ajv();
-
 async function createCustomer(req, res) {
     try {
-        const createCustomerValidate = ajv.compile(customerValidator.createOrUpdateCustomer);
+        const createCustomerValidate = customerValidator.isDataCustomerValid();
 
         if (!createCustomerValidate(req.body)) {
-            return res.status(400).json(webResponses.errorResponse('Invalid input! ' + formatErrorMessage(createCustomerValidate.errors[0])));
+            return res.status(400).json(webResponses.errorResponse(formatErrorMessage(createCustomerValidate.errors[0])));
         }
 
         const { name } = req.body;
 
-        const customer = await customerService.createCustomer({            
-            name: name,
-            created_by: req.user_id,
-            updated_by: req.user_id
+        const customer = await customerService.createCustomer({
+            name: name
         });
 
         res.status(200).json(webResponses.successResponse('Customer created successfully!', customer));
@@ -35,17 +30,24 @@ async function createCustomer(req, res) {
 }
 
 async function getAllCustomers(req, res) {
-    try {        
+    try {
+        const isGetAllCustomersValid = customerValidator.isGetAllCustomersValid();
+
         const params = {
             page: Number(req.query.page),
             limit: Number(req.query.limit),
             search: req.query.search ?? '',
             sort: req.query.sort ?? 'created_at',
             order: req.query.order ?? 'desc',
+            start_date: req.query.start_date,
+            end_date: req.query.end_date
         }
 
         if (!params.page || params.page < 1) params.page = 1;
         if (!params.limit || params.limit < 1) params.limit = 10;
+        if (!isGetAllCustomersValid(params)) {
+            return res.status(400).json(webResponses.errorResponse(formatErrorMessage(isGetAllCustomersValid.errors[0])));
+        }
 
         const customer = await customerService.findAllCustomers(params);
 
@@ -76,20 +78,17 @@ async function getCustomer(req, res) {
 
 async function updateCustomer(req, res) {
     try {
-        const updateCustomerValidate = ajv.compile(customerValidator.createOrUpdateCustomer);
+        const updateCustomerValidate = customerValidator.isDataCustomerValid();
 
         if (!updateCustomerValidate(req.body)) {
-            return res.status(400).json(webResponses.errorResponse('Invalid input! ' + formatErrorMessage(updateCustomerValidate.errors[0])));
+            return res.status(400).json(webResponses.errorResponse(formatErrorMessage(updateCustomerValidate.errors[0])));
         }
 
         const { name } = req.body;
 
         const customerId = Number(req.params.id);
 
-        const customer = await customerService.updateCustomer(customerId, {
-            name: name,
-            updated_by: req.user_id
-        });
+        const customer = await customerService.updateCustomer(customerId, { name: name });
 
         if (customer) {
             res.status(200).json(webResponses.successResponse('Customer updated successfully!', customer));
