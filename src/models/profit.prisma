@@ -1,6 +1,7 @@
 // Database configuration properties
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -10,196 +11,288 @@ datasource db {
 
 // Schema GTOM
 model pic {
-    id         String   @id @default(uuid())
+    id         String        @id @default(uuid())
     name       String
-    phone      String
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
-    created_by String
-    updated_by String
+    phone      String        @unique
+    role       pic_role_enum // ex: LIRA, External
+    created_at DateTime      @default(now())
+    updated_at DateTime      @updatedAt
+    deleted_at DateTime?
 
     // Relationship
-    project_pic_external   project[]      @relation("ExternalPIC")
-    project_pic_segment    project[]      @relation("SegmentPIC")
-    project_pic_midfielder project_init[]
+    pic_external   project[]      @relation("EXTERNAL_PIC")
+    pic_segment    project[]      @relation("SEGMENT_PIC")
+    pic_midfielder project_init[]
+}
+
+enum pic_role_enum {
+    LIRA
+    external
+    midfielder
 }
 
 model customer {
-    id         String   @id @default(uuid())
-    name       String
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
-    created_by String
-    updated_by String
-
-    // Relationship
-    project project[]
+    id         Int       @id @default(autoincrement())
+    name       String    @unique
+    created_at DateTime  @default(now())
+    updated_at DateTime  @updatedAt
+    deleted_at DateTime?
 }
 
 model project {
-    id                    String            @id @default(uuid())
+    id                    String             @id @default(uuid())
     start_date            DateTime
     end_date              DateTime
-    subscription_duration Int
-    customer              customer          @relation(fields: [customer_id], references: [id])
-    customer_id           String            @unique
+    subscription_duration Int?
+    customer              String
+    solution              project_solution?  @relation(fields: [solution_id], references: [id])
+    solution_id           String?            @unique
     topic                 String
-    status                String
-    pic_external          pic               @relation(name: "ExternalPIC", fields: [pic_external_id], references: [id])
+    status                project_status     @default(initiation)
+    pic_external          pic                @relation(name: "EXTERNAL_PIC", fields: [pic_external_id], references: [id])
     pic_external_id       String
-    segment               String
-    pic_segment           pic               @relation(name: "SegmentPIC", fields: [pic_segment_id], references: [id])
+    segment               segment_enum
+    pic_segment           pic                @relation(name: "SEGMENT_PIC", fields: [pic_segment_id], references: [id])
     pic_segment_id        String
-    project_init          project_init      @relation(fields: [project_init_id], references: [id])
-    project_init_id       String            @unique
-    project_ongoing       project_ongoing   @relation(fields: [project_ongoing_id], references: [id])
-    project_ongoing_id    String            @unique
-    project_drop          project_drop      @relation(fields: [project_drop_id], references: [id])
-    project_drop_id       String            @unique
-    project_close_out     project_close_out @relation(fields: [project_close_out_id], references: [id])
-    project_close_out_id  String            @unique
+    project_init          project_init?      @relation(fields: [project_init_id], references: [id])
+    project_init_id       String?            @unique
+    project_ongoing       project_ongoing?   @relation(fields: [project_ongoing_id], references: [id])
+    project_ongoing_id    String?            @unique
+    project_drop          project_drop?      @relation(fields: [project_drop_id], references: [id])
+    project_drop_id       String?            @unique
+    project_close_out     project_close_out? @relation(fields: [project_close_out_id], references: [id])
+    project_close_out_id  String?            @unique
     passcode              String
     comments              comment[]
-    created_at            DateTime          @default(now())
-    updated_at            DateTime          @updatedAt
-    created_by            String
-    updated_by            String
+    created_at            DateTime           @default(now())
+    updated_at            DateTime           @updatedAt
+    created_by            users?             @relation(name: "CREATOR", fields: [creator_id], references: [user_id])
+    creator_id            Int?
+    updated_by            users?             @relation(name: "UPDATER", fields: [updater_id], references: [user_id])
+    updater_id            Int?
+    deleted_at            DateTime?
+}
+
+enum project_status {
+    initiation
+    ongoing
+    close_out
+    hold
+    drop
+}
+
+enum segment_enum {
+    DGS
+    DPS
+    DSS
 }
 
 model project_init {
-    id                         String  @id @default(uuid())
-    nde_request                String // Document id
+    id                         String     @id @default(uuid())
+    nde_request                document?  @relation(name: "NDE_REQUEST", fields: [nde_request_id], references: [id])
+    nde_request_id             String?    @unique
     midfielder                 String
     related_unit               String
-    pic_midfielder             pic     @relation(fields: [pic_midfielder_id], references: [id])
+    pic_midfielder             pic        @relation(fields: [pic_midfielder_id], references: [id])
     pic_midfielder_id          String
-    mom_req                    String // Document id
-    helix                      String
-    lir_requirement            String // Document id
+    mom_req                    document?  @relation(name: "MOM_REQ", fields: [mom_req_id], references: [id])
+    mom_req_id                 String?    @unique
+    helix                      helix_enum
+    lir_requirement            document?  @relation(name: "LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
+    lir_requirement_id         String?    @unique
     requester                  String
     impact                     String
     potential_employee_trained Int
-    nde_determination          String // Document id
+    nde_determination          document?  @relation(name: "NDE_DETERMINATION", fields: [nde_determination_id], references: [id])
+    nde_determination_id       String?    @unique
     tariff                     Int
     potential_revenue          Int
-    is_approved                Boolean
+    is_approved                Boolean    @default(false)
 
     // Relationship
     project project?
 }
 
+enum helix_enum {
+    academy
+    business
+    goverment
+    community
+    tech_prov
+    subsidiary
+}
+
 model project_ongoing {
-    id                  String    @id @default(uuid())
-    nde_req_cfu_to_mid  String // Document id
-    nde_req_mid_to_tcuc String // Document id
-    UIC                 String
-    solutions           product[]
-    start_access        DateTime
-    end_access          DateTime
-    mom_readiness       String // Document id
-    nde_confirmation    String // Document id
-    baa                 String // Document id
-    bast                String // Document id
-    is_approved         Boolean
+    id                     String    @id @default(uuid())
+    nde_req_cfu_to_mid     document? @relation(name: "NDE_REQ_CFU_TO_MID", fields: [nde_req_cfu_to_mid_id], references: [id])
+    nde_req_cfu_to_mid_id  String?   @unique
+    nde_req_mid_to_tcuc    document? @relation(name: "NDE_REQ_MID_TO_TCUC", fields: [nde_req_mid_to_tcuc_id], references: [id])
+    nde_req_mid_to_tcuc_id String?   @unique
+    UIC                    String
+    start_access           DateTime
+    end_access             DateTime
+    mom_readiness          document? @relation(name: "MOM_READINESS", fields: [mom_readiness_id], references: [id])
+    mom_readiness_id       String?   @unique
+    nde_confirmation       document? @relation(name: "NDE_CONFIRMATION", fields: [nde_confirmation_id], references: [id])
+    nde_confirmation_id    String?   @unique
+    baa                    document? @relation(name: "BAA", fields: [baa_id], references: [id])
+    baa_id                 String?   @unique
+    bast                   document? @relation(name: "BAST", fields: [bast_id], references: [id])
+    bast_id                String?   @unique
+    is_approved            Boolean   @default(false)
 
     // Relationship
     project project?
 }
 
 model project_drop {
-    id               String  @id @default(uuid())
-    nde_project_drop String // Document id
-    is_approved      Boolean
+    id                  String    @id @default(uuid())
+    nde_project_drop    document? @relation(name: "NDE_PROJECT_DROP", fields: [nde_project_drop_id], references: [id])
+    nde_project_drop_id String?   @unique
+    is_approved         Boolean   @default(false)
 
     // Relationship
     project project?
 }
 
 model project_close_out {
-    id                      String  @id @default(uuid())
-    mom_reconciles          String // Document id
-    nde_revenue_recognition String // Document id
-    employee_trained        Int
-    revenue_in              Int
-    report_project          String // Document id
-    nde_report_project      String // Document id
-    nps                     String // Document id
-    delivery_year           String
-    is_approved             Boolean
+    id                         String    @id @default(uuid())
+    mom_reconciles             document? @relation(name: "MOM_RECONCILES", fields: [mom_reconciles_id], references: [id])
+    mom_reconciles_id          String?   @unique
+    nde_revenue_recognition    document? @relation(name: "NDE_REVENUE_RECOGNITION", fields: [nde_revenue_recognition_id], references: [id])
+    nde_revenue_recognition_id String?   @unique
+    employee_trained           Int
+    revenue_in                 Int
+    report_project             document? @relation(name: "REPORT_PROJECT", fields: [report_project_id], references: [id])
+    report_project_id          String?   @unique
+    nde_report_project         document? @relation(name: "NDE_REPORT_PROJECT", fields: [nde_report_project_id], references: [id])
+    nde_report_project_id      String?   @unique
+    nps                        document? @relation(name: "NPS", fields: [nps_id], references: [id])
+    nps_id                     String?   @unique
+    delivery_year              String
+    is_approved                Boolean   @default(false)
 
     // Relationship
     project project?
 }
 
 model document {
-    id            String   @id @default(uuid())
-    project_id    String
+    id            String        @id @default(uuid())
     original_name String // Original Document name when uploaded
     document_name String // Renamed Document after upload
-    document_type String // Ex: NDE Penetapan, MoM Readiness dll
-    encoding      String // Ex: 7bit
+    document_type document_type // Ex: nde, mom, bast, report etc.
     mime_type     String // Ex: image/jpeg    
-    created_at    DateTime @default(now())
-    updated_at    DateTime @updatedAt
-    created_by    String
-    updated_by    String
+    location      String
+    created_at    DateTime      @default(now())
+    updated_at    DateTime      @updatedAt
+    deleted_at    DateTime?
+
+    // Relationship
+    nde_request             project_init?      @relation("NDE_REQUEST")
+    mom_req                 project_init?      @relation("MOM_REQ")
+    lir_requirement         project_init?      @relation("LIR_REQUIREMENT")
+    nde_determination       project_init?      @relation("NDE_DETERMINATION")
+    nde_req_cfu_to_mid      project_ongoing?   @relation("NDE_REQ_CFU_TO_MID")
+    nde_req_mid_to_tcuc     project_ongoing?   @relation("NDE_REQ_MID_TO_TCUC")
+    mom_readiness           project_ongoing?   @relation("MOM_READINESS")
+    nde_confirmation        project_ongoing?   @relation("NDE_CONFIRMATION")
+    baa                     project_ongoing?   @relation("BAA")
+    bast                    project_ongoing?   @relation("BAST")
+    nde_project_drop        project_drop?      @relation("NDE_PROJECT_DROP")
+    mom_reconciles          project_close_out? @relation("NDE_REVENUE_RECOGNITION")
+    nde_revenue_recognition project_close_out? @relation("MOM_RECONCILES")
+    report_project          project_close_out? @relation("REPORT_PROJECT")
+    nde_report_project      project_close_out? @relation("NDE_REPORT_PROJECT")
+    nps                     project_close_out? @relation("NPS")
+}
+
+enum document_type {
+    nde
+    mom
+    requirement
+    baa
+    bast
+    report
+    nps
 }
 
 model notification {
-    id         Int      @id @default(autoincrement())
-    user_id    String // Relate to User Table
-    sender     String // Relate to User Table
-    header     String
-    content    String
-    category   String
-    url        String
-    read       Boolean
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
-    created_by String
-    updated_by String
+    id          Int       @id @default(autoincrement())
+    receiver    users     @relation(name: "RECEIVER", fields: [receiver_id], references: [user_id])
+    receiver_id Int
+    sender      users?    @relation(name: "SENDER", fields: [sender_id], references: [user_id])
+    sender_id   Int?
+    header      String
+    content     String
+    category    String
+    url         String
+    read        Boolean   @default(false)
+    created_at  DateTime  @default(now())
+    updated_at  DateTime  @updatedAt
+    deleted_at  DateTime?
 }
 
 model comment {
-    id         Int      @id @default(autoincrement())
-    user_id    String
+    id         Int       @id @default(autoincrement())
+    user       users     @relation(fields: [user_id], references: [user_id])
+    user_id    Int
     comment    String
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
-    created_by String
-    updated_by String
-    project    project  @relation(fields: [project_id], references: [id])
-    project_id String   @unique
+    project    project   @relation(fields: [project_id], references: [id])
+    project_id String
+    created_at DateTime  @default(now())
+    updated_at DateTime  @updatedAt
+    deleted_at DateTime?
+}
+
+model project_solution {
+    id            String    @id @default(uuid())
+    solution_name String
+    created_at    DateTime  @default(now())
+    updated_at    DateTime  @updatedAt
+    deleted_at    DateTime?
+
+    // Relationship
+    project         project?
+    solution_detail project_solution_detail[]
+}
+
+model project_solution_detail {
+    id                  String           @id @default(uuid())
+    product             product          @relation(fields: [product_id], references: [id])
+    product_id          Int
+    package             packages         @relation(fields: [package_id], references: [id])
+    package_id          Int
+    project_solution    project_solution @relation(fields: [project_solution_id], references: [id])
+    project_solution_id String
 }
 
 // Schema Porto
 model product {
-    id                 Int                 @id @default(autoincrement())
-    units              units               @relation(fields: [units_name], references: [units_name])
-    taxonomy           taxonomy            @relation(fields: [taxonomy_id], references: [taxonomy_id])
-    category           category            @relation(fields: [category_id], references: [category_id])
-    category_id        Int // Foreign Key of category
-    taxonomy_id        Int // Foreign key of taxonomy
-    units_name         String // Foreign key of unit
-    year               Int
-    name               String
-    branding           String // store the directory of branding file
-    evidence_tariff    String // Store the directory of tariff file
-    evidence_product   String // Store the directory of product's evidence file
-    playbook           String // Store the directory of product's playbook file
-    product_profile    String
-    is_active          Boolean
-    progress_enum      progress_enum       @default(aquisition)
-    stpdb              stpdb[]
-    product_services   product_services[]
-    product_use_case   product_use_case[]
-    operating_model    operating_model[]
-    segment_targeting  segment_targeting[]
-    packages           packages[]
-    types              type[]
-    offerings          offering[]
-    project_ongoing    project_ongoing     @relation(fields: [project_ongoing_id], references: [id])
-    project_ongoing_id String
+    id                      Int                       @id @default(autoincrement())
+    units                   units                     @relation(fields: [units_name], references: [units_name])
+    taxonomy                taxonomy                  @relation(fields: [taxonomy_id], references: [taxonomy_id])
+    category                category                  @relation(fields: [category_id], references: [category_id])
+    category_id             Int // Foreign Key of category
+    taxonomy_id             Int // Foreign key of taxonomy
+    units_name              String // Foreign key of unit
+    year                    Int
+    name                    String
+    branding                String // store the directory of branding file
+    evidence_tariff         String // Store the directory of tariff file
+    evidence_product        String // Store the directory of product's evidence file
+    playbook                String // Store the directory of product's playbook file
+    product_profile         String
+    is_active               Boolean
+    progress_enum           progress_enum             @default(aquisition)
+    stpdb                   stpdb[]
+    product_services        product_services[]
+    product_use_case        product_use_case[]
+    operating_model         operating_model[]
+    segment_targeting       segment_targeting[]
+    packages                packages[]
+    types                   type[]
+    offerings               offering[]
+    project_solution_detail project_solution_detail[]
 }
 
 model units {
@@ -216,17 +309,24 @@ model users {
     levels               levels            @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
     login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id]) // 1 to 1 relation with login_credentials
     teams                teams             @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
+    display_name         String            @default("User")
     units_name           String // foreign key of units
     level_name           String // foreign key of levels
     login_credentials_id String            @unique // foreign key of login_credentials
-    team_name            String //  Foreign key of teams
+    team_name            String //  Foreign key of teams    
+
+    // Relationships
+    user_as_sender   notification[] @relation("SENDER")
+    user_as_receiver notification[] @relation("RECEIVER")
+    user_as_creator  project[]      @relation("CREATOR")
+    user_as_updater  project[]      @relation("UPDATER")
+    comment          comment[]
 }
 
 model login_credentials {
     login_credentials_id String          @id @default(uuid())
     users                users?
-    refresh_token        refresh_token[]
-    user_name            String
+    refresh_token        refresh_token[]    
     email                String          @unique
     password             String
 }
@@ -442,11 +542,12 @@ model packages {
     update_at        DateTime      @updatedAt
     delete_at        DateTime?
 
-    product           product            @relation(fields: [product_id], references: [id])
-    product_id        Int
-    offering_packages offering_package[]
-    totals            total[]
-    data_package      data_package[]
+    product                 product                   @relation(fields: [product_id], references: [id])
+    product_id              Int
+    offering_packages       offering_package[]
+    totals                  total[]
+    data_package            data_package[]
+    project_solution_detail project_solution_detail[]
 }
 
 model offering {

@@ -4,37 +4,45 @@ const { generateTokens } = require('../../helpers/utils/authentication/jsonwebto
 const webResponses = require('../../helpers/web/webResponses');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
+const Ajv = require('ajv');
+const AuthValidator = require('../../validators/Auth.validator');
+
+const ajv = new Ajv();
+
 
 /* registerController handles user registration operation */
 /* Endpoint: '/profitplus/porto/registration/' */
 async function registerController (req, res, next) {
     try {
         /* Request body */
-        const { email, password, user_name, unit, team, level } = req.body;
+        const registerValidate = ajv.compile(AuthValidator.register);
         /* Check if input is invalid */
-        if (!email || !password || !unit || !team || !level || !user_name) {
-            res.status(400).json(webResponses.errorResponse('Invalid input! Fields cannot be empty'));
+        if (!registerValidate(req.body)) {
+            res.status(400).json(webResponses.errorResponse('Invalid input! '+registerValidate.errors[0].message));
             throw new Error('There are several fields empty!');
         }
 
         /* Check if the email has been used before */
-        const existingEmail = await userService.findLoginCredentialsByEmail(email);
+        const existingEmail = await userService.findLoginCredentialsByEmail(req.body.email);
         if (existingEmail) {
             res.status(400).json(webResponses.errorResponse('Email has been used!'));
             throw new Error('Multiple email is detected!');
         }
 
+        const {email, password, display_name} = req.body;
+
         /* If no error occurs, perform post operation to database and hold the id */
-        const loginCredentials = await userService.createloginCredentialsByEmailAndPassword({ email, password, user_name});
+        const loginCredentials = await userService.createloginCredentialsByEmailAndPassword({email, password});
         const roles = userService.findRoleByLoginCredentialId(loginCredentials.login_credentials_id);
 
         console.log(roles.levels);
 
         /* Store credentials as a new users */
         await userService.createNewUsers( {
-            unitsName: unit,
-            teamName: team,
-            levelName: level,
+            unitsName: req.body.unit,
+            teamName: req.body.team,
+            levelName: req.body.level,
+            displayName: req.body.display_name,
             loginCredentialsId: loginCredentials.login_credentials_id
         });
 
