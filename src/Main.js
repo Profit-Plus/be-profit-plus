@@ -1,6 +1,18 @@
 /* Basic properties for express, body-parser, and controllers route */
+require("dotenv").config();
 const express = require('express')
 const bodyParser = require('body-parser');
+
+// GTOM Route
+const picRouter = require('./routes/projectMonitoring/picRoute');
+const customerRouter = require('./routes/projectMonitoring/customerRoute');
+
+// Tarif Route  
+const searchRoute = require('./routes/tariffRoutes/searchRoute');
+const sheetRoute = require('./routes/tariffRoutes/searchRoute');
+const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
+
+// Porto Route
 const authRouter = require('./routes/auth/auth.routes');
 const stepOneRouter = require('./routes/productGuide/stepOne.routes');
 const stepTwoRouter = require('./routes/productGuide/stepOne.routes');
@@ -15,6 +27,16 @@ main.use(bodyParser.urlencoded ({
     extended: false
 }));
 
+// GTOM Use route
+main.use(picRouter);
+main.use(customerRouter);
+
+// Tarif Use route
+main.use('/tariff/search', searchRoute);
+main.use('/tariff/sheet', sheetRoute);
+main.use('/tariff/masterPackage', masterPackageRoute);
+
+// Porto Use route
 main.use(authRouter);
 main.use(stepOneRouter);
 main.use(stepThreeRouter);

@@ -10,16 +10,12 @@ function findLoginCredentialsByEmail(email) {
 
 function createloginCredentialsByEmailAndPassword(user) {
     user.password = bcrypt.hashSync(user.password, 12);
-    return database.login_credentials.create({
-        data: {
-            email: user.email,
-            password: user.password,
-            user_name: user.userName,
-        }
+    return database.login_credentials.create({  
+        data: user
     });
 }
 
-function createNewUsers(user, loginCredentials) {
+function createNewUsers({unitsName, teamName, levelName, displayName, loginCredentialsId}) {
     return database.users.create({
         data: {
             units: {
@@ -31,6 +27,7 @@ function createNewUsers(user, loginCredentials) {
             teams: {
                 connect: {team_name: user.team}
             },
+            display_name: displayName,
             login_credentials: {
                 connect: {login_credentials_id: loginCredentials.login_credentials_id}
             },
