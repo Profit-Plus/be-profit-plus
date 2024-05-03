@@ -1,12 +1,13 @@
+const templateService = require('../../services/template/template.service');
 const stepOneService = require('../../services/productGuide/stepOne.service');
 const webResponses = require('../../helpers/web/webResponses');
 
+const { Prisma } = require('@prisma/client');
 const formidable = require('formidable');
 const { v4: uuidv4 } = require('uuid');
 const filestream = require('fs');
 const path = require('path');
 const mv = require('mv');
-const { Prisma } = require('@prisma/client');
 
 /**
  * @function createNewProduct to create a new template for product (contains only product name without any other data)
@@ -21,7 +22,8 @@ async function createNewProduct(req, res, next) {
         const product = req.body;
         
         /* Create new product template */
-        await stepOneService.createProductTemplate(product);
+        await templateService.stepOneTemplate(product);
+
         res.status(200).json(webResponses.successResponse('Successfully create new product template!', product));
     
     } catch (error) {

@@ -74,10 +74,7 @@ async function uploadPartnershipGtmHostFile(req, res, next) {
                     /* Save the directory of the file to database */
                     const updatePartnershipFileDir = await stepThreeService.updatePartnershipFileDir(productName, completePath);
 
-                    res.status(200).json(webResponses.successResponse(
-                        'File updated successfully', 
-                        updatePartnershipFileDir
-                    ));
+                    res.status(200).json(webResponses.successResponse('File updated successfully', updatePartnershipFileDir));
                 });
 
             } else {
@@ -308,6 +305,12 @@ async function addProductOrganization(req, res, next) {
     }
 }
 
+/**
+ * @function addProductManagementSystem
+ * @param {} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 async function addProductManagementSystem(req, res, next) {
     try {
         /* Request body: productName as a string and element as an array */

@@ -1,31 +1,6 @@
 const { database } = require('../../helpers/utils/db/database');
 
 /**
- * Create a template for product without any data
- * @param {Request} product 
- * @returns async function to perform operation
- */
-function createProductTemplate(product) {
-    return database.$transaction([
-        database.product.create({
-            data: {
-                product_name: product.productName
-            }
-        }),
-        database.unit_in_charge.create({
-            data: {
-                product_name: product.productName
-            }
-        }),
-        database.product_files.create({
-            data: {
-                product_name: product.productName
-            }
-        }),
-    ]);
-}
-
-/**
  * Update some details of the requested product
  * @param {Request} product 
  * @returns async function to perform operation
@@ -226,7 +201,6 @@ function updateProductFileDir(productName, documentType, productDocumentDir) {
  *  Exporting all functions to module
  */
 module.exports = {
-    createProductTemplate,
     updateProductDetail,
     addNewProductUnit,
     getProductUnit,
