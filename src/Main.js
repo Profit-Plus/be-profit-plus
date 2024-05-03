@@ -13,6 +13,17 @@ const sheetRoute = require('./routes/tariffRoutes/searchRoute');
 const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
 
 // Porto Route
+
+// GTOM Route
+const picRouter = require('./routes/projectMonitoring/picRoute');
+const customerRouter = require('./routes/projectMonitoring/customerRoute');
+
+// Tarif Route  
+const searchRoute = require('./routes/tariffRoutes/searchRoute');
+const sheetRoute = require('./routes/tariffRoutes/searchRoute');
+const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
+
+// Porto Route
 const authRouter = require('./routes/auth/auth.routes');
 const stepOneRouter = require('./routes/productGuide/stepOne.routes');
 const stepTwoRouter = require('./routes/productGuide/stepOne.routes');
