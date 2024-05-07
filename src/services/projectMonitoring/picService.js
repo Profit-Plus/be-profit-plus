@@ -18,7 +18,7 @@ async function findAllPICs(params) {
         created_at: {
             gte: params.start_date ? new Date(params.start_date) : undefined,
             lt: params.end_date ? new Date(new Date(params.end_date).getTime() + 24 * 60 * 60 * 1000) : undefined
-        }
+        }        
     };
 
     const [data, total] = await database.$transaction([
@@ -49,18 +49,14 @@ function findPIC(picId) {
 
 function updatePIC(picId, data) {
     return database.pic.update({
-        where: {
-            id: picId
-        },
+        where: { id: picId },
         data: data
     });
 }
 
 function deletePIC(picId) {
     return database.pic.delete({
-        where: {
-            id: picId
-        }
+        where: { id: picId }
     });
 }
 
