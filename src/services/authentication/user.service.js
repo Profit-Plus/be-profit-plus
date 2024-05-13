@@ -19,17 +19,17 @@ function createNewUsers({unitsName, teamName, levelName, displayName, loginCrede
     return database.users.create({
         data: {
             units: {
-                connect: {units_name: unitsName}
+                connect: {units_name: user.unit}
             },
             levels: {
-                connect: {level_name: levelName}
+                connect: {level_name: user.level}
             },
             teams: {
-                connect: {team_name: teamName}
+                connect: {team_name: user.team}
             },
             display_name: displayName,
             login_credentials: {
-                connect: {login_credentials_id: loginCredentialsId}
+                connect: {login_credentials_id: loginCredentials.login_credentials_id}
             },
         }
     });
