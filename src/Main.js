@@ -3,25 +3,15 @@ require("dotenv").config();
 const express = require('express')
 const bodyParser = require('body-parser');
 
-// GTOM Route
-const picRouter = require('./routes/projectMonitoring/picRoute');
-const customerRouter = require('./routes/projectMonitoring/customerRoute');
-
 // Tarif Route  
 const searchRoute = require('./routes/tariffRoutes/searchRoute');
 const sheetRoute = require('./routes/tariffRoutes/searchRoute');
 const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
-
-// Porto Route
+const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
 
 // GTOM Route
 const picRouter = require('./routes/projectMonitoring/picRoute');
 const customerRouter = require('./routes/projectMonitoring/customerRoute');
-
-// Tarif Route  
-const searchRoute = require('./routes/tariffRoutes/searchRoute');
-const sheetRoute = require('./routes/tariffRoutes/searchRoute');
-const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
 
 // Porto Route
 const authRouter = require('./routes/auth/auth.routes');
@@ -46,6 +36,7 @@ main.use(customerRouter);
 main.use('/tariff/search', searchRoute);
 main.use('/tariff/sheet', sheetRoute);
 main.use('/tariff/masterPackage', masterPackageRoute);
+main.use('/tariff/offering', offeringRoute);
 
 // Porto Use route
 main.use(authRouter);
