@@ -6,17 +6,7 @@ const bodyParser = require('body-parser');
 // GTOM Route
 const picRouter = require('./routes/projectMonitoring/picRoute');
 const customerRouter = require('./routes/projectMonitoring/customerRoute');
-
-// Tarif Route  
-const searchRoute = require('./routes/tariffRoutes/searchRoute');
-const sheetRoute = require('./routes/tariffRoutes/searchRoute');
-const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
-
-// Porto Route
-
-// GTOM Route
-const picRouter = require('./routes/projectMonitoring/picRoute');
-const customerRouter = require('./routes/projectMonitoring/customerRoute');
+const documentRouter = require('./routes/projectMonitoring/documentRoute')
 
 // Tarif Route  
 const searchRoute = require('./routes/tariffRoutes/searchRoute');
@@ -34,13 +24,14 @@ const PORT = process.env.PORT || 3001;
 const main = express();
 
 main.use(bodyParser.json());
-main.use(bodyParser.urlencoded ({
+main.use(bodyParser.urlencoded({
     extended: false
 }));
 
 // GTOM Use route
 main.use(picRouter);
 main.use(customerRouter);
+main.use(documentRouter);
 
 // Tarif Use route
 main.use('/tariff/search', searchRoute);
