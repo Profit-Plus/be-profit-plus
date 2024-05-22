@@ -12,6 +12,8 @@ const documentRouter = require('./routes/projectMonitoring/documentRoute')
 const searchRoute = require('./routes/tariffRoutes/searchRoute');
 const sheetRoute = require('./routes/tariffRoutes/searchRoute');
 const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
+const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
+
 
 // Porto Route
 const authRouter = require('./routes/auth/auth.routes');
@@ -37,6 +39,7 @@ main.use(documentRouter);
 main.use('/tariff/search', searchRoute);
 main.use('/tariff/sheet', sheetRoute);
 main.use('/tariff/masterPackage', masterPackageRoute);
+main.use('/tariff/offering', offeringRoute);
 
 // Porto Use route
 main.use(authRouter);
