@@ -91,18 +91,20 @@ async function updatePIC(req, res) {
             return res.status(400).json(webResponses.errorResponse(formatErrorMessage(updatePicValidate.errors[0])));
         }
 
-        const { name, phone, role } = req.body;
-
         const picId = req.params.id;
 
-        const pic = await picService.updatePIC(picId, {
-            name: name,
-            phone: phone,
-            role: role            
-        });
+        const pic = await picService.findPIC(picId);        
 
         if (pic) {
-            res.status(200).json(webResponses.successResponse('PIC updated successfully!', pic));
+            const { name, phone, role } = req.body;
+
+            const updatedPIC = await picService.updatePIC(picId, {
+                name: name,
+                phone: phone,
+                role: role            
+            });
+
+            res.status(200).json(webResponses.successResponse('PIC updated successfully!', updatedPIC));
         }
         else {
             res.status(404).json(webResponses.errorResponse('PIC not found!'));
@@ -124,9 +126,9 @@ async function deletePIC(req, res) {
         const pic = await picService.findPIC(picId);
 
         if (pic) {
-            await picService.deletePIC(picId);
+            const deletedPIC = await picService.deletePIC(picId);
 
-            res.status(200).json(webResponses.successResponse('PIC deleted successfully!', pic));
+            res.status(200).json(webResponses.successResponse('PIC deleted successfully!', deletedPIC));
         }
         else {
             res.status(404).json(webResponses.errorResponse('PIC not found!'));
