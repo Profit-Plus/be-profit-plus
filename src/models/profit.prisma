@@ -15,7 +15,7 @@ model pic {
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
   role           pic_role_enum
-  deleted_at     DateTime?
+  deleted_at     DateTime?  
   pic_external   project[]      @relation("EXTERNAL_PIC")
   pic_segment    project[]      @relation("SEGMENT_PIC")
   pic_midfielder project_init[]
@@ -50,8 +50,8 @@ model project {
   solution_id           String?            @unique
   tariff                Int
   deleted_at            DateTime?
-  creator_id            Int?
-  updater_id            Int?
+  creator_id            String?
+  updater_id            String?
   requesting_approval   Boolean            @default(false)
   comments              comment?
   created_by            users?             @relation("CREATOR", fields: [creator_id], references: [user_id])
@@ -184,8 +184,8 @@ model notification {
   read        Boolean   @default(false)
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
-  receiver_id Int
-  sender_id   Int?
+  receiver_id String
+  sender_id   String?
   deleted_at  DateTime?
   receiver    users     @relation("RECEIVER", fields: [receiver_id], references: [user_id])
   sender      users?    @relation("SENDER", fields: [sender_id], references: [user_id])
@@ -193,7 +193,7 @@ model notification {
 
 model comment {
   id           Int          @id @default(autoincrement())
-  user_id      Int
+  user_id      String
   comment      String
   comment_type comment_type @default(comment)
   created_at   DateTime     @default(now())
@@ -233,7 +233,7 @@ model product {
   id                      Int                       @id @default(autoincrement())
   category_id             Int
   taxonomy_id             Int
-  units_name              String
+  unit_id                 String
   year                    Int
   name                    String
   branding                String
@@ -248,7 +248,7 @@ model product {
   packages                packages[]
   category                category                  @relation(fields: [category_id], references: [category_id])
   taxonomy                taxonomy                  @relation(fields: [taxonomy_id], references: [taxonomy_id])
-  units                   units                     @relation(fields: [units_name], references: [units_name])
+  units                   units                     @relation(fields: [unit_id], references: [unit_id])
   product_services        product_services[]
   product_use_case        product_use_case[]
   project_solution_detail project_solution_detail[]
@@ -257,66 +257,102 @@ model product {
   types                   type[]
 }
 
-model units {
-  units_name  String       @id @unique
-  product     product[]
-  unit_leader unit_leader?
-  users       users[]
-}
-
+//  Authentication Schema
 model users {
-  user_id              Int               @id @default(autoincrement())
-  units_name           String
-  level_name           String
-  login_credentials_id String            @unique
-  team_name            String
-  display_name         String            @default("User")
-  comment              comment[]
-  user_as_receiver     notification[]    @relation("RECEIVER")
-  user_as_sender       notification[]    @relation("SENDER")
-  user_as_creator      project[]         @relation("CREATOR")
-  user_as_updater      project[]         @relation("UPDATER")
-  unit_leader          unit_leader?
-  levels               levels            @relation(fields: [level_name], references: [level_name])
-  login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id])
-  teams                teams             @relation(fields: [team_name], references: [team_name])
-  units                units             @relation(fields: [units_name], references: [units_name])
+  user_id               String @id @default(uuid())
+  units_name            String // foreign key of units
+  level_name            String // foreign key of levels
+  access_credentials_id String @unique // foreign key of login_credentials
+  team_name             String //  Foreign key of teams
+
+  // Relations section
+  unit_leader        unit_leader? // 1 to 1 relation with unit_leader
+  units              units              @relation(fields: [units_name], references: [units_name]) // 1 to Many relation with units
+  levels             levels             @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
+  access_credentials access_credentials @relation(fields: [access_credentials_id], references: [access_credentials_id]) // 1 to 1 relation with login_credentials
+  teams              teams              @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
+
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+  user_as_creator  project[]      @relation("CREATOR")
+  user_as_updater  project[]      @relation("UPDATER")
+  user_as_sender   notification[] @relation("SENDER")
+  user_as_receiver notification[] @relation("RECEIVER")
+  comment          comment[]
 }
 
-model login_credentials {
-  login_credentials_id String          @id @default(uuid())
-  email                String          @unique
-  password             String
-  refresh_token        refresh_token[]
-  users                users?
-}
+model access_credentials {
+  access_credentials_id String @id @default(uuid())
+  user_name             String
+  email                 String @unique
+  password              String
 
-model teams {
-  team_name String  @id @unique
-  users     users[]
+  // Relations section
+  users         users?
+  refresh_token refresh_token[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model refresh_token {
-  id                   String            @id @unique @default(uuid())
-  hashed_token         String
-  login_credentials_id String
-  revoked              Boolean           @default(false)
-  created_at           DateTime          @default(now())
-  updated_at           DateTime          @updatedAt
-  login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id], onDelete: Cascade)
+  id                    String @id @unique @default(uuid())
+  hashed_token          String
+  access_credentials_id String
+
+  // Relations section
+  access_credentials access_credentials @relation(fields: [access_credentials_id], references: [access_credentials_id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
+// Insert a default data named '-'
+model units {
+  unit_id     String       @id @default(uuid())
+  units_name  String       @unique
+  users       users[] // 1 to many relation with users
+  unit_leader unit_leader? // 1 to 1 relation with unit_leader
+  product     product[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model teams {
+  team_id   String @id @default(uuid())
+  team_name String @unique
+
+  // Relations section
+  users users[] //   1 to many relation with users
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+// Add new entity named unit_leader
 model unit_leader {
-  leader_id  Int    @id @default(autoincrement())
-  user_id    Int    @unique
-  units_name String @unique
-  units      units  @relation(fields: [units_name], references: [units_name])
-  users      users  @relation(fields: [user_id], references: [user_id])
+  leader_id  String @id @default(uuid())
+  user_id    String @unique //  Foreign key of user
+  units_name String @unique // Foreign key of unit
+
+  // Relations section
+  users users @relation(fields: [user_id], references: [user_id])
+  units units @relation(fields: [units_name], references: [units_name])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model levels {
-  level_name String  @id @unique
-  users      users[]
+  level_id   String @id @default(uuid())
+  level_name String @unique
+
+  // Relations section
+  users users[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model taxonomy {

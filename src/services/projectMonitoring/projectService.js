@@ -173,7 +173,7 @@ function deleteProject(projectId) {
     });
 }
 
-function doTransaction(transactions) {    
+function doTransaction(transactions) {  
     return database.$transaction(transactions);
 }
 

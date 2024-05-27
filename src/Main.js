@@ -15,7 +15,7 @@ const sheetRoute = require('./routes/tariffRoutes/searchRoute');
 const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
 
 // Porto Route
-const authRouter = require('./routes/auth/auth.routes');
+const authRouter = require('./routes/authentication/auth.routes');
 const stepOneRouter = require('./routes/productGuide/stepOne.routes');
 const stepTwoRouter = require('./routes/productGuide/stepOne.routes');
 const stepThreeRouter = require('./routes/productGuide/stepTwo.routes');
