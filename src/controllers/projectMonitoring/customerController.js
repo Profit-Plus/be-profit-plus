@@ -14,9 +14,9 @@ async function createCustomer(req, res) {
 
         const { name } = req.body;
 
-        const isExist = await customerService.isCustomerExist(name);
-        if (isExist) {
-            return res.status(409).json(webResponses.errorResponse('Customer already exist!'));
+        const isNameExist = await customerService.findUniqueName(name);
+        if (isNameExist) {
+            return res.status(409).json(webResponses.errorResponse('Customer name has been used!'));
         }
 
         const customer = await customerService.createCustomer({
@@ -89,8 +89,8 @@ async function updateCustomer(req, res) {
 
         const customerId = req.params.id;
 
-        const isExist = await customerService.isCustomerExist(name);
-        if (isExist) {
+        const isNameExist = await customerService.findUniqueName(name);
+        if (isNameExist) {
             return res.status(409).json(webResponses.errorResponse('Customer name has been used!'));
         }
 

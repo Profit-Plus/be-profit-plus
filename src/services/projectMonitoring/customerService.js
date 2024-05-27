@@ -41,7 +41,7 @@ function findCustomer(customerId) {
     });
 }
 
-async function isCustomerExist(customerName) {
+async function findUniqueName(customerName) {
     const customer = await database.customer.findUnique({
         where: {
             AND: [
@@ -76,7 +76,7 @@ module.exports = {
     createCustomer,
     findAllCustomers,
     findCustomer,
-    isCustomerExist,
+    findUniqueName,
     updateCustomer,
     deleteCustomer
 };
