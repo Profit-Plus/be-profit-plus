@@ -18,7 +18,7 @@ async function findAllPICs(params) {
         created_at: {
             gte: params.start_date ? new Date(params.start_date) : undefined,
             lt: params.end_date ? new Date(new Date(params.end_date).getTime() + 24 * 60 * 60 * 1000) : undefined
-        }        
+        }
     };
 
     const [data, total] = await database.$transaction([
@@ -47,6 +47,20 @@ function findPIC(picId) {
     });
 }
 
+async function findUniquePhone(picPhone) {
+    const isExist = await database.pic.findUnique({
+        where: {
+            AND: [
+                { phone: picPhone },
+                { deleted_at: null }
+            ]
+        }
+    });
+
+    if (isExist) return true;
+    else return false;
+}
+
 function updatePIC(picId, data) {
     return database.pic.update({
         where: { id: picId },
@@ -64,6 +78,7 @@ module.exports = {
     createPIC,
     findAllPICs,
     findPIC,
+    findUniquePhone,
     updatePIC,
     deletePIC
 };
