@@ -48,9 +48,11 @@ model project {
   created_at            DateTime           @default(now())
   updated_at            DateTime           @updatedAt
   solution_id           String?            @unique
+  tariff                Int
   deleted_at            DateTime?
   creator_id            Int?
   updater_id            Int?
+  requesting_approval   Boolean            @default(false)
   comments              comment?
   created_by            users?             @relation("CREATOR", fields: [creator_id], references: [user_id])
   pic_external          pic                @relation("EXTERNAL_PIC", fields: [pic_external_id], references: [id])
@@ -64,75 +66,85 @@ model project {
 }
 
 model project_init {
-  id                         String     @id @default(uuid())
-  nde_request_id             String?    @unique
-  midfielder                 String
-  related_unit               String
-  pic_midfielder_id          String
-  mom_req_id                 String?    @unique
-  helix                      helix_enum
-  lir_requirement_id         String?    @unique
-  requester                  String
-  impact                     String
-  potential_employee_trained Int
-  nde_determination_id       String?    @unique
-  tariff                     Int
-  potential_revenue          Int
-  is_approved                Boolean    @default(false)
+  id                         String          @id @default(uuid())
+  project_id                 String
+  nde_request_id             String?         @unique
+  midfielder                 String?
+  related_unit               String?
+  pic_midfielder_id          String?
+  mom_req_id                 String?         @unique
+  helix                      helix_enum?
+  lir_requirement_id         String?         @unique
+  requester                  String?
+  impact                     String?
+  potential_employee_trained Int?
+  nde_determination_id       String?         @unique
+  potential_revenue          Int?
+  approval_status            approval_status @default(draft)
   project                    project?
-  lir_requirement            document?  @relation("LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
-  mom_req                    document?  @relation("MOM_REQ", fields: [mom_req_id], references: [id])
-  nde_determination          document?  @relation("NDE_DETERMINATION", fields: [nde_determination_id], references: [id])
-  nde_request                document?  @relation("NDE_REQUEST", fields: [nde_request_id], references: [id])
-  pic_midfielder             pic        @relation(fields: [pic_midfielder_id], references: [id])
+  lir_requirement            document?       @relation("LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
+  mom_req                    document?       @relation("MOM_REQ", fields: [mom_req_id], references: [id])
+  nde_determination          document?       @relation("NDE_DETERMINATION", fields: [nde_determination_id], references: [id])
+  nde_request                document?       @relation("NDE_REQUEST", fields: [nde_request_id], references: [id])
+  pic_midfielder             pic?            @relation(fields: [pic_midfielder_id], references: [id])
 }
 
 model project_ongoing {
-  id                     String    @id @default(uuid())
-  nde_req_cfu_to_mid_id  String?   @unique
-  nde_req_mid_to_tcuc_id String?   @unique
-  UIC                    String
-  start_access           DateTime
-  end_access             DateTime
-  mom_readiness_id       String?   @unique
-  nde_confirmation_id    String?   @unique
-  baa_id                 String?   @unique
-  bast_id                String?   @unique
-  is_approved            Boolean   @default(false)
+  id                     String          @id @default(uuid())
+  project_id             String
+  nde_req_cfu_to_mid_id  String?         @unique
+  nde_req_mid_to_tcuc_id String?         @unique
+  UIC                    String?
+  start_access           DateTime?
+  end_access             DateTime?
+  mom_readiness_id       String?         @unique
+  nde_confirmation_id    String?         @unique
+  baa_id                 String?         @unique
+  bast_id                String?         @unique
+  approval_status        approval_status @default(draft)
   project                project?
-  baa                    document? @relation("BAA", fields: [baa_id], references: [id])
-  bast                   document? @relation("BAST", fields: [bast_id], references: [id])
-  mom_readiness          document? @relation("MOM_READINESS", fields: [mom_readiness_id], references: [id])
-  nde_confirmation       document? @relation("NDE_CONFIRMATION", fields: [nde_confirmation_id], references: [id])
-  nde_req_cfu_to_mid     document? @relation("NDE_REQ_CFU_TO_MID", fields: [nde_req_cfu_to_mid_id], references: [id])
-  nde_req_mid_to_tcuc    document? @relation("NDE_REQ_MID_TO_TCUC", fields: [nde_req_mid_to_tcuc_id], references: [id])
+  baa                    document?       @relation("BAA", fields: [baa_id], references: [id])
+  bast                   document?       @relation("BAST", fields: [bast_id], references: [id])
+  mom_readiness          document?       @relation("MOM_READINESS", fields: [mom_readiness_id], references: [id])
+  nde_confirmation       document?       @relation("NDE_CONFIRMATION", fields: [nde_confirmation_id], references: [id])
+  nde_req_cfu_to_mid     document?       @relation("NDE_REQ_CFU_TO_MID", fields: [nde_req_cfu_to_mid_id], references: [id])
+  nde_req_mid_to_tcuc    document?       @relation("NDE_REQ_MID_TO_TCUC", fields: [nde_req_mid_to_tcuc_id], references: [id])
 }
 
 model project_drop {
-  id                  String    @id @default(uuid())
-  nde_project_drop_id String?   @unique
-  is_approved         Boolean   @default(false)
+  id                  String          @id @default(uuid())
+  project_id          String
+  nde_project_drop_id String?         @unique
+  approval_status     approval_status @default(draft)
   project             project?
-  nde_project_drop    document? @relation("NDE_PROJECT_DROP", fields: [nde_project_drop_id], references: [id])
+  nde_project_drop    document?       @relation("NDE_PROJECT_DROP", fields: [nde_project_drop_id], references: [id])
 }
 
 model project_close_out {
-  id                         String    @id @default(uuid())
-  mom_reconciles_id          String?   @unique
-  nde_revenue_recognition_id String?   @unique
-  employee_trained           Int
-  revenue_in                 Int
-  report_project_id          String?   @unique
-  nde_report_project_id      String?   @unique
-  nps_id                     String?   @unique
-  delivery_year              String
-  is_approved                Boolean   @default(false)
+  id                         String          @id @default(uuid())
+  project_id                 String
+  mom_reconciles_id          String?         @unique
+  nde_revenue_recognition_id String?         @unique
+  employee_trained           Int?
+  revenue_in                 Int?
+  report_project_id          String?         @unique
+  nde_report_project_id      String?         @unique
+  nps_id                     String?         @unique
+  delivery_year              String?
+  approval_status            approval_status @default(draft)
   project                    project?
-  mom_reconciles             document? @relation("MOM_RECONCILES", fields: [mom_reconciles_id], references: [id])
-  nde_report_project         document? @relation("NDE_REPORT_PROJECT", fields: [nde_report_project_id], references: [id])
-  nde_revenue_recognition    document? @relation("NDE_REVENUE_RECOGNITION", fields: [nde_revenue_recognition_id], references: [id])
-  nps                        document? @relation("NPS", fields: [nps_id], references: [id])
-  report_project             document? @relation("REPORT_PROJECT", fields: [report_project_id], references: [id])
+  mom_reconciles             document?       @relation("MOM_RECONCILES", fields: [mom_reconciles_id], references: [id])
+  nde_report_project         document?       @relation("NDE_REPORT_PROJECT", fields: [nde_report_project_id], references: [id])
+  nde_revenue_recognition    document?       @relation("NDE_REVENUE_RECOGNITION", fields: [nde_revenue_recognition_id], references: [id])
+  nps                        document?       @relation("NPS", fields: [nps_id], references: [id])
+  report_project             document?       @relation("REPORT_PROJECT", fields: [report_project_id], references: [id])
+}
+
+enum approval_status {
+  draft
+  waiting
+  approved
+  declined
 }
 
 model document {
@@ -180,15 +192,21 @@ model notification {
 }
 
 model comment {
-  id         Int       @id @default(autoincrement())
-  user_id    Int
-  comment    String
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  project_id String    @unique
-  deleted_at DateTime?
-  project    project   @relation(fields: [project_id], references: [id])
-  user       users     @relation(fields: [user_id], references: [user_id])
+  id           Int          @id @default(autoincrement())
+  user_id      Int
+  comment      String
+  comment_type comment_type @default(comment)
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
+  project_id   String       @unique
+  deleted_at   DateTime?
+  project      project      @relation(fields: [project_id], references: [id])
+  user         users        @relation(fields: [user_id], references: [user_id])
+}
+
+enum comment_type {
+  comment
+  log
 }
 
 model project_solution {
