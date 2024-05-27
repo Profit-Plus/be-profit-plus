@@ -6,7 +6,6 @@ const authRouter = require('./routes/auth/authRoutes');
 const picRouter = require('./routes/projectMonitoring/picRoutes');
 const cors = require('cors');
 
-
 // Tarif Route  
 const searchRoute = require('./routes/tariffRoutes/searchRoute');
 const sheetRoute = require('./routes/tariffRoutes/searchRoute');
