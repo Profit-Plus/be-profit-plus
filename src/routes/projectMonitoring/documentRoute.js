@@ -1,7 +1,7 @@
 const express = require('express');
 const documentRouter = express.Router();
 const documentController = require('../../controllers/projectMonitoring/documentController');
-const { authenticationMiddleware } = require('../../middlewares/authMiddlewares/authMiddleware');
+const authenticationMiddleware = require('../../middlewares/authentication/auth.middleware');
 
 // Use Auth Middleware
 documentRouter.use('/document', authenticationMiddleware.authenticateUser);
