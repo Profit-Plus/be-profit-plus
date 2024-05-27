@@ -36,7 +36,7 @@
     "uuid": "^9.0.1"
   },
   "prisma": {
-    "schema": "src/models/master_calculator.prisma"
+    "schema": "src/models/profit.prisma"
   },
   "devDependencies": {
     "@prisma/client": "^5.13.0",
