@@ -11,19 +11,19 @@ datasource db {
 model pic {
   id             String         @id @default(uuid())
   name           String
-  phone          String         @unique(map: "pic_phone_key")
+  phone          String
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
   role           pic_role_enum
-  deleted_at     DateTime?  
+  deleted_at     DateTime?
   pic_external   project[]      @relation("EXTERNAL_PIC")
   pic_segment    project[]      @relation("SEGMENT_PIC")
   pic_midfielder project_init[]
 }
 
 model customer {
-  id         Int       @id @default(autoincrement())
-  name       String    @unique(map: "customer_name_key")
+  id         String    @id @default(uuid())
+  name       String
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
@@ -176,7 +176,7 @@ model document {
 }
 
 model notification {
-  id          Int       @id @default(autoincrement())
+  id          String    @id @default(uuid())
   header      String
   content     String
   category    String
@@ -192,7 +192,7 @@ model notification {
 }
 
 model comment {
-  id           Int          @id @default(autoincrement())
+  id           String       @id @default(uuid())
   user_id      String
   comment      String
   comment_type comment_type @default(comment)
