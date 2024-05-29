@@ -9,92 +9,323 @@ datasource db {
 
 //  Authentication Schema
 model users {
-    user_id                 String              @id @default(uuid())
-    units_name              String              // foreign key of units
-    level_name              String              // foreign key of levels
-    access_credentials_id   String              @unique  // foreign key of login_credentials
-    team_name               String              //  Foreign key of teams
+    user_id String @id @default(uuid())
+    units_name String // foreign key of units
+    level_name String  // foreign key of levels
+    access_credentials_id String @unique // foreign key of login_credentials
+    team_name String // foreign key of teams
 
     // Relations section
-    unit_leader          unit_leader?           // 1 to 1 relation with unit_leader
-    units                units                  @relation(fields: [units_name], references: [units_name]) // 1 to Many relation with units
-    levels               levels                 @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
-    access_credentials   access_credentials     @relation(fields: [access_credentials_id], references: [access_credentials_id]) // 1 to 1 relation with login_credentials
-    teams                teams                  @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
+    unit_leader unit_leader? // 1 to 1 relation with unit_leader
+    units units @relation(fields: [units_name], references: [units_name]) // 1 to Many relation with units
+    levels levels @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
+    access_credentials access_credentials @relation(fields: [access_credentials_id], references: [access_credentials_id]) // 1 to 1 relation with login_credentials
+    teams teams @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
 
-    created_at           DateTime               @default(now())
-    updated_at           DateTime               @updatedAt   
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt   
 }
 
 model access_credentials {
-    access_credentials_id   String              @id @default(uuid())
-    user_name               String
-    email                   String              @unique
-    password                String
+    access_credentials_id String @id @default(uuid())
+    user_name String
+    email String @unique
+    password String
 
     // Relations section
-    users                users?
-    refresh_token        refresh_token[]
+    users users?
+    refresh_token refresh_token[]
 
-    created_at           DateTime               @default(now())
-    updated_at           DateTime               @updatedAt
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 model refresh_token {
-    id                      String              @id @unique @default(uuid())
-    hashed_token            String
-    access_credentials_id   String
+    id String @id @unique @default(uuid())
+    hashed_token String
+    access_credentials_id String
 
     // Relations section
-    access_credentials   access_credentials     @relation(fields: [access_credentials_id], references: [access_credentials_id], onDelete: Cascade)
+    access_credentials access_credentials @relation(fields: [access_credentials_id], references: [access_credentials_id], onDelete: Cascade)
 
-    created_at           DateTime               @default(now())
-    updated_at           DateTime               @updatedAt
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 // Insert a default data named '-'
 model units {
-    unit_id         String                  @id @default(uuid())
-    units_name      String                  @unique
-    users           users[]                 // 1 to many relation with users
-    unit_leader     unit_leader?            // 1 to 1 relation with unit_leader
+    unit_id String @id @default(uuid())
+    units_name String @unique
+    users users[] // 1 to many relation with users
+    unit_leader unit_leader? // 1 to 1 relation with unit_leader
 
-    created_at           DateTime           @default(now())
-    updated_at           DateTime           @updatedAt   
+    // Relation section
+    product_overview product_overview[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt   
 }
 
 model teams {
-    team_id     String                      @id @default(uuid())
-    team_name   String                      @unique
+    team_id String @id @default(uuid())
+    team_name String @unique
 
     // Relations section
-    users       users[]                     //   1 to many relation with users
+    users users[]                       //   1 to many relation with users
 
-    created_at           DateTime           @default(now())
-    updated_at           DateTime           @updatedAt
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 // Add new entity named unit_leader
 model unit_leader {
-    leader_id  String                       @id @default(uuid())
-    user_id    String                       @unique //  Foreign key of user
-    units_name String                       @unique // Foreign key of unit
+    leader_id String @id @default(uuid())
+    user_id String @unique //  Foreign key of user
+    unit_id String @unique // Foreign key of unit
 
     // Relations section
-    users      users                        @relation(fields: [user_id], references: [user_id])
-    units      units                        @relation(fields: [units_name], references: [units_name])
+    users users @relation(fields: [user_id], references: [user_id])
+    units units @relation(fields: [unit_id], references: [unit_id])
 
-    created_at           DateTime           @default(now())
-    updated_at           DateTime           @updatedAt
+    created_at  DateTime @default(now())
+    updated_at  DateTime @updatedAt
 }
 
 model levels {
-    level_id    String                      @id @default(uuid())
-    level_name  String                      @unique
+    level_id String @id @default(uuid())
+    level_name String @unique
 
     // Relations section
-    users       users[]
+    users users[]
 
-    created_at           DateTime           @default(now())
-    updated_at           DateTime           @updatedAt
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+// Product Overview Schema
+model taxonomy {
+    taxonomy_uuid String @id @default(uuid())
+    taxonomy_name String @unique
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt        
+}
+
+model product_overview {
+    product_uuid String @id @default(uuid())
+    unit_id String @default("undefined")   // Unit in charge
+    product_name String @default("undefined") @unique
+    product_description String @default("undefined")   
+    taxonomy_uuid String @default("undefined")   
+    product_profile_link String @default("undefined")   
+    product_website_link String @default("undefined")   
+    product_logo_dir String @default("undefined")   
+    product_playbook_dir String @default("undefined")   
+    product_marketing_collateral_dir String @default("undefined")   
+
+    //  Relation section
+    units units @relation(fields: [unit_id], references: [unit_id])
+    product_main_use product_main_use[]
+    product_gallery product_gallery[]
+    product_service product_service[]
+    product_positioning product_positioning?
+    product_segmenting_targeting product_segmenting_targeting?
+    product_differentiation product_differentiation_branding?
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_service {
+    product_service_uuid String @id @default(uuid())
+    product_uuid String
+    product_service_name String
+    product_service_desc String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_main_use {
+    product_main_use_uuid String @id @default(uuid())
+    product_uuid String
+    product_main_use_name String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_gallery {
+    product_overview_gallery_uuid String @id @default(uuid())
+    product_uuid String
+    product_picture_dir String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+// Product STPDB Schema
+
+//  Segmenting-Targeting
+model product_segmenting_targeting {
+    segmenting_targeting_uuid String @id @default(uuid())
+    product_uuid String @unique
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+    segmenting_targeting_feature_used segmenting_targeting_feature_used[]
+    segmenting_targeting_legends segmenting_targeting_legends[]
+    segmenting_targeting_market_potential segmenting_targeting_market_potential?
+    product_penta_helix_properties product_penta_helix_properties?
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+enum penta_helix {
+    BUSINESS
+    ACADEMY
+    TECH_PROVIDER
+    GOVERNMENT
+    COMMUNITY
+    SUBDIARIES
+}
+
+model product_penta_helix_properties {
+    penta_helix_uuid String @id @default(uuid())
+    segmenting_targeting_uuid String @unique
+
+    penta_helix penta_helix
+    penta_helix_desc String
+    penta_helix_user_desc String
+    penta_helix_status Int
+    
+    // Relation section
+    product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt    
+}
+
+model segmenting_targeting_feature_used {
+    feature_uuid String @id @default(uuid())
+    segmenting_targeting_uuid String
+    feature_desc String
+
+    // Relation section
+    product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+model segmenting_targeting_legends {
+    legends_uuid String @id @default(uuid())
+    segmenting_targeting_uuid String
+    legend_name String
+    legend_color_code String
+    legend_pos_x Int
+    legend_pos_y Int
+
+    // Relation section
+    product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+model segmenting_targeting_market_potential {
+    market_potential_uuid String @id @default(uuid())
+    segmenting_targeting_uuid String @unique
+    tam_desc String
+    sam_desc String
+    som_desc String
+
+    // Relation section
+    product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+model product_positioning {
+    positioning_uuid String @id @default(uuid())
+    product_uuid String @unique
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+    positioning_logos positioning_logos[]
+    product_positioning_story product_positioning_story[]
+    positioning_indicators positioning_indicators?
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+model positioning_indicators {
+    positioning_indicators_uuid String @id @default(uuid())
+    positioning_uuid String @unique
+    indicator_one_name String
+    indicator_two_name String
+    indicator_three_name String
+    indicator_four_name String
+
+    // Relation Section
+    product_positioning product_positioning @relation(fields: [positioning_uuid], references: [positioning_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+model positioning_logos {
+    positioning_logos_uuid String @id @default(uuid())
+    positioning_uuid String
+    logo_name String
+    logo_desc String
+    logo_pos_x String
+    logo_pos_y String
+
+    // Relation Section
+    product_positioning product_positioning @relation(fields: [positioning_uuid], references: [positioning_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt   
+}
+
+model product_differentiation_branding {
+    differentiation_branding_uuid String @id @default(uuid())
+    product_uuid String @unique
+    product_differentiation_slogan String
+    product_differentiation_desc String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+model product_positioning_story {
+    product_positioning_story_uuid String @id @default(uuid())
+    positioning_uuid String
+    sentence_one_market_target String
+    sentence_two_use_case String
+    sentence_three_name_product String
+    sentence_four_differentiation String
+    sentence_five_reason String
+    
+    // Relation section
+    product_positioning product_positioning @relation(fields: [positioning_uuid], references: [positioning_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
 }

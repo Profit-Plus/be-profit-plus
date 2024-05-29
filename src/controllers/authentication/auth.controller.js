@@ -10,10 +10,6 @@ const { v4: uuidv4 } = require('uuid');
 
 /**
  * @function userRegistration to handle the registration process of the user
- * the controller will also generate a refresh token and access token
- * @param {Object} req 
- * @param {JSON} res 
- * @param {Function} next 
  */
 async function userRegistration(req, res, next) {
     try {
@@ -24,24 +20,27 @@ async function userRegistration(req, res, next) {
         /* Validate the request body of registrationCredentials */
         const { error, value } = authValidator.accessCredentialsValidation(registrationCredentials);
         if (error) {
-            res.status(400).json(response.errorResponse({ error: error.details[0].message }));
+            res.status(400).json(response.errorResponse({
+                error: error.details[0].message
+            }));
             next(new Error('Failed validation!'));
         }
 
         /* Check if the email has been used before */
         const existingEmail = await userService.findAccessCredentials(value.email);
         if (existingEmail) {
-            res.status(400).json(response.errorResponse('Email has been used!'));
+            res.status(409).json(response.errorResponse('Email has been used!'));
             next(new Error('Failed validation!'));
         }
 
         /* Create a new user credentials and add the details to user table */
         const newAccessCredentials = await userService.createUserAccessCredentials(value);
         await userService.createNewUsers(userProperties, newAccessCredentials);
-
+        
         /* Generate access token and refresh token */
         const jwtId = uuidv4();
-        const { accessToken, refreshToken } = generateTokens(value, userProperties, jwtId);
+        const { accessToken, refreshToken } =
+        generateTokens(value, userProperties, jwtId);
         await authService.addRefreshTokenToWhiteList({ jwtId, refreshToken, accessCredentialsId: newAccessCredentials.access_credentials_id});
 
         /* Send responses */
@@ -54,11 +53,7 @@ async function userRegistration(req, res, next) {
 }
 
 /**
- * @function userLogin to handle the login process of the user
- * the controller will also generate a refresh token and access token
- * @param {Object} req 
- * @param {JSON} res 
- * @param {Function} next 
+ * @function userLogin to handle the login process of the user and generete a pair of access token and refresh token
  */
 async function userLogin(req, res, next) {
     try {
@@ -75,7 +70,7 @@ async function userLogin(req, res, next) {
         /* Check if the email belongs to existed user */
         const existedEmail = await userService.findAccessCredentials(value.email);
         if (!existedEmail) {
-            res.status(400).json(response.errorResponse("Wrong credentials!"));
+            res.status(401).json(response.errorResponse("Wrong credentials!"));
             next(new Error('Wrong credentials!'));
         }
 
@@ -88,6 +83,7 @@ async function userLogin(req, res, next) {
 
         /* If no errors occured, generate access and refresh token */
         /* Generate access token and refresh token */
+        
         const jwtId = uuidv4();
         const userProperties = await userService.findUserPropertiesByAccessCredentialId(existedEmail.access_credentials_id);
         const { accessToken, refreshToken } = generateTokens(existedEmail, userProperties, jwtId);
@@ -111,9 +107,6 @@ async function userLogin(req, res, next) {
 
 /**
  * @function generateNewToken to generate a new access token (Called when the access token has expired)
- * @param {Object} req 
- * @param {JSON} res 
- * @param {Function} next 
  */
 async function generateNewToken(req, res, next) {
     try {
@@ -131,7 +124,9 @@ async function generateNewToken(req, res, next) {
                 } else {
                     res.status(400).json(response.errorResponse('Token is invalid!'));
                     next(new Error('Invalid token!'));
+
                 }
+
             } else {
                 /* Check if the token belongs to a valid user  */
                 const validUser = await userService.checkUserValidation(decoded.userId);
@@ -161,75 +156,7 @@ async function generateNewToken(req, res, next) {
                 }
             }
         });
-    } catch (error) {
-        res.status(500).json(response.errorResponse('Internal Server error!'));
-        next(error);
-    }
-}
-
-/**
- * @function addNewLevel to add a new name of level
- * @param {Object} req 
- * @param {JSON} res 
- * @param {Function} next 
- */
-async function addNewLevel(req, res, next) {
-    try {
-        /* Initialize the request body of the API and uuid */
-        const level = req.body;
-        const id = uuidv4();
-
-        /* Add a new level name */
-        await userService.addNewLevel(id, level);
-
-        /* Send responses */
-        res.status(200).json(response.successResponse('New level added!', level));
-    } catch (error) {
-        res.status(500).json(response.errorResponse('Internal Server error!'));
-        next(error);
-    }
-}
-
-/**
- * @function addNewUnit to add a new name of unit
- * @param {Object} req 
- * @param {JSON} res 
- * @param {Function} next 
- */
-async function addNewUnit(req, res, next) {
-    try {
-        /* Initialize the request body of the API and uuid */
-        const unit = req.body;
-        const id = uuidv4();
-
-        /* Add a new level name */
-        await userService.addNewUnit(id, unit);
-
-        /* Send responses */
-        res.status(200).json(response.successResponse('New unit added!', unit));
-    } catch (error) {
-        res.status(500).json(response.errorResponse('Internal Server error!'));
-        next(error);
-    }
-}
-
-/**
- * @function addNewLevel to add a new name of level
- * @param {Object} req 
- * @param {JSON} res 
- * @param {Function} next 
- */
-async function addNewTeam(req, res, next) {
-    try {
-        /* Initialize the request body of the API and uuid */
-        const team = req.body;
-        const id = uuidv4();
-
-        /* Add a new level name */
-        await userService.addNewTeam(id, team);
-
-        /* Send responses */
-        res.status(200).json(response.successResponse('New team added!', team));
+        
     } catch (error) {
         res.status(500).json(response.errorResponse('Internal Server error!'));
         next(error);
@@ -239,8 +166,5 @@ async function addNewTeam(req, res, next) {
 module.exports = {
     userRegistration,
     userLogin,
-    generateNewToken,
-    addNewLevel,
-    addNewUnit,
-    addNewTeam
+    generateNewToken
 }

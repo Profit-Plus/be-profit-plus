@@ -1,0 +1,17 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\controllers",
+    "\\src\\controllers\\productGuideEditor",
+    "\\src\\helpers",
+    "\\src\\helpers\\token",
+    "\\src\\middlewares",
+    "\\src\\middlewares\\authentication",
+    "\\src\\models",
+    "\\src\\services",
+    "\\src\\services\\productGuideEditor"
+  ],
+  "SelectedNode": "\\src\\services\\productGuideEditor\\step1.service.js",
+  "PreviewInSolutionExplorer": false
+}
