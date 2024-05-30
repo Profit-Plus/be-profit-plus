@@ -1,68 +1,153 @@
 const { database } = require('../../helpers/utils/db/database');
-const { v4: uuidv4 } = require('uuid');
 
-function createProject(data) {
-    return database.project.create({
-        data: {
-            ...data,
-            project_init: {
-                create: {
-                    id: uuidv4(),
-                    project_id: data.id
-                }
+const omitIncludeOptions = {
+    omit: {
+        customer_id: true,
+        project_init_id: true,
+        project_ongoing_id: true,
+        project_drop_id: true,
+        project_close_out_id: true,
+        creator_id: true,
+        updater_id: true,
+        solution_id: true,
+        pic_external_id: true,
+        pic_lira_id: true
+    },
+    include: {
+        customer: true,
+        members: {
+            omit: { password: true }
+        },
+        project_init: {
+            omit: {
+                lir_requirement_id: true,
+                mom_req_id: true,
+                nde_determination_id: true,
+                nde_request_id: true,
+                sph_id: true,
+                spk_id: true
             },
-            project_ongoing: {
-                create: {
-                    id: uuidv4(),
-                    project_id: data.id
-                }
+            include: {
+                lir_requirement: true,
+                mom_req: true,
+                nde_determination: true,
+                nde_request: true,
+                sph: true,
+                spk: true
+            }
+        },
+        project_ongoing: {
+            omit: {
+                baa_id: true,
+                bast_id: true,
+                mom_readiness_id: true,
+                nde_confirmation_id: true,
+                nde_req_cfu_to_mid_id: true,
+                nde_req_mid_to_tcuc_id: true
             },
-            project_drop: {
-                create: {
-                    id: uuidv4(),
-                    project_id: data.id
-                }
+            include: {
+                baa: true,
+                bast: true,
+                mom_readiness: true,
+                nde_confirmation: true,
+                nde_req_cfu_to_mid: true,
+                nde_req_mid_to_tcuc: true
+            }
+        },
+        project_drop: {
+            omit: {
+                nde_project_drop_id: true
             },
-            project_close_out: {
-                create: {
-                    id: uuidv4(),
-                    project_id: data.id
-                }
+            include: {
+                nde_project_drop: true
+            }
+        },
+        project_close_out: {
+            omit: {
+                mom_reconciles_id: true,
+                nde_report_project_id: true,
+                nde_revenue_recognition_id: true,
+                nps_id: true,
+                report_project_id: true
             },
-        }
-    });
+            include: {
+                mom_reconciles: true,
+                nde_report_project: true,
+                nde_revenue_recognition: true,
+                nps: true,
+                report_project: true
+            }
+        },
+        created_by: {
+            omit: { password: true }
+        },
+        updated_by: {
+            omit: { password: true }
+        },
+        solution: {
+            include: {
+                items: {
+                    include: {
+                        package: true,
+                        product: true
+                    }
+                }
+            }
+        },
+        pic_external: true,
+        pic_lira: true
+    }
 }
 
-function createProjectInit(data) {
-    return database.project_init.create({
-        data: data
-    });
-}
+async function createProject(payload) {
+    const result = await database.$transaction(async (transaction) => {
+        const init = await transaction.project_init.create({
+            data: { project_id: payload.project.id }
+        });
+        const ongoing = await transaction.project_ongoing.create({
+            data: { project_id: payload.project.id }
+        });
+        const drop = await transaction.project_drop.create({
+            data: { project_id: payload.project.id }
+        });
+        const closeout = await transaction.project_close_out.create({
+            data: { project_id: payload.project.id }
+        });
+        const solution = await transaction.project_solution.create({
+            data: { solution_name: payload.solution.solution_name }
+        });
+        await transaction.project_solution_detail.createMany({
+            data: payload.solution.items.map((item) => ({
+                ...item,
+                project_solution_id: solution.id
+            }))
+        });
 
-function createProjectOngoing(data) {
-    return database.project_ongoing.create({
-        data: data
-    });
-}
+        const project = await transaction.project.create({
+            data: {
+                ...payload.project,
+                members: {
+                    connect: { access_credentials_id: payload.project.creator_id }
+                },
+                project_init_id: init.id,
+                project_ongoing_id: ongoing.id,
+                project_drop_id: drop.id,
+                project_close_out_id: closeout.id,
+                solution_id: solution.id
+            }
+        });
 
-function createProjectCloseOut(data) {
-    return database.project_close_out.create({
-        data: data
+        return project;
     });
-}
 
-function createProjectDrop(data) {
-    return database.project_drop.create({
-        data: data
-    });
+    return result;
 }
 
 async function findAllProjects(params) {
     const condition = {
-        OR: [
-            { customer: { contains: params.search } },
-            { topic: { contains: params.search } }
-        ],
+        topic: { contains: params.search },
+        requesting_approval: params.requesting_approval,
+        status: params.status,
         created_at: {
             gte: params.start_date ? new Date(params.start_date) : undefined,
             lt: params.end_date ? new Date(new Date(params.end_date).getTime() + 24 * 60 * 60 * 1000) : undefined
@@ -76,7 +161,8 @@ async function findAllProjects(params) {
             orderBy: {
                 [params.sort]: params.order
             },
-            where: condition
+            where: condition,
+            include: { customer: true }
         }),
         database.project.count({ where: condition })
     ]);
@@ -91,79 +177,72 @@ async function findAllProjects(params) {
 
 function findProject(projectId) {
     return database.project.findUnique({
-        where: { id: projectId }
+        where: { id: projectId },
+        ...omitIncludeOptions
     });
 }
 
-function findProjectInit(projectInitId) {
-    return database.project_init.findUnique({
-        where: { id: projectInitId }
-    });
-}
+async function updateProject({ projectId, projectInitId, projectOngoingId, projectDropId, projectCloseOutId, projectSolutionId, isMember, payload }) {
+    const result = await database.$transaction(async (transaction) => {
+        if (payload.project_init) {
+            await transaction.project_init.update({
+                data: payload.project_init,
+                where: { id: projectInitId }
+            });
+        }
+        if (payload.project_ongoing) {
+            await transaction.project_ongoing.update({
+                data: payload.project_ongoing,
+                where: { id: projectOngoingId }
+            });
+        }
+        if (payload.project_drop) {
+            await transaction.project_drop.update({
+                data: payload.project_drop,
+                where: { id: projectDropId }
+            });
+        }
+        if (payload.project_close_out) {
+            await transaction.project_close_out.update({
+                data: payload.project_close_out,
+                where: { id: projectCloseOutId }
+            });
+        }
+        if (payload.solution) {
+            await transaction.project_solution.update({
+                data: {
+                    solution_name: payload.solution.solution_name
+                },
+                where: { id: projectSolutionId }
+            });
+            if (payload.solution.items.length > 0) {
+                await transaction.project_solution_detail.deleteMany({
+                    where: { project_solution_id: projectSolutionId }
+                });
+                await transaction.project_solution_detail.createMany({
+                    data: payload.solution.items.map((item) => ({
+                        ...item,
+                        project_solution_id: projectSolutionId
+                    }))
+                });
+            }
+        }
+        const project = await transaction.project.update({
+            data: {
+                ...payload.project,
+                members: {
+                    connect: isMember ? [] : { access_credentials_id: payload.project.updater_id }
+                }
+            },
+            where: { id: projectId },
+            ...omitIncludeOptions
+        });
 
-function findProjectOngoing(projectOngoingId) {
-    return database.project_ongoing.findUnique({
-        where: { id: projectOngoingId }
+        return project;
     });
-}
 
-function findProjectCloseOut(projectCloseOutId) {
-    return database.project_close_out.findUnique({
-        where: { id: projectCloseOutId }
-    });
+    return result;
 }
-
-function findProjectDrop(projectDropId) {
-    return database.project_drop.findUnique({
-        where: { id: projectDropId }
-    });
-}
-
-function updateProject(projectId, data) {
-    return database.project.update({
-        where: {
-            id: projectId
-        },
-        data: data
-    });
-}
-
-function updateProjectInit(projectInitId, data) {
-    return database.project_init.update({
-        where: {
-            id: projectInitId
-        },
-        data: data
-    });
-}
-
-function updateProjectOngoing(projectOngoingId, data) {
-    return database.project_ongoing.update({
-        where: {
-            id: projectOngoingId
-        },
-        data: data
-    });
-}
-
-function updateProjectCloseOut(projectCloseOutId, data) {
-    return database.project_close_out.update({
-        where: {
-            id: projectCloseOutId
-        },
-        data: data
-    });
-}
-
-function updateProjectDrop(projectDropId, data) {
-    return database.project_close_out.update({
-        where: {
-            id: projectDropId
-        },
-        data: data
-    });
-}
-
 
 function deleteProject(projectId) {
     return database.project.delete({
@@ -173,27 +252,32 @@ function deleteProject(projectId) {
     });
 }
 
-function doTransaction(transactions) {  
-    return database.$transaction(transactions);
+async function updateProjectApprovalStatus({ projectId, model, identifier, projectStatus, approvalStatus, logMsg, comment }) {
+    const result = await database.$transaction(async (transaction) => {
+        await transaction[model].update({
+            data: { approval_status: approvalStatus },
+            where: { id: identifier }
+        });
+        const project = await transaction.project.update({
+            data: {
+                requesting_approval: approvalStatus == 'requesting',
+                status: projectStatus
+            },
+            where: { id: projectId },
+            ...omitIncludeOptions
+        });
+
+        return project;
+    });
+
+    return result;
 }
 
 module.exports = {
     createProject,
-    createProjectInit,
-    createProjectOngoing,
-    createProjectCloseOut,
-    createProjectDrop,
     findAllProjects,
     findProject,
-    findProjectInit,
-    findProjectOngoing,
-    findProjectCloseOut,
-    findProjectDrop,
     updateProject,
-    updateProjectInit,
-    updateProjectOngoing,
-    updateProjectCloseOut,
-    updateProjectDrop,
+    updateProjectApprovalStatus,
     deleteProject,
-    doTransaction
 };
