@@ -95,7 +95,7 @@ function isUpdateProjectValid() {
                     mom_readiness_id: { type: 'string' },
                     nde_confirmation_id: { type: 'string' },
                     baa_id: { type: 'string' },
-                    bast_id: { type: 'string' },
+                    bast_id: { type: 'string' }
                 }
             },
             project_drop: {
@@ -114,7 +114,7 @@ function isUpdateProjectValid() {
                     report_project_id: { type: 'string' },
                     nde_report_project_id: { type: 'string' },
                     nps_id: { type: 'string' },
-                    delivery_year: { type: 'string' },
+                    delivery_year: { type: 'string' }
                 }
             },
             solution: {

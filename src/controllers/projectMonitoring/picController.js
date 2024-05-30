@@ -1,7 +1,5 @@
-const { Prisma } = require('@prisma/client');
 const picService = require('../../services/projectMonitoring/picService');
 const webResponses = require('../../helpers/web/webResponses');
-const { v4: uuidv4 } = require('uuid');
 const picValidator = require('../../validators/PIC.validator');
 const { formatErrorMessage } = require('../../helpers/utils/validator/formatError');
 
@@ -23,10 +21,10 @@ async function createPIC(req, res) {
         const pic = await picService.createPIC({
             name: name,
             phone: phone,
-            role: role,
+            role: role
         });
 
-        res.status(200).json(webResponses.successResponse('PIC created successfully!', pic));
+        res.status(201).json(webResponses.successResponse('PIC created successfully!', pic));
     } catch (e) {
         console.log(e);
         throw e;
@@ -46,7 +44,7 @@ async function getAllPICs(req, res) {
             role: req.query.role,
             start_date: req.query.start_date,
             end_date: req.query.end_date
-        }
+        };
 
         if (!params.page || params.page < 1) params.page = 1;
         if (!params.limit || params.limit < 1) params.limit = 10;
@@ -144,4 +142,4 @@ module.exports = {
     getAllPICs,
     updatePIC,
     deletePIC
-};
+}

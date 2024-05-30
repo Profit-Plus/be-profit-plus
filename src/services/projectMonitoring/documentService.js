@@ -1,8 +1,8 @@
 const { database } = require('../../helpers/utils/db/database');
 
-function createDocument(data) {
+function createDocument(payload) {
     return database.document.create({
-        data: data
+        data: payload
     });
 }
 
@@ -42,12 +42,12 @@ function findDocument(documentId) {
     });
 }
 
-function updateDocument(documentId, data) {
+function updateDocument(documentId, payload) {
     return database.document.update({
         where: {
             id: documentId
         },
-        data: data
+        data: payload
     });
 }
 
@@ -65,4 +65,4 @@ module.exports = {
     findDocument,
     updateDocument,
     deleteDocument
-};
+}

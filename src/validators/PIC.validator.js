@@ -18,13 +18,13 @@ function isCreatePICValid() {
             role: { type: 'string', enum: ['LIRA', 'external', 'midfielder'] },
         },
         required: ['name', 'phone', 'role'],
-        additionalProperties: false,
+        additionalProperties: false
     };
 
     const validate = ajv.compile(schema);
 
     return validate;
-};
+}
 
 function isUpdatePICValid() {
     const schema = {
@@ -34,13 +34,13 @@ function isUpdatePICValid() {
             phone: { type: 'string', minLength: 7, maxLength: 13 },
             role: { type: 'string', enum: ['LIRA', 'external', 'midfielder'] },
         },
-        additionalProperties: false,
+        additionalProperties: false
     };
 
     const validate = ajv.compile(schema);
 
     return validate;
-};
+}
 
 function isGetAllPICValid() {
     const dateErrorMessage = 'format should be \'yyyy-mm-dd\'';
@@ -52,16 +52,16 @@ function isGetAllPICValid() {
             start_date: { type: 'string', format: 'date', errorMessage: dateErrorMessage },
             end_date: { type: 'string', format: 'date', errorMessage: dateErrorMessage }
         },
-        additionalProperties: true,
+        additionalProperties: true
     };
 
     const validate = ajv.compile(schema);
 
     return validate;
-};
+}
 
 module.exports = {
     isCreatePICValid,
     isUpdatePICValid,
     isGetAllPICValid
-};
+}

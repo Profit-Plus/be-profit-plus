@@ -1,4 +1,3 @@
-const { Prisma } = require('@prisma/client');
 const customerService = require('../../services/projectMonitoring/customerService');
 const webResponses = require('../../helpers/web/webResponses');
 const customerValidator = require('../../validators/Customer.validator');
@@ -23,7 +22,7 @@ async function createCustomer(req, res) {
             name: name
         });
 
-        res.status(200).json(webResponses.successResponse('Customer created successfully!', customer));
+        res.status(201).json(webResponses.successResponse('Customer created successfully!', customer));
     } catch (e) {
         console.log(e);
         throw e;
@@ -42,7 +41,7 @@ async function getAllCustomers(req, res) {
             order: req.query.order ?? 'desc',
             start_date: req.query.start_date,
             end_date: req.query.end_date
-        }
+        };
 
         if (!params.page || params.page < 1) params.page = 1;
         if (!params.limit || params.limit < 1) params.limit = 10;
@@ -134,4 +133,4 @@ module.exports = {
     getAllCustomers,
     updateCustomer,
     deleteCustomer
-};
+}

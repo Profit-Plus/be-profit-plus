@@ -280,4 +280,4 @@ module.exports = {
     updateProject,
     updateProjectApprovalStatus,
     deleteProject,
-};
+}

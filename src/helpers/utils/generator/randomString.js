@@ -9,4 +9,4 @@ function generateRandomString(maxDigits = 6) {
     return result;
 }
 
-module.exports = generateRandomString;
+module.exports = generateRandomString

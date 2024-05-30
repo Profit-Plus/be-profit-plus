@@ -1,4 +1,3 @@
-const { Prisma } = require('@prisma/client');
 const documentService = require('../../services/projectMonitoring/documentService');
 const webResponses = require('../../helpers/web/webResponses');
 const documentValidator = require('../../validators/Document.validator');
@@ -48,7 +47,7 @@ async function createDocument(req, res) {
             const id = uuidv4();
             const newDocName = `${docType.toUpperCase()}_${id}.${fileExt}`;
 
-            const uploadDir = path.join('src\\uploads', 'documents', docType.toUpperCase());
+            const uploadDir = path.join('src\\resources', 'documents', docType.toUpperCase());
             filestream.mkdirSync(uploadDir, { recursive: true });
 
             const oldPath = uploadedDoc.filepath;
@@ -66,7 +65,7 @@ async function createDocument(req, res) {
                     mime_type: uploadedDoc.mimetype,
                     location: newPath,
                     document_type: docType.toLowerCase()
-                }
+                };
 
                 const document = await documentService.createDocument(docData);
 
@@ -91,7 +90,7 @@ async function getAllDocuments(req, res) {
             order: req.query.order ?? 'desc',
             start_date: req.query.start_date,
             end_date: req.query.end_date
-        }
+        };
 
         if (!params.page || params.page < 1) params.page = 1;
         if (!params.limit || params.limit < 1) params.limit = 10;
@@ -188,7 +187,7 @@ async function updateDocument(req, res) {
                 uploadDir = uploadDir.toString().replaceAll(',', '\\');                
 
                 if (docType && docType != document.document_type) {
-                    uploadDir = path.join('src\\uploads', 'documents', docType.toUpperCase());
+                    uploadDir = path.join('src\\resources', 'documents', docType.toUpperCase());
                     docName = `${docType.toUpperCase()}_${document.id}.${fileExt}`;
                 }
 
@@ -215,7 +214,7 @@ async function updateDocument(req, res) {
                         mime_type: uploadedDoc.mimetype,
                         location: newPath,
                         document_type: docType.toLowerCase()
-                    }
+                    };
 
                     const updatedDoc = await documentService.updateDocument(documentId, docData);
 
@@ -268,4 +267,4 @@ module.exports = {
     updateDocument,
     deleteDocument,
     downloadDocument
-};
+}

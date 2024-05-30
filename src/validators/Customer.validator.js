@@ -18,7 +18,7 @@ function isGetAllCustomersValid() {
             start_date: { type: 'string', format: 'date', errorMessage: dateErrorMessage },
             end_date: { type: 'string', format: 'date', errorMessage: dateErrorMessage }
         },
-        additionalProperties: true,
+        additionalProperties: true
     };
 
     const validate = ajv.compile(schema);
@@ -33,7 +33,7 @@ function isDataCustomerValid() {
             name: { type: 'string', minLength: 1, maxLength: 68, nullable: false },
         },
         required: ['name'],
-        additionalProperties: false,
+        additionalProperties: false
     };
 
     const validate = ajv.compile(schema);
@@ -41,4 +41,4 @@ function isDataCustomerValid() {
     return validate;
 }
 
-module.exports = { isDataCustomerValid, isGetAllCustomersValid };
+module.exports = { isDataCustomerValid, isGetAllCustomersValid }

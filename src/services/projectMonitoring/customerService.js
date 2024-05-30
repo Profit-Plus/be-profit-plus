@@ -1,8 +1,8 @@
 const { database } = require('../../helpers/utils/db/database');
 
-function createCustomer(data) {
+function createCustomer(payload) {
     return database.customer.create({
-        data: data
+        data: payload
     });
 }
 
@@ -55,12 +55,12 @@ async function findUniqueName(customerName) {
     else return false;
 }
 
-function updateCustomer(customerId, data) {
+function updateCustomer(customerId, payload) {
     return database.customer.update({
         where: {
             id: customerId
         },
-        data: data
+        data: payload
     });
 }
 
@@ -79,4 +79,4 @@ module.exports = {
     findUniqueName,
     updateCustomer,
     deleteCustomer
-};
+}

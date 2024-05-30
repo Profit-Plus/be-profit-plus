@@ -47,7 +47,7 @@ async function getAllProjects(req, res) {
             end_date: req.query.end_date,
             requesting_approval: parseStringToBoolean(req.query.requesting_approval),
             status: req.query.status
-        }
+        };
 
         if (!params.page || params.page < 1) params.page = 1;
         if (!params.limit || params.limit < 1) params.limit = 10;
@@ -267,4 +267,4 @@ module.exports = {
     sendApprovalRequest,
     approveApprovalRequest,
     declineApprovalRequest
-};
+}

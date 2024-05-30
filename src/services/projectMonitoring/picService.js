@@ -1,8 +1,8 @@
 const { database } = require('../../helpers/utils/db/database');
 
-function createPIC(data) {
+function createPIC(payload) {
     return database.pic.create({
-        data: data
+        data: payload
     });
 }
 
@@ -61,10 +61,10 @@ async function findUniquePhone(picPhone) {
     else return false;
 }
 
-function updatePIC(picId, data) {
+function updatePIC(picId, payload) {
     return database.pic.update({
         where: { id: picId },
-        data: data
+        data: payload
     });
 }
 
@@ -81,5 +81,5 @@ module.exports = {
     findUniquePhone,
     updatePIC,
     deletePIC
-};
+}
 
