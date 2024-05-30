@@ -17,7 +17,7 @@ model pic {
   role           pic_role_enum
   deleted_at     DateTime?
   pic_external   project[]      @relation("EXTERNAL_PIC")
-  pic_segment    project[]      @relation("SEGMENT_PIC")
+  pic_lira       project[]      @relation("LIRA_PIC")
   pic_midfielder project_init[]
 }
 
@@ -27,42 +27,44 @@ model customer {
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
+  project    project[]
 }
 
 model project {
-  id                    String             @id @default(uuid())
-  start_date            DateTime
-  end_date              DateTime
-  subscription_duration Int?
-  customer              String
-  topic                 String
-  status                project_status     @default(initiation)
-  pic_external_id       String
-  segment               segment_enum
-  pic_segment_id        String
-  project_init_id       String?            @unique
-  project_ongoing_id    String?            @unique
-  project_drop_id       String?            @unique
-  project_close_out_id  String?            @unique
-  passcode              String
-  created_at            DateTime           @default(now())
-  updated_at            DateTime           @updatedAt
-  solution_id           String?            @unique
-  tariff                Int
-  deleted_at            DateTime?
-  creator_id            String?
-  updater_id            String?
-  requesting_approval   Boolean            @default(false)
-  comments              comment?
-  created_by            users?             @relation("CREATOR", fields: [creator_id], references: [user_id])
-  pic_external          pic                @relation("EXTERNAL_PIC", fields: [pic_external_id], references: [id])
-  pic_segment           pic                @relation("SEGMENT_PIC", fields: [pic_segment_id], references: [id])
-  project_close_out     project_close_out? @relation(fields: [project_close_out_id], references: [id])
-  project_drop          project_drop?      @relation(fields: [project_drop_id], references: [id])
-  project_init          project_init?      @relation(fields: [project_init_id], references: [id])
-  project_ongoing       project_ongoing?   @relation(fields: [project_ongoing_id], references: [id])
-  solution              project_solution?  @relation(fields: [solution_id], references: [id])
-  updated_by            users?             @relation("UPDATER", fields: [updater_id], references: [user_id])
+  id                   String               @id @default(uuid())
+  start_project        DateTime
+  end_project          DateTime
+  customer_id          String
+  topic                String
+  status               project_status       @default(initiation)
+  pic_external_id      String?
+  segment              segment_enum
+  pic_lira_id          String?
+  project_init_id      String?              @unique
+  project_ongoing_id   String?              @unique
+  project_drop_id      String?              @unique
+  project_close_out_id String?              @unique
+  passcode             String
+  created_at           DateTime             @default(now())
+  updated_at           DateTime             @updatedAt
+  solution_id          String?              @unique
+  tariff               Int                  @default(0)
+  deleted_at           DateTime?
+  creator_id           String?
+  updater_id           String?
+  members              access_credentials[] @relation("PROJECT_MEMBERS")
+  requesting_approval  Boolean              @default(false)
+  comments             comment[]
+  customer             customer             @relation(fields: [customer_id], references: [id])
+  created_by           access_credentials?  @relation("CREATOR", fields: [creator_id], references: [access_credentials_id])
+  pic_external         pic?                 @relation("EXTERNAL_PIC", fields: [pic_external_id], references: [id])
+  pic_lira             pic?                 @relation("LIRA_PIC", fields: [pic_lira_id], references: [id])
+  project_close_out    project_close_out?   @relation(fields: [project_close_out_id], references: [id])
+  project_drop         project_drop?        @relation(fields: [project_drop_id], references: [id])
+  project_init         project_init?        @relation(fields: [project_init_id], references: [id])
+  project_ongoing      project_ongoing?     @relation(fields: [project_ongoing_id], references: [id])
+  solution             project_solution?    @relation(fields: [solution_id], references: [id])
+  updated_by           access_credentials?  @relation("UPDATER", fields: [updater_id], references: [access_credentials_id])
 }
 
 model project_init {
@@ -75,14 +77,18 @@ model project_init {
   mom_req_id                 String?         @unique
   helix                      helix_enum?
   lir_requirement_id         String?         @unique
+  sph_id                     String?         @unique
+  spk_id                     String?         @unique
   requester                  String?
   impact                     String?
-  potential_employee_trained Int?
+  potential_employee_trained Int             @default(0)
   nde_determination_id       String?         @unique
-  potential_revenue          Int?
+  potential_revenue          Int             @default(0)
   approval_status            approval_status @default(draft)
   project                    project?
   lir_requirement            document?       @relation("LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
+  sph                        document?       @relation("SPH", fields: [sph_id], references: [id])
+  spk                        document?       @relation("SPK", fields: [spk_id], references: [id])
   mom_req                    document?       @relation("MOM_REQ", fields: [mom_req_id], references: [id])
   nde_determination          document?       @relation("NDE_DETERMINATION", fields: [nde_determination_id], references: [id])
   nde_request                document?       @relation("NDE_REQUEST", fields: [nde_request_id], references: [id])
@@ -125,8 +131,8 @@ model project_close_out {
   project_id                 String
   mom_reconciles_id          String?         @unique
   nde_revenue_recognition_id String?         @unique
-  employee_trained           Int?
-  revenue_in                 Int?
+  employee_trained           Int             @default(0)
+  revenue_in                 Int             @default(0)
   report_project_id          String?         @unique
   nde_report_project_id      String?         @unique
   nps_id                     String?         @unique
@@ -142,7 +148,7 @@ model project_close_out {
 
 enum approval_status {
   draft
-  waiting
+  requesting
   approved
   declined
 }
@@ -167,6 +173,8 @@ model document {
   mom_req                 project_init?      @relation("MOM_REQ")
   nde_determination       project_init?      @relation("NDE_DETERMINATION")
   nde_request             project_init?      @relation("NDE_REQUEST")
+  sph                     project_init?      @relation("SPH")
+  spk                     project_init?      @relation("SPK")
   baa                     project_ongoing?   @relation("BAA")
   bast                    project_ongoing?   @relation("BAST")
   mom_readiness           project_ongoing?   @relation("MOM_READINESS")
@@ -176,32 +184,32 @@ model document {
 }
 
 model notification {
-  id          String    @id @default(uuid())
+  id          String             @id @default(uuid())
   header      String
   content     String
-  category    String
-  url         String
-  read        Boolean   @default(false)
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+  url         String?
+  read        Boolean            @default(false)
+  created_at  DateTime           @default(now())
+  updated_at  DateTime           @updatedAt
   receiver_id String
-  sender_id   String?
+  sender_id   String
   deleted_at  DateTime?
-  receiver    users     @relation("RECEIVER", fields: [receiver_id], references: [user_id])
-  sender      users?    @relation("SENDER", fields: [sender_id], references: [user_id])
+  receiver    access_credentials @relation("RECEIVER", fields: [receiver_id], references: [access_credentials_id])
+  sender      access_credentials @relation("SENDER", fields: [sender_id], references: [access_credentials_id])
 }
 
 model comment {
-  id           String       @id @default(uuid())
+  id           String             @id @default(uuid())
   user_id      String
   comment      String
-  comment_type comment_type @default(comment)
-  created_at   DateTime     @default(now())
-  updated_at   DateTime     @updatedAt
-  project_id   String       @unique
+  log_message  String?
+  comment_type comment_type       @default(comment)
+  created_at   DateTime           @default(now())
+  updated_at   DateTime           @updatedAt
+  project_id   String
   deleted_at   DateTime?
-  project      project      @relation(fields: [project_id], references: [id])
-  user         users        @relation(fields: [user_id], references: [user_id])
+  project      project            @relation(fields: [project_id], references: [id])
+  user         access_credentials @relation(fields: [user_id], references: [access_credentials_id])
 }
 
 enum comment_type {
@@ -210,22 +218,19 @@ enum comment_type {
 }
 
 model project_solution {
-  id              String                    @id @default(uuid())
-  solution_name   String
-  created_at      DateTime                  @default(now())
-  updated_at      DateTime                  @updatedAt
-  deleted_at      DateTime?
-  project         project?
-  solution_detail project_solution_detail[]
+  id            String                    @id @default(uuid())
+  solution_name String
+  project       project?
+  items         project_solution_detail[]
 }
 
 model project_solution_detail {
   id                  String           @id @default(uuid())
-  product_id          Int
-  package_id          Int
+  product_id          Int?
+  package_id          Int?
   project_solution_id String
-  package             packages         @relation(fields: [package_id], references: [id])
-  product             product          @relation(fields: [product_id], references: [id])
+  package             packages?        @relation(fields: [package_id], references: [id])
+  product             product?         @relation(fields: [product_id], references: [id])
   project_solution    project_solution @relation(fields: [project_solution_id], references: [id])
 }
 
@@ -272,13 +277,8 @@ model users {
   access_credentials access_credentials @relation(fields: [access_credentials_id], references: [access_credentials_id]) // 1 to 1 relation with login_credentials
   teams              teams              @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
 
-  created_at       DateTime       @default(now())
-  updated_at       DateTime       @updatedAt
-  user_as_creator  project[]      @relation("CREATOR")
-  user_as_updater  project[]      @relation("UPDATER")
-  user_as_sender   notification[] @relation("SENDER")
-  user_as_receiver notification[] @relation("RECEIVER")
-  comment          comment[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model access_credentials {
@@ -291,8 +291,14 @@ model access_credentials {
   users         users?
   refresh_token refresh_token[]
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  user_as_creator  project[]      @relation("CREATOR")
+  user_as_updater  project[]      @relation("UPDATER")
+  user_as_member   project[]      @relation("PROJECT_MEMBERS")
+  user_as_sender   notification[] @relation("SENDER")
+  user_as_receiver notification[] @relation("RECEIVER")
+  comment          comment[]
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
 }
 
 model refresh_token {
