@@ -50,6 +50,7 @@ async function getOffering(query_sheet_id) {
                     select:{
                         package_id:true,
                         offering_id:true,
+                        package_status:true,
                         package:{
                             select:{
                                 id:true,

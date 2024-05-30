@@ -2,6 +2,7 @@
 require("dotenv").config();
 const express = require('express')
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 // GTOM Route
 const picRouter = require('./routes/projectMonitoring/picRoute');
@@ -13,6 +14,7 @@ const searchRoute = require('./routes/tariffRoutes/searchRoute');
 const sheetRoute = require('./routes/tariffRoutes/searchRoute');
 const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
 const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
+const productRoute = require('./routes/tariffRoutes/productRoute');
 
 
 // Porto Route
@@ -24,6 +26,9 @@ const stepThreeRouter = require('./routes/productGuide/stepTwo.routes');
 /* Necessary variables */
 const PORT = process.env.PORT || 3001;
 const main = express();
+
+/* Use express */
+main.use(cors());
 
 main.use(bodyParser.json());
 main.use(bodyParser.urlencoded({
@@ -40,6 +45,7 @@ main.use('/tariff/search', searchRoute);
 main.use('/tariff/sheet', sheetRoute);
 main.use('/tariff/masterPackage', masterPackageRoute);
 main.use('/tariff/offering', offeringRoute);
+main.use('/tariff/product', productRoute);
 
 // Porto Use route
 main.use(authRouter);
