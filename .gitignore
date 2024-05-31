@@ -4,3 +4,4 @@
 /src/models/migrations
 /src/resources
 /nbproject/private/
+*.swp

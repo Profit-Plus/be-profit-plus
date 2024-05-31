@@ -184,8 +184,8 @@ model product_segmenting_targeting {
     product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
     segmenting_targeting_feature_used segmenting_targeting_feature_used[]
     segmenting_targeting_legends segmenting_targeting_legends[]
+    product_penta_helix_properties segmenting_targeting_penta_helix_properties[]
     segmenting_targeting_market_potential segmenting_targeting_market_potential?
-    product_penta_helix_properties product_penta_helix_properties?
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -200,14 +200,14 @@ enum penta_helix {
     SUBDIARIES
 }
 
-model product_penta_helix_properties {
+model segmenting_targeting_penta_helix_properties {
     penta_helix_uuid String @id @default(uuid())
-    segmenting_targeting_uuid String @unique
+    segmenting_targeting_uuid String
 
     penta_helix penta_helix
-    penta_helix_desc String
-    penta_helix_user_desc String
-    penta_helix_status Int
+    penta_helix_desc String @default("undefined")
+    penta_helix_user_desc String @default("undefined")
+    penta_helix_status Int @default(1)
     
     // Relation section
     product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
@@ -246,9 +246,9 @@ model segmenting_targeting_legends {
 model segmenting_targeting_market_potential {
     market_potential_uuid String @id @default(uuid())
     segmenting_targeting_uuid String @unique
-    tam_desc String
-    sam_desc String
-    som_desc String
+    tam_desc String @default("undefined")
+    sam_desc String @default("undefined")
+    som_desc String @default("undefined")
 
     // Relation section
     product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
@@ -257,6 +257,7 @@ model segmenting_targeting_market_potential {
     updated_at DateTime @updatedAt 
 }
 
+//  Positioning
 model product_positioning {
     positioning_uuid String @id @default(uuid())
     product_uuid String @unique
@@ -274,10 +275,10 @@ model product_positioning {
 model positioning_indicators {
     positioning_indicators_uuid String @id @default(uuid())
     positioning_uuid String @unique
-    indicator_one_name String
-    indicator_two_name String
-    indicator_three_name String
-    indicator_four_name String
+    indicator_one_name String @default("undefined")
+    indicator_two_name String @default("undefined")
+    indicator_three_name String @default("undefined")
+    indicator_four_name String @default("undefined")
 
     // Relation Section
     product_positioning product_positioning @relation(fields: [positioning_uuid], references: [positioning_uuid])
@@ -301,30 +302,31 @@ model positioning_logos {
     updated_at DateTime @updatedAt   
 }
 
-model product_differentiation_branding {
-    differentiation_branding_uuid String @id @default(uuid())
-    product_uuid String @unique
-    product_differentiation_slogan String
-    product_differentiation_desc String
+model product_positioning_story {
+    product_positioning_story_uuid String @id @default(uuid())
+    positioning_uuid String 
+    sentence_one_market_target String @default("undefined")
+    sentence_two_use_case String @default("undefined")
+    sentence_three_name_product String @default("undefined")
+    sentence_four_differentiation String @default("undefined")
+    sentence_five_reason String @default("undefined")
 
     // Relation section
-    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+    product_positioning product_positioning @relation(fields: [positioning_uuid], references: [positioning_uuid])
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt 
 }
 
-model product_positioning_story {
-    product_positioning_story_uuid String @id @default(uuid())
-    positioning_uuid String
-    sentence_one_market_target String
-    sentence_two_use_case String
-    sentence_three_name_product String
-    sentence_four_differentiation String
-    sentence_five_reason String
-    
+//  Differentiation Branding
+model product_differentiation_branding {
+    differentiation_branding_uuid String @id @default(uuid())
+    product_uuid String @unique
+    product_differentiation_slogan String @default("undefined")
+    product_differentiation_desc String @default("undefined")
+
     // Relation section
-    product_positioning product_positioning @relation(fields: [positioning_uuid], references: [positioning_uuid])
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt 

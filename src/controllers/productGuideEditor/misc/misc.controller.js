@@ -1,4 +1,4 @@
-const stepOneService = require('../../../services/productGuideEditor/step1.service');
+const stepOneService = require('../../../services/productGuideEditor/step1/step1.service');
 const response = require('../../../helpers/web/webResponses');
 
 const { v4: uuidv4 } = require('uuid');

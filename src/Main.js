@@ -5,7 +5,9 @@ const bodyParser = require('body-parser');
 
 // Porto Route
 const authRouter = require('./routes/authentication/auth.routes');
-const stepOneRouter = require('./routes/productGuideEditor/step1.routes');
+const productGuideProductTemplate = require('./routes/productGuideEditor/templates.routes');
+const productGuideMiscRouter = require('./routes/productGuideEditor/misc/misc.routes');
+const productGuidestepOneRouter = require('./routes/productGuideEditor/step1/step1.routes');
 
 /* Necessary variables */
 const PORT = process.env.PORT || 3001;
@@ -17,7 +19,9 @@ main.use(bodyParser.urlencoded ({
 }));
 
 main.use(authRouter);
-main.use(stepOneRouter);
+main.use(productGuideProductTemplate);
+main.use(productGuideMiscRouter);
+main.use(productGuidestepOneRouter);
 
 main.listen(PORT, () => {
     console.log('Server is running! port: ' + PORT);

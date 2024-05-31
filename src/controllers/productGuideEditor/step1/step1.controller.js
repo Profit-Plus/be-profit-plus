@@ -1,4 +1,4 @@
-const stepOneService = require('../../../services/productGuideEditor/step1.service');
+const stepOneService = require('../../../services/productGuideEditor/step1/step1.service');
 const response = require('../../../helpers/web/webResponses');
 
 const { Prisma } = require("@prisma/client");
@@ -7,37 +7,6 @@ const { v4: uuidv4 } = require('uuid');
 const filestream = require('fs');
 const path = require('path');
 const mv = require('mv');
-
-/**
- *  @function addNewProduct to add a new name of a product
- */
-async function addNewProduct(req, res, next) {
-    
-    try {
-        /* Initialize request body and uuid */
-        const product = req.body;
-        const id = uuidv4();
-
-        /* Get unit ID and taxonomy ID by their name */
-        const unitId = await stepOneService.getUnitIDByName('undefined');
-        const taxonomyId = await stepOneService.getTaxonomyIdByName('undefined');
-
-        /* Add a new product */
-        await stepOneService.addProductOverviewTemplate(id, unitId.unit_id, taxonomyId.taxonomy_uuid, product);
-        
-        res.status(200).json(response.successResponse('New product added!', product));
-        
-    } catch (error) {
-        if (error.code === 'P2002') {
-            res.status(409).json(response.errorResponse('Duplicate name of product!'));
-
-        } else {
-            res.status(500).json(response.errorResponse('Internal Server error!'));
-        }
-
-        next(error);
-    }
-}
 
 /**
  * @function updateProductOverview to update the overview details of the product
@@ -314,7 +283,6 @@ async function addGallery(req, res, next) {
 }
 
 module.exports = {
-    addNewProduct,
     updateProductOverviewDetail,
     addServices,
     addMainUse,

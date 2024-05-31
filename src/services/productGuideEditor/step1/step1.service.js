@@ -1,58 +1,4 @@
-const { database } = require('../../helpers/configuration/db');
-
-/**
- *  @function addProductOverviewTemplate to add a new product guide template contains only a name
- */
-function addProductOverviewTemplate(id, unitId, taxonomyId, product) {
-    return database.product_overview.create({
-        data: {
-            product_uuid: id,
-            unit_id: unitId,
-            taxonomy_uuid: taxonomyId,
-            product_name: product.name
-        }
-    });
-}
-
-/**
- *  @function addNewTaxonomy to add a new name of taxonomy
- */
-function addNewTaxonomy(id, taxonomy) {
-    return database.taxonomy.create({
-        data: {
-            taxonomy_uuid: id,
-            taxonomy_name: taxonomy.name
-        }
-    })
-}
-
-/**
- *  @function getTaxonomyIdByName to get a taxonomy ID based on its name
- */
-function getTaxonomyIdByName(name) {
-    return database.taxonomy.findUnique({
-        where: {
-            taxonomy_name: name
-        },
-        select: {
-            taxonomy_uuid: true
-        }
-    });
-}
-
-/**
- *  @function getUnitIDByName to get a unit ID based on its name
- */
-function getUnitIDByName(name) {
-    return database.units.findUnique({
-        where: {
-            units_name: name
-        },
-        select: {
-            unit_id: true
-        }
-    });
-}
+const { database } = require('../../../helpers/configuration/db');
 
 /**
  *  @function updateProductOverview to update the data of the first part of product overview 
@@ -174,10 +120,6 @@ function addProductGallery(id, productId, dir) {
 }
 
 module.exports = {
-    addProductOverviewTemplate,
-    addNewTaxonomy,
-    getTaxonomyIdByName,
-    getUnitIDByName,
     updateProductOverview,
     updateFileDirProductOverview,
     getProductIdByName,
