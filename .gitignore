@@ -3,5 +3,5 @@
 /server_data
 /src/models/migrations
 /src/resources
-/nbproject/private/
+/nbproject
 *.swp

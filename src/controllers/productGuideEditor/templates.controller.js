@@ -21,6 +21,7 @@ async function addNewProduct(req, res, next) {
         /* Initialize uuid for sub-services */
         const indiciatorUuid = uuidv4();
         const storyUuid = uuidv4();
+        const marketPotentialUuid = uuidv4();
     
         /* Initialize penta helix array */
         const pentaHelixArray = [
@@ -43,13 +44,17 @@ async function addNewProduct(req, res, next) {
         );
         
         /* Add a new template for STPDB sub-services */
-        await productTemplateService.addProductPositioningIndicatorsTemplate(positioningUuid, indiciatorUuid);
-        await productTemplateService.addProductPositioningStoryTemplate(storyUuid, positioningUuid);
-        
+        /* Segmenting-targeting sub-services */
+        await productTemplateService.addSegmentingTargetingMarketPotential(marketPotentialUuid, segmentingTargetingUuid)
+
         await Promise.all(pentaHelixArray.map(async (element) => {
             const pentaHelixUuid = uuidv4();
             await productTemplateService.addPentaHelixProperties(pentaHelixUuid, segmentingTargetingUuid, element);
         }));
+
+        /* Positioning sub-services */
+        await productTemplateService.addProductPositioningIndicatorsTemplate(positioningUuid, indiciatorUuid);
+        await productTemplateService.addProductPositioningStoryTemplate(storyUuid, positioningUuid);
             
         res.status(200).json(responses.successResponse('New product added!', product));
         

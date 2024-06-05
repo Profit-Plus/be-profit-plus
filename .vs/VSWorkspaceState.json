@@ -4,14 +4,13 @@
     "\\src",
     "\\src\\controllers",
     "\\src\\controllers\\productGuideEditor",
-    "\\src\\helpers",
-    "\\src\\helpers\\token",
+    "\\src\\controllers\\productGuideEditor\\misc",
     "\\src\\middlewares",
     "\\src\\middlewares\\authentication",
     "\\src\\models",
     "\\src\\services",
     "\\src\\services\\productGuideEditor"
   ],
-  "SelectedNode": "\\src\\services\\productGuideEditor\\step1.service.js",
+  "SelectedNode": "\\src\\controllers\\productGuideEditor\\misc\\misc.controller.js",
   "PreviewInSolutionExplorer": false
 }

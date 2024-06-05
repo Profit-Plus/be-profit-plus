@@ -41,27 +41,6 @@ function addProductStpdbTemplate(productId, segmentingTargetingId, positioningId
 }
 
 /**
- *  @function addProductPositioningIndicatorsTemplate to add a template for positioning indicators
- */
-function addProductPositioningIndicatorsTemplate(positioningId, indicatorId) {
-    return database.positioning_indicators.create({
-        data: {
-            positioning_indicators_uuid: indicatorId,
-            positioning_uuid: positioningId
-        }
-    })
-}
-
-function addProductPositioningStoryTemplate(storyId, positioningId) {
-    return database.product_positioning_story.create({
-        data: {
-            product_positioning_story_uuid: storyId,
-            positioning_uuid: positioningId
-        }
-    });
-}
-
-/**
  *  @function addPentaHelixProperties to add a template for penta helix properties
  */
 function addPentaHelixProperties(pentaHelixId, segmentingTargetingId, pentaHelixElement) {
@@ -74,10 +53,47 @@ function addPentaHelixProperties(pentaHelixId, segmentingTargetingId, pentaHelix
     });
 }
 
+/**
+ *  @function addSegmentingTargetingMarketPotential to add a new detail of market potential in a segmenting targeting of a product 
+ */
+function addSegmentingTargetingMarketPotential(id, segmentingTargetingId) {
+    return database.segmenting_targeting_market_potential.create({
+        data: {
+            market_potential_uuid: id,
+            segmenting_targeting_uuid: segmentingTargetingId,
+        }
+    });
+}
+
+/**
+ *  @function addProductPositioningIndicatorsTemplate to add a template for positioning indicators
+ */
+function addProductPositioningIndicatorsTemplate(positioningId, indicatorId) {
+    return database.positioning_indicators.create({
+        data: {
+            positioning_indicators_uuid: indicatorId,
+            positioning_uuid: positioningId
+        }
+    })
+}
+
+/**
+ *  @function addProductPositioningStoryTemplate to add the stories text of product positioning
+ */
+function addProductPositioningStoryTemplate(storyId, positioningId) {
+    return database.product_positioning_story.create({
+        data: {
+            product_positioning_story_uuid: storyId,
+            positioning_uuid: positioningId
+        }
+    });
+}
+
 module.exports = {
     addProductOverviewTemplate,
     addProductStpdbTemplate,
+    addPentaHelixProperties,
+    addSegmentingTargetingMarketPotential,
     addProductPositioningStoryTemplate,
     addProductPositioningIndicatorsTemplate,
-    addPentaHelixProperties
 }

@@ -3,6 +3,6 @@ const express = require('express');
 
 const productGuideMiscRouter = express.Router();
 
-productGuideMiscRouter.post('/profitplus/product/add-new-taxonomy', miscController.addNewTaxonomy);
+productGuideMiscRouter.post('/product/add-new-taxonomy', miscController.addNewTaxonomy);
 
 module.exports = productGuideMiscRouter;

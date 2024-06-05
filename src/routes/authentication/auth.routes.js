@@ -4,11 +4,11 @@ const express = require('express');
 
 const authRouter = express.Router();
 
-authRouter.post('/profitplus/register', authController.userRegistration);
-authRouter.post('/profitplus/login', authController.userLogin);
-authRouter.post('/profitplus/auth/generate-new-token', authController.generateNewToken);
-authRouter.post('/profitplus/register/add-new-level', miscController.addNewLevel);
-authRouter.post('/profitplus/register/add-new-unit', miscController.addNewUnit);
-authRouter.post('/profitplus/register/add-new-team', miscController.addNewTeam);
+authRouter.post('/register', authController.userRegistration);
+authRouter.post('/login', authController.userLogin);
+authRouter.post('/auth/generate-new-token', authController.generateNewToken);
+authRouter.post('/register/add-new-level', miscController.addNewLevel);
+authRouter.post('/register/add-new-unit', miscController.addNewUnit);
+authRouter.post('/register/add-new-team', miscController.addNewTeam);
 
 module.exports = authRouter;

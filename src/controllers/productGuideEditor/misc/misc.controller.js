@@ -1,4 +1,4 @@
-const stepOneService = require('../../../services/productGuideEditor/step1/step1.service');
+const miscService = require('../../../services/productGuideEditor/misc/misc.service');
 const response = require('../../../helpers/web/webResponses');
 
 const { v4: uuidv4 } = require('uuid');
@@ -13,7 +13,7 @@ async function addNewTaxonomy(req, res, next) {
         const id = uuidv4();
 
         /* Store id and taxonomy to database */
-        await stepOneService.addNewTaxonomy(id, taxonomy);
+        await miscService.addNewTaxonomy(id, taxonomy);
 
         /* Send responses */
         res.status(200).json(response.successResponse('New taxonomy added!', taxonomy));
