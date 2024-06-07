@@ -17,11 +17,14 @@ async function addNewProduct(req, res, next) {
         const segmentingTargetingUuid = uuidv4();
         const positioningUuid = uuidv4();
         const differentiationBrandingUuid = uuidv4();
+        const operatingModelUuid = uuidv4();
 
         /* Initialize uuid for sub-services */
         const indiciatorUuid = uuidv4();
         const storyUuid = uuidv4();
         const marketPotentialUuid = uuidv4();
+        const operatingModelGtmHostUuid = uuidv4();
+        const operatingModelOrganizationHeaderUuid = uuidv4();
     
         /* Initialize penta helix array */
         const pentaHelixArray = [
@@ -55,6 +58,13 @@ async function addNewProduct(req, res, next) {
         /* Positioning sub-services */
         await productTemplateService.addProductPositioningIndicatorsTemplate(positioningUuid, indiciatorUuid);
         await productTemplateService.addProductPositioningStoryTemplate(storyUuid, positioningUuid);
+
+        /* Add a new template for product operating model */
+        await productTemplateService.addProductOperatingModelTemplate(productUuid, operatingModelUuid);
+
+        /* Operatimg model sub-services */
+        await productTemplateService.addProductOperatingModelGtmHostTemplate(operatingModelGtmHostUuid, operatingModelUuid);
+        await productTemplateService.addProductOperatingModelOrganizationHeaderTemplate(operatingModelOrganizationHeaderUuid, operatingModelUuid);
             
         res.status(200).json(responses.successResponse('New product added!', product));
         

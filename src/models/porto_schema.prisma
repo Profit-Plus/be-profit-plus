@@ -132,6 +132,7 @@ model product_overview {
     product_positioning product_positioning?
     product_segmenting_targeting product_segmenting_targeting?
     product_differentiation_branding product_differentiation_branding?
+    product_operating_model product_operating_model?
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -332,4 +333,106 @@ model product_differentiation_branding {
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt 
+}
+
+// Product Operating Model Schema
+model product_operating_model {
+    product_operating_model_uuid String @id @default(uuid())
+    product_uuid String @unique
+    product_location String @default("undefined")
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+    product_op_gtm_host product_op_gtm_host?
+    product_op_organization_header product_op_organization_header?
+    product_op_supplier product_op_supplier[]
+    product_op_business_process_header product_op_business_process_header[]
+    product_op_information_internal product_op_information_internal[]
+    product_op_information_external product_op_information_external[]
+    product_op_management_systems product_op_management_systems[]
+}
+
+enum gtm_host_option {
+    PARTNERSHIP
+    IBL
+    OBL
+}
+
+model product_op_gtm_host {
+    product_gtm_host_uuid String @id @default(uuid())
+    product_operating_model_uuid String @unique
+    host_option gtm_host_option @default(PARTNERSHIP)
+    host_description String @default("undefined")
+    host_file_dir String @default("undefined")
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
+}
+
+model product_op_supplier {
+    product_op_supplier_uuid String @id @default(uuid())
+    product_operating_model_uuid String
+    product_supplier_description String
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid]) 
+}
+
+// Business process section in operating model split into two different entities, header and nodes
+model product_op_business_process_header {
+    product_op_business_process_header_uuid String @id @default(uuid())
+    product_operating_model_uuid String
+    header_description String
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
+    product_op_business_process_nodes product_op_business_process_nodes[]
+}
+
+model product_op_business_process_nodes {
+    product_op_business_process_nodes_uuid String @id @default(uuid())
+    product_op_business_process_header_uuid String
+    node_description String
+
+    product_op_business_process_header product_op_business_process_header @relation(fields: [product_op_business_process_header_uuid], references: [product_op_business_process_header_uuid])
+}
+
+// Information section in operating model split into two different entities, internal and external
+model product_op_information_internal {
+    product_op_information_internal_uuid String @id @default(uuid())
+    product_operating_model_uuid String
+    information_description String
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid]) 
+}
+
+model product_op_information_external {
+    product_op_information_external_uuid String @id @default(uuid())
+    product_operating_model_uuid String
+    information_description String
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid]) 
+}
+
+// Organization section in operating model split into two different entities, header and nodes
+model product_op_organization_header {
+    product_op_organization_header_uuid String @id @default(uuid())
+    product_operating_model_uuid String @unique
+    header_description String @default("undefined")
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
+    product_op_organization_nodes product_op_organization_nodes[]
+}
+
+model product_op_organization_nodes {
+    product_op_organization_nodes_uuid String @id @default(uuid())
+    product_op_organization_header_uuid String
+    node_description String
+
+    product_op_organization_header product_op_organization_header @relation(fields: [product_op_organization_header_uuid], references: [product_op_organization_header_uuid])
+}
+
+model product_op_management_systems {
+    product_op_management_systems_uuid String @id @default(uuid())
+    product_operating_model_uuid String
+    management_system_description String
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
 }

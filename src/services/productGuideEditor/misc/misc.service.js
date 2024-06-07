@@ -108,6 +108,24 @@ function getProductPositioningIdByProductName(name) {
     });
 }
 
+/**
+ *  @function getProductOperatingModelIdByProductName to get the id of product operating model based on the product name
+ */
+function getProductOperatingModelIdByProductName(name) {
+    return database.product_overview.findUnique({
+        where: {
+            product_name: name
+        },
+        select: {
+            product_operating_model: {
+                select: {
+                    product_operating_model_uuid: true
+                }
+            }
+        }
+    });
+}
+
 
 module.exports = {
     addNewTaxonomy,
@@ -116,5 +134,6 @@ module.exports = {
     getProductIdByName,
     getSegmentingTargetingIdByProductName,
     getSegmentingTargetingPentaHelixId,
-    getProductPositioningIdByProductName
+    getProductPositioningIdByProductName,
+    getProductOperatingModelIdByProductName
 }

@@ -15,7 +15,7 @@ function addProductOverviewTemplate(id, unitId, taxonomyId, product) {
 }
 
 /**
- *  @function addProductStpdbTemplate to add a new product segmenting targeting template contains only a name
+ *  @function addProductStpdbTemplate to add a new product STPDB template contains only a name
  */
 function addProductStpdbTemplate(productId, segmentingTargetingId, positioningId, differentiationBrandingId) {
     return database.$transaction([
@@ -89,6 +89,42 @@ function addProductPositioningStoryTemplate(storyId, positioningId) {
     });
 }
 
+/**
+ *  @function addProductOperatingModelTemplate to add a new product operating model template contains only an ID 
+ */
+function addProductOperatingModelTemplate(productId, operatingModelId) {
+    return database.product_operating_model.create({
+        data: {
+            product_operating_model_uuid: operatingModelId,
+            product_uuid: productId,
+        }
+    });
+}
+
+/**
+ *  @function addProductOperatingModelGtmHostTemplate to add a new product operating model GTM Host template contains only an ID 
+ */
+function addProductOperatingModelGtmHostTemplate(id, operatingModelId) {
+    return database.product_op_gtm_host.create({
+        data: {
+            product_gtm_host_uuid: id,
+            product_operating_model_uuid: operatingModelId
+        }
+    });
+}
+
+/**
+ *  @function addProductOperatingModelOrganizationHeaderTemplate to add a new template for organization header in product operating model
+ */
+function addProductOperatingModelOrganizationHeaderTemplate(id, operatingModelId) {
+    return database.product_op_organization_header.create({
+        data: {
+            product_op_organization_header_uuid: id,
+            product_operating_model_uuid: operatingModelId
+        }
+    });
+}
+
 module.exports = {
     addProductOverviewTemplate,
     addProductStpdbTemplate,
@@ -96,4 +132,7 @@ module.exports = {
     addSegmentingTargetingMarketPotential,
     addProductPositioningStoryTemplate,
     addProductPositioningIndicatorsTemplate,
+    addProductOperatingModelTemplate,
+    addProductOperatingModelGtmHostTemplate,
+    addProductOperatingModelOrganizationHeaderTemplate
 }

@@ -1,4 +1,5 @@
 const stepOneService = require('../../../services/productGuideEditor/step1/step1.service');
+const miscService = require('../../../services/productGuideEditor/misc/misc.service');
 const response = require('../../../helpers/web/webResponses');
 
 const { Prisma } = require("@prisma/client");
@@ -35,8 +36,8 @@ async function updateProductOverviewDetail(req, res, next) {
                 const productId = uuidv4();
 
                 /* Get unit ID and taxonomy ID based on the their names */
-                const unitInCharge = await stepOneService.getUnitIDByName(productUnitInCharge);
-                const taxonomy = await stepOneService.getTaxonomyIdByName(productTaxonomy);
+                const unitInCharge = await miscService.getUnitIDByName(productUnitInCharge);
+                const taxonomy = await miscService.getTaxonomyIdByName(productTaxonomy);
 
                 /* Store the properties to database */
                 const properties = {
@@ -86,7 +87,7 @@ async function updateProductOverviewDetail(req, res, next) {
                         /* Check if the uploaded file has appropriate extension */              
                         if (allowedExtension.includes(extension)) {
                             /* Set the folder for uploaded file */
-                            const uploadFolder =  path.join('src', 'resources', 'uploads', documentType.toString());
+                            const uploadFolder =  path.join('resources', 'uploads', documentType.toString());
 
                             /* Make a new directory if doesn't exist before */
                             filestream.mkdirSync(uploadFolder, { recursive: true });
@@ -142,7 +143,7 @@ async function addMainUse(req, res, next) {
         const productName = req.query.product;
 
         /* Get product ID by its name */
-        const productId = await stepOneService.getProductIdByName(productName);
+        const productId = await miscService.getProductIdByName(productName);
 
         /* Add main uses of product to database */
         await Promise.all(mainUses.map(async (item) => {
@@ -178,7 +179,7 @@ async function addServices(req, res, next) {
         const productName = req.query.product;
 
         /* Get product ID by its name */
-        const productId = await stepOneService.getProductIdByName(productName);
+        const productId = await miscService.getProductIdByName(productName);
         
         /* Add services of a product to database */
         await Promise.all(services.map(async (item) => {
@@ -221,10 +222,10 @@ async function addGallery(req, res, next) {
 
             /* Initilize request param and directory */
             const productName = req.query.product;
-            const dir = path.join('src', 'resources', 'uploads', 'gallery', productName);
+            const dir = path.join('resources', 'uploads', 'gallery', productName);
 
             /* Get the id of product based on its name */
-            const productId = await stepOneService.getProductIdByName(productName);
+            const productId = await miscService.getProductIdByName(productName);
 
             /* Check the availibility of the directory and create a new one if doesn't */
             filestream.mkdirSync(dir, { recursive: true });

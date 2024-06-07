@@ -5,3 +5,6 @@
 /src/resources
 /nbproject
 *.swp
+/docs
+/.vs
+/.vscode

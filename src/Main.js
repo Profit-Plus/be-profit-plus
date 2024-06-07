@@ -9,6 +9,7 @@ const productGuideProductTemplate = require('./routes/productGuideEditor/templat
 const productGuideMiscRouter = require('./routes/productGuideEditor/misc/misc.routes');
 const productGuidestepOneRouter = require('./routes/productGuideEditor/step1/step1.routes');
 const productGuideStepTwoRouter = require('./routes/productGuideEditor/step2/step2.routes');
+const productGuideStepThreeRouter = require('./routes/productGuideEditor/step3/step3.routes');
 
 /* Necessary variables */
 const PORT = process.env.PORT || 3001;
@@ -22,10 +23,11 @@ main.use(bodyParser.urlencoded ({
 main.use('/profitplus/api', authRouter);
 
 /* Product Management routes */
-main.use('/profitplus/api', productGuideProductTemplate);
 main.use('/profitplus/api', productGuideMiscRouter);
+main.use('/profitplus/api', productGuideProductTemplate);
 main.use('/profitplus/api', productGuidestepOneRouter);
 main.use('/profitplus/api', productGuideStepTwoRouter)
+main.use('/profitplus/api', productGuideStepThreeRouter);
 
 main.listen(PORT, () => {
     console.log('Server is running! port: ' + PORT);
