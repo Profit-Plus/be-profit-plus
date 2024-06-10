@@ -63,7 +63,7 @@ async function updateProductOverviewDetail(req, res, next) {
                         switch (documentType.toString()) {
                             case 'logo':
                                 docFile = files.logo[0];
-                                allowedExtension = ['jpg', 'jpeg', 'png'];
+                                allowedExtension = ['jpg', 'jpeg', 'png', 'pjpeg', 'pjp'];
                                 break;
 
                             case 'playbook':

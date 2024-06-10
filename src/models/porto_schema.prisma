@@ -129,11 +129,12 @@ model product_overview {
     product_main_use product_main_use[]
     product_gallery product_gallery[]
     product_service product_service[]
+    product_use_case product_use_case[]
     product_positioning product_positioning?
     product_segmenting_targeting product_segmenting_targeting?
     product_differentiation_branding product_differentiation_branding?
     product_operating_model product_operating_model?
-
+    
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
 }
@@ -350,6 +351,9 @@ model product_operating_model {
     product_op_information_internal product_op_information_internal[]
     product_op_information_external product_op_information_external[]
     product_op_management_systems product_op_management_systems[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 enum gtm_host_option {
@@ -365,7 +369,11 @@ model product_op_gtm_host {
     host_description String @default("undefined")
     host_file_dir String @default("undefined")
 
+    // Relation Section
     product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 model product_op_supplier {
@@ -374,6 +382,9 @@ model product_op_supplier {
     product_supplier_description String
 
     product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid]) 
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 // Business process section in operating model split into two different entities, header and nodes
@@ -384,6 +395,9 @@ model product_op_business_process_header {
 
     product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
     product_op_business_process_nodes product_op_business_process_nodes[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 model product_op_business_process_nodes {
@@ -392,6 +406,9 @@ model product_op_business_process_nodes {
     node_description String
 
     product_op_business_process_header product_op_business_process_header @relation(fields: [product_op_business_process_header_uuid], references: [product_op_business_process_header_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 // Information section in operating model split into two different entities, internal and external
@@ -401,6 +418,9 @@ model product_op_information_internal {
     information_description String
 
     product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid]) 
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 model product_op_information_external {
@@ -409,6 +429,9 @@ model product_op_information_external {
     information_description String
 
     product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid]) 
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 // Organization section in operating model split into two different entities, header and nodes
@@ -419,6 +442,9 @@ model product_op_organization_header {
 
     product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
     product_op_organization_nodes product_op_organization_nodes[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 model product_op_organization_nodes {
@@ -427,6 +453,9 @@ model product_op_organization_nodes {
     node_description String
 
     product_op_organization_header product_op_organization_header @relation(fields: [product_op_organization_header_uuid], references: [product_op_organization_header_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
 
 model product_op_management_systems {
@@ -435,4 +464,24 @@ model product_op_management_systems {
     management_system_description String
 
     product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
+    
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_use_case {
+    use_case_uuid String @id @default(uuid())
+    product_uuid String
+    company_name String
+    company_description String
+    company_logo_dir String
+    product_for_company_description String
+    use_case_description String
+    use_case_features String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 }
