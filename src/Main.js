@@ -2,12 +2,16 @@
 require("dotenv").config();
 const express = require('express')
 const bodyParser = require('body-parser');
+const cors = require('cors');
+
+
 
 // Tarif Route  
 const searchRoute = require('./routes/tariffRoutes/searchRoute');
 const sheetRoute = require('./routes/tariffRoutes/searchRoute');
 const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
 const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
+const costStructureRoute = require('./routes/tariffRoutes/costStructureRoute')
 
 // GTOM Route
 const picRouter = require('./routes/projectMonitoring/picRoute');
@@ -23,6 +27,7 @@ const stepThreeRouter = require('./routes/productGuide/stepTwo.routes');
 const PORT = process.env.PORT || 3001;
 const main = express();
 
+main.use(cors());
 main.use(bodyParser.json());
 main.use(bodyParser.urlencoded ({
     extended: false
@@ -35,8 +40,9 @@ main.use(customerRouter);
 // Tarif Use route
 main.use('/tariff/search', searchRoute);
 main.use('/tariff/sheet', sheetRoute);
-main.use('/tariff/masterPackage', masterPackageRoute);
+main.use('/tariff/master-package', masterPackageRoute);
 main.use('/tariff/offering', offeringRoute);
+main.use('/tariff/cost-structure', costStructureRoute);
 
 // Porto Use route
 main.use(authRouter);

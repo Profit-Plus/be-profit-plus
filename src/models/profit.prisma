@@ -1,7 +1,6 @@
 // Database configuration properties
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["omitApi"]
+    provider = "prisma-client-js"
 }
 
 datasource db {
@@ -289,9 +288,6 @@ model product {
     product_use_case        product_use_case[]
     operating_model         operating_model[]
     segment_targeting       segment_targeting[]
-    packages                packages[]
-    types                   type[]
-    offerings               offering[]
     project_solution_detail project_solution_detail[]
 }
 
@@ -326,7 +322,7 @@ model users {
 model login_credentials {
     login_credentials_id String          @id @default(uuid())
     users                users?
-    refresh_token        refresh_token[]    
+    refresh_token        refresh_token[]
     email                String          @unique
     password             String
 }
@@ -526,6 +522,15 @@ model st_targeting_user {
 
 // schema tarif
 
+model sheets {
+    id            Int                @id @default(autoincrement())
+    name          String
+    tariff_status tariff_status_enum @default(None)
+    packages      packages[]
+    types         type[]
+    offerings     offering[]
+}
+
 model packages {
     id               Int           @id @default(autoincrement())
     name             String
@@ -542,12 +547,12 @@ model packages {
     update_at        DateTime      @updatedAt
     delete_at        DateTime?
 
-    product                 product                   @relation(fields: [product_id], references: [id])
-    product_id              Int
     offering_packages       offering_package[]
     totals                  total[]
     data_package            data_package[]
     project_solution_detail project_solution_detail[]
+    sheets                  sheets?                   @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheets_id               Int?
 }
 
 model offering {
@@ -555,14 +560,14 @@ model offering {
     offer_name String
 
     offering_packages offering_package[]
-    product           product            @relation(fields: [product_id], references: [id])
-    product_id        Int
+    sheets            sheets?            @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheets_id         Int?
 }
 
 model offering_package {
-    package     packages @relation(fields: [package_id], references: [id])
+    package     packages @relation(fields: [package_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     package_id  Int
-    offering    offering @relation(fields: [offering_id], references: [id])
+    offering    offering @relation(fields: [offering_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     offering_id Int
 
     @@id([package_id, offering_id])
@@ -572,46 +577,56 @@ model type {
     id   String    @id @default(uuid())
     type type_enum
 
-    product    product      @relation(fields: [product_id], references: [id])
-    product_id Int
     categories categories[]
     totals     total[]
+    sheets     sheets?      @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheets_id  Int?
 }
 
 model categories {
     id       Int    @id @default(autoincrement())
     category String
 
-    type    type   @relation(fields: [type_id], references: [id])
-    type_id String
-    data    data[]
+    type          type            @relation(fields: [type_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    type_id       String
+    category_data category_data[]
 }
 
 model data {
-    id           Int       @id @default(autoincrement())
-    event_module String
-    description  String?
-    unit         String?
-    code         String?
-    grade        String?
-    create_at    DateTime  @default(now())
-    update_at    DateTime  @updatedAt
-    delete_at    DateTime?
+    id            Int       @id @default(autoincrement())
+    event_module  String
+    description   String?
+    unit          String?
+    code          String?
+    grade         String?
+    average_price Float?
+    create_at     DateTime  @default(now())
+    update_at     DateTime  @updatedAt
+    delete_at     DateTime?
 
-    category     categories     @relation(fields: [category_id], references: [id])
-    category_id  Int
-    components   components[]
-    data_package data_package[]
+    components    components[]
+    data_package  data_package[]
+    category_data category_data[]
+}
+
+model category_data {
+    data        data       @relation(fields: [data_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    data_id     Int
+    category    categories @relation(fields: [category_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    category_id Int
+
+    @@id([data_id, category_id])
 }
 
 model data_package {
-    data        data     @relation(fields: [data_id], references: [id])
+    data        data     @relation(fields: [data_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     data_id     Int
-    package     packages @relation(fields: [package_id], references: [id])
+    package     packages @relation(fields: [package_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     package_id  Int
     quantity    Int?
     frequency   Int?
-    excess      Float?
+    excess      Float? 
+    total       Float?
     information String?
 
     @@id([data_id, package_id])
@@ -635,9 +650,9 @@ model components {
 
 // Total cost for each type (capex/opex/cogs) in a package
 model total {
-    package    packages @relation(fields: [package_id], references: [id])
+    package    packages @relation(fields: [package_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     package_id Int
-    type       type     @relation(fields: [type_id], references: [id])
+    type       type     @relation(fields: [type_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     type_id    String
     total      Float
 
@@ -652,7 +667,7 @@ enum category_enum {
 enum type_enum {
     CAPEX
     OPEX
-    CoGS
+    COGS
 }
 
 enum tariff_status_enum {
