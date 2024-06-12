@@ -161,9 +161,12 @@ async function deleteProject(req, res) {
 function sendApprovalRequest(req, res) {
     try {
         const projectId = req.params.id;
+        const { message } = req.body;
+
         changeApprovalStatus({
             projectId: projectId,
             approvalStatus: 'requesting',
+            approvalMessage: message,
             res: res,
             responseMsg: 'Your approval request has been sent!'
         });
@@ -176,9 +179,12 @@ function sendApprovalRequest(req, res) {
 function approveApprovalRequest(req, res) {
     try {
         const projectId = req.params.id;
+        const { message } = req.body;
+
         changeApprovalStatus({
             projectId: projectId,
             approvalStatus: 'approved',
+            approvalMessage: message,
             res: res,
             responseMsg: 'Approval request has been approved!'
         });
@@ -191,9 +197,12 @@ function approveApprovalRequest(req, res) {
 function declineApprovalRequest(req, res) {
     try {
         const projectId = req.params.id;
+        const { message } = req.body;
+
         changeApprovalStatus({
             projectId: projectId,
             approvalStatus: 'declined',
+            approvalMessage: message,
             res: res,
             responseMsg: 'Approval request has been declined!'
         });
@@ -203,7 +212,7 @@ function declineApprovalRequest(req, res) {
     }
 }
 
-async function changeApprovalStatus({ projectId, approvalStatus, res, responseMsg }) {
+async function changeApprovalStatus({ projectId, approvalStatus, approvalMessage, res, responseMsg }) {
     try {
         const project = await projectService.findProject(projectId);
 

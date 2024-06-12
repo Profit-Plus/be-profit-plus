@@ -6,10 +6,9 @@ function createDocument(payload) {
     });
 }
 
-async function findAllDocuments(params) {
-    console.log(params);
+async function findAllDocuments(params) {    
     const condition = {
-        document_name: { contains: params.search },
+        original_name: { contains: params.search },
         created_at: {
             gte: params.start_date ? new Date(params.start_date) : undefined,
             lt: params.end_date ? new Date(new Date(params.end_date).getTime() + 24 * 60 * 60 * 1000) : undefined

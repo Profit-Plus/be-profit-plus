@@ -50,12 +50,14 @@ function findPIC(picId) {
 async function findUniquePhone(picPhone) {
     const isExist = await database.pic.findUnique({
         where: {
-            AND: [
-                { phone: picPhone },
-                { deleted_at: null }
-            ]
+            phone: picPhone ?? "",
+            deleted_at: null
+        },
+        select: {
+            phone: true,
+            deleted_at: true
         }
-    });
+    });    
 
     if (isExist) return true;
     else return false;
