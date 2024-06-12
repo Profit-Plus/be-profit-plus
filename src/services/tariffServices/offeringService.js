@@ -1,7 +1,4 @@
-const { json } = require('body-parser');
 const { database } = require('../../helpers/utils/db/database');
-const { query } = require('express');
-const { count } = require('console');
 
 async function createOffer(query_sheet_id, query_offer_name) {
     const offering = await database.offering.create({

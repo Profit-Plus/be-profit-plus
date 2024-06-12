@@ -3,7 +3,7 @@ const router = express.Router();
 const sheetController = require('../../controllers/tariffControllers/sheetController');
 
 router.post('/product', sheetController.createSheet);
-router.get('/product', sheetController.getSheet);
+router.get('', sheetController.getSheet);
 router.get('/product/:id', sheetController.getSheetById);
 router.put('/product/:id', sheetController.updateSheet);
 router.delete('/product/:id', sheetController.deleteSheet);
