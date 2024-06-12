@@ -215,7 +215,7 @@ async function updateProject({ projectId, projectInitId, projectOngoingId, proje
                 },
                 where: { id: projectSolutionId }
             });
-            if (payload.solution.items.length > 0) {
+            if (payload.solution && payload.solution.items.length > 0) {
                 await transaction.project_solution_detail.deleteMany({
                     where: { project_solution_id: projectSolutionId }
                 });
