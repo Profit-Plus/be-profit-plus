@@ -13,9 +13,9 @@ const authenticationMiddleware = {
         }
 
         try {
-            jsonWebToken.verify(token, process.env.JWT_ACCESS_SECRET, (errors, decoded) => {
-                console.log(decoded.userLevel);
+            jsonWebToken.verify(token, process.env.JWT_ACCESS_SECRET, (errors, decoded) => {                
                 req.role = decoded.userLevel;
+                req.user_id = decoded.userId;
 
                 next();
             });

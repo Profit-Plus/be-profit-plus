@@ -1,7 +1,7 @@
 const { database } = require('../../helpers/utils/db/database');
 
 async function getSheet(){
-    return database.product.findMany({
+    return database.sheet.findMany({
         select: {
             id: true,
             name: true,

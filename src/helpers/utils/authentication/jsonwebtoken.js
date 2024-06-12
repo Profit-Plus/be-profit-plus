@@ -6,7 +6,7 @@ const jsonwebtoken = require('jsonwebtoken');
 function generateAccessToken(user, role) {
     return jsonwebtoken.sign({
         userId : user.login_credentials_id,
-        userLevel: role.level_name,
+        level: role.level_name,
     }, process.env.JWT_ACCESS_SECRET, {expiresIn: '3m'});
 }
 
@@ -16,8 +16,7 @@ function generateAccessToken(user, role) {
 function generateRefreshToken(user, role, jti) {
     return jsonwebtoken.sign ({
         userId : user.login_credentials_id,
-        userLevel: role.level_name,
-        jti
+        level: role.level_name,
     }, process.env.JWT_REFRESH_SECRET, {expiresIn: '12h'});
 }
 

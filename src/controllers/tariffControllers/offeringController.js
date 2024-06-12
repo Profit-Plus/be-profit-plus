@@ -11,8 +11,6 @@ async function createOffering(req, res) {
 
     const parsedSheetId = parseInt(sheet_id);
     try {
-        
-
         const createdData = await offeringService.createOffer(parsedSheetId, offer_name);
         res.json( webResponses.successResponse('Data Created successfully', createdData) );
     } catch (error) {

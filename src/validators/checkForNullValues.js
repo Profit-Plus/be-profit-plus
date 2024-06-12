@@ -8,6 +8,7 @@ function checkForNullValues(req) {
         if (req.body[key] === null) {
             return true;
         }
+        
         return false;
     }
 }
