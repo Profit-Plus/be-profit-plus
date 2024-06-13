@@ -6,7 +6,10 @@ const now = new Date();
 const models = [
   'pic',
   'customer',
-  'project'
+  'project',
+  'document',
+  'notification',
+  'comment'
 ];
 
 database.$use(async (params, next) => {

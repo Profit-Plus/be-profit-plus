@@ -184,7 +184,7 @@ async function updateDocument(req, res) {
                 let docName = document.document_name;
                 let uploadDir = document.location.split('\\');
                 uploadDir.pop();
-                uploadDir = uploadDir.toString().replaceAll(',', '\\');                
+                uploadDir = uploadDir.toString().replaceAll(',', '\\');
 
                 if (docType && docType != document.document_type) {
                     uploadDir = path.join('src\\resources', 'documents', docType.toUpperCase());
@@ -237,19 +237,24 @@ async function deleteDocument(req, res) {
         const document = await documentService.findDocument(documentId);
 
         if (document) {
-            filestream.stat(document.location, function (err) {
-                if (err) {
-                    throw new Error("File not found!");
-                }
+            const deletedDocument = await documentService.deleteDocument(documentId);
 
-                filestream.unlink(document.location, async function (err) {
-                    if (err) throw new Error("Delete file failed!");
+            res.status(200).json(webResponses.successResponse('Document deleted successfully!', deletedDocument));
 
-                    const deletedDocument = await documentService.deleteDocument(documentId);
+            // Delete the file
+            // filestream.stat(document.location, function (err) {
+            //     if (err) {
+            //         throw new Error("File not found!");
+            //     }
 
-                    res.status(200).json(webResponses.successResponse('Document deleted successfully!', deletedDocument));
-                });
-            });
+            //     filestream.unlink(document.location, async function (err) {
+            //         if (err) throw new Error("Delete file failed!");
+
+            //         const deletedDocument = await documentService.deleteDocument(documentId);
+
+            //         res.status(200).json(webResponses.successResponse('Document deleted successfully!', deletedDocument));
+            //     });
+            // });
         }
         else {
             res.status(404).json(webResponses.errorResponse('Document not found!'));
