@@ -2,6 +2,7 @@ const notificationService = require('../../services/projectMonitoring/notificati
 const webResponses = require('../../helpers/web/webResponses');
 const notificationValidator = require('../../validators/Notification.validator');
 const { formatErrorMessage } = require('../../helpers/utils/validator/formatError');
+const parseStringToBoolean = require('../../helpers/utils/parser/stringToBool');
 
 async function createNotification(req, res) {
     try {
@@ -40,6 +41,7 @@ async function getAllNotifications(req, res) {
             order: req.query.order ?? 'desc',                        
             start_date: req.query.start_date,
             end_date: req.query.end_date,
+            read: parseStringToBoolean(req.query.read),
             receiver_id: req.userId
         };
 

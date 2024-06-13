@@ -26,6 +26,7 @@ async function findAllNotifications(params) {
             gte: params.start_date ? new Date(params.start_date) : undefined,
             lt: params.end_date ? new Date(new Date(params.end_date).getTime() + 24 * 60 * 60 * 1000) : undefined
         },
+        read: params.read,
         receiver_id: params.receiver_id
     };
 

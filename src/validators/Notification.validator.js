@@ -17,7 +17,8 @@ function isGetAllNotificationsValid() {
         properties: {
             receiver_id: { type: 'string' },
             start_date: { type: 'string', format: 'date', errorMessage: dateErrorMessage },
-            end_date: { type: 'string', format: 'date', errorMessage: dateErrorMessage }
+            end_date: { type: 'string', format: 'date', errorMessage: dateErrorMessage },
+            read: { type: 'boolean' }
         },
         required: ['receiver_id'],
         additionalProperties: true
@@ -37,7 +38,7 @@ function isCreateNotificationValid() {
             receiver_id: { type: 'string' }
         },
         required: ['receiver_id', 'header', 'content'],
-        additionalProperties: false
+        additionalProperties: true
     };
 
     const validate = ajv.compile(schema);
