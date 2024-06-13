@@ -3,7 +3,7 @@ const { database } = require('../../helpers/utils/db/database');
 const omitIncludeOptions = {
     include: {
         sender: {
-            select: { email: true, user_name: true },
+            omit: { password: true }
         }
     },
     omit: { receiver_id: true, sender_id: true }

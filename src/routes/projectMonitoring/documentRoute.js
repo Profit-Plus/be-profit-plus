@@ -4,7 +4,7 @@ const documentController = require('../../controllers/projectMonitoring/document
 const authenticationMiddleware = require('../../middlewares/authentication/auth.middleware');
 
 // Use Auth Middleware
-documentRouter.use('/document', authenticationMiddleware.authenticateUser);
+documentRouter.use('/documents', authenticationMiddleware.authenticateUser);
 
 // Define Routes
 documentRouter.post('/documents', documentController.createDocument);
