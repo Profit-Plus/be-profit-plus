@@ -8,6 +8,7 @@ const picRouter = require('./routes/projectMonitoring/picRoute');
 const customerRouter = require('./routes/projectMonitoring/customerRoute');
 const documentRouter = require('./routes/projectMonitoring/documentRoute');
 const projectRouter = require('./routes/projectMonitoring/projectRoute');
+const commentRouter = require('./routes/projectMonitoring/commentRoute');
 
 // Tarif Route  
 const searchRoute = require('./routes/tariffRoutes/searchRoute');
@@ -36,6 +37,7 @@ main.use(picRouter);
 main.use(customerRouter);
 main.use(documentRouter);
 main.use(projectRouter);
+main.use(commentRouter);
 
 // Tarif Use route
 main.use('/tariff/search', searchRoute);
