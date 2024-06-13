@@ -33,10 +33,10 @@ function isCreateCommentValid() {
     const schema = {
         type: 'object',
         properties: {
-            comment: { type: 'string', minLength: 1, maxLength: 68, nullable: false },
+            message: { type: 'string', minLength: 1, maxLength: 68, nullable: false },
             project_id: { type: 'string' }
         },
-        required: ['comment', 'project_id'],
+        required: ['message', 'project_id'],
         additionalProperties: false
     };
 
@@ -49,9 +49,9 @@ function isUpdateCommentValid() {
     const schema = {
         type: 'object',
         properties: {
-            comment: { type: 'string', minLength: 1, maxLength: 68, nullable: false },
+            message: { type: 'string', minLength: 1, maxLength: 68, nullable: false },
         },
-        required: ['comment'],
+        required: ['message'],
         additionalProperties: false
     };
 

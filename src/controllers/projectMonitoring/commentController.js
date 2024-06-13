@@ -1,4 +1,7 @@
 const commentService = require('../../services/projectMonitoring/commentService');
+const projectService = require('../../services/projectMonitoring/projectService');
+const notificationService = require('../../services/projectMonitoring/notificationService');
+const userService = require('../../services/authentication/user.service');
 const webResponses = require('../../helpers/web/webResponses');
 const commentValidator = require('../../validators/Comment.validator');
 const { formatErrorMessage } = require('../../helpers/utils/validator/formatError');
@@ -11,15 +14,37 @@ async function createComment(req, res) {
             return res.status(400).json(webResponses.errorResponse(formatErrorMessage(isCreateCommentValid.errors[0])));
         }
 
-        const { comment, project_id } = req.body;        
+        const { message, project_id } = req.body;
 
-        const result = await commentService.createComment({
-            user_id: req.userId,
-            comment: comment,
-            project_id: project_id
-        });
+        const project = await projectService.findProject(project_id);
 
-        res.status(201).json(webResponses.successResponse('Comment created successfully!', result));
+        if (project) {
+            const user = await userService.findAccessCredentialsById(req.userId);
+
+            const result = await commentService.createComment({
+                user_id: req.userId,
+                message: message,
+                project_id: project_id
+            });
+
+            for (key in project.members) {
+                const member = project.members[key];
+
+                if (member.access_credentials_id != req.userId) {
+                    await notificationService.createNotification({
+                        sender_id: req.userId,
+                        receiver_id: member.access_credentials_id,
+                        header: `${user.user_name} commented on project ${project.topic}`,
+                        content: message,
+                        url: process.env.BASE_URL_FE + '/project-monitoring/project/' + project.id
+                    });
+                }
+            }
+
+            res.status(201).json(webResponses.successResponse('Comment created successfully!', result));
+        } else {
+            res.status(404).json(webResponses.errorResponse('Project not found!'));
+        }
     } catch (e) {
         console.log(e);
         throw e;
@@ -36,7 +61,7 @@ async function getAllComments(req, res) {
             search: req.query.search ?? '',
             sort: req.query.sort ?? 'created_at',
             order: req.query.order ?? 'desc',
-            comment_type: req.query.comment_type ?? 'comment',
+            comment_type: req.query.comment_type,
             project_id: req.query.project_id,
             start_date: req.query.start_date,
             end_date: req.query.end_date
@@ -88,10 +113,10 @@ async function updateComment(req, res) {
         const comment = await commentService.findComment(commentId);
 
         if (comment) {
-            const { comment } = req.body;            
+            const { message } = req.body;
 
             const updatedComment = await commentService.updateComment(commentId, {
-                comment: comment
+                message: message
             });
 
             res.status(200).json(webResponses.successResponse('Comment updated successfully!', updatedComment));

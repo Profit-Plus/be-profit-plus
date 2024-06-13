@@ -14,6 +14,17 @@ function findAccessCredentials(email) {
     });
 }
 
+function findAccessCredentialsById(id) {
+    return database.access_credentials.findUnique({
+        where: { 
+            access_credentials_id: id 
+        },
+        omit: {            
+            password: true
+        }
+    });
+}
+
 function createUserAccessCredentials(user) {
     user.password = bcrypt.hashSync(user.password, 12);
     return database.access_credentials.create({
@@ -106,6 +117,7 @@ function checkUserValidation(userId) {
 
 module.exports = {
     findAccessCredentials,
+    findAccessCredentialsById,
     createNewUsers,
     createUserAccessCredentials,
     findUserById,

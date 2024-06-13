@@ -1,4 +1,7 @@
 const projectService = require('../../services/projectMonitoring/projectService');
+const commentService = require('../../services/projectMonitoring/commentService');
+const notificationService = require('../../services/projectMonitoring/notificationService');
+const userService = require('../../services/authentication/user.service');
 const webResponses = require('../../helpers/web/webResponses');
 const { v4: uuidv4 } = require('uuid');
 const projectValidator = require('../../validators/Project.validator');
@@ -158,17 +161,24 @@ async function deleteProject(req, res) {
     }
 }
 
-function sendApprovalRequest(req, res) {
+async function sendApprovalRequest(req, res) {
     try {
+        if (req.level != "STAFF") {
+            return res.status(401).json(webResponses.errorResponse('Approval request can only be send by STAFF'));
+        }
+
         const projectId = req.params.id;
         const { message } = req.body;
 
+        const user = await userService.findAccessCredentialsById(req.userId);
+
         changeApprovalStatus({
+            req: req,
+            res: res,
             projectId: projectId,
             approvalStatus: 'requesting',
             approvalMessage: message,
-            res: res,
-            responseMsg: 'Your approval request has been sent!'
+            responseMsg: `${user.user_name} has been send the approval request`
         });
     } catch (e) {
         console.log(e);
@@ -176,17 +186,23 @@ function sendApprovalRequest(req, res) {
     }
 }
 
-function approveApprovalRequest(req, res) {
+async function approveApprovalRequest(req, res) {
     try {
+        if (req.level != "SUPERADMIN") {
+            return res.status(401).json(webResponses.errorResponse('Approval request can only be approved by SUPERADMIN'));
+        }
+
         const projectId = req.params.id;
         const { message } = req.body;
+        const user = await userService.findAccessCredentialsById(req.userId);
 
         changeApprovalStatus({
+            req: req,
+            res: res,
             projectId: projectId,
             approvalStatus: 'approved',
             approvalMessage: message,
-            res: res,
-            responseMsg: 'Approval request has been approved!'
+            responseMsg: `${user.user_name} has been approved the approval request`
         });
     } catch (e) {
         console.log(e);
@@ -194,17 +210,23 @@ function approveApprovalRequest(req, res) {
     }
 }
 
-function declineApprovalRequest(req, res) {
+async function declineApprovalRequest(req, res) {
     try {
+        if (req.level != "SUPERADMIN") {
+            return res.status(401).json(webResponses.errorResponse('Approval request can only be declined by SUPERADMIN'));
+        }
+
         const projectId = req.params.id;
         const { message } = req.body;
+        const user = await userService.findAccessCredentialsById(req.userId);
 
         changeApprovalStatus({
+            req: req,
+            res: res,
             projectId: projectId,
             approvalStatus: 'declined',
-            approvalMessage: message,
-            res: res,
-            responseMsg: 'Approval request has been declined!'
+            approvalMessage: message,            
+            responseMsg: `${user.user_name} has been declined the approval request`
         });
     } catch (e) {
         console.log(e);
@@ -212,7 +234,7 @@ function declineApprovalRequest(req, res) {
     }
 }
 
-async function changeApprovalStatus({ projectId, approvalStatus, approvalMessage, res, responseMsg }) {
+async function changeApprovalStatus({ req, res, projectId, approvalStatus, approvalMessage, responseMsg }) {
     try {
         const project = await projectService.findProject(projectId);
 
@@ -256,6 +278,34 @@ async function changeApprovalStatus({ projectId, approvalStatus, approvalMessage
                 projectStatus: newProjectStatus,
                 approvalStatus: approvalStatus
             });
+
+            await commentService.createComment({
+                user_id: req.userId,
+                message: responseMsg,                
+                project_id: project.id,                
+                comment_type: 'log'
+            });
+            
+            await commentService.createComment({
+                user_id: req.userId,
+                message: approvalMessage,
+                project_id: project.id,
+                comment_type: 'comment'
+            });
+
+            for (key in project.members) {
+                const member = project.members[key];
+
+                if (member.access_credentials_id != req.userId) {
+                    await notificationService.createNotification({
+                        sender_id: req.userId,
+                        receiver_id: member.access_credentials_id,
+                        header: responseMsg,
+                        content: approvalMessage,
+                        url: process.env.BASE_URL_FE + '/project-monitoring/project/' + project.id
+                    });
+                }
+            }
 
             res.status(200).json(webResponses.successResponse(responseMsg, result));
         } else {

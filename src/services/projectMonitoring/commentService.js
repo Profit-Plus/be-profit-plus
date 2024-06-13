@@ -8,7 +8,7 @@ function createComment(payload) {
 
 async function findAllComments(params) {
     const condition = {
-        comment: { contains: params.search },
+        message: { contains: params.search },
         project_id: params.project_id,
         comment_type: params.comment_type,
         created_at: {
