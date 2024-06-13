@@ -19,6 +19,19 @@ function findAccessCredentialsById(id) {
         where: { 
             access_credentials_id: id 
         },
+        omit: {
+            password: true
+        }
+    });
+}
+
+function findAllSuperAdmin() {
+    return database.access_credentials.findMany({
+        where: { 
+            users: {
+                level_name: 'SUPERADMIN'
+            }
+        },
         omit: {            
             password: true
         }
@@ -118,6 +131,7 @@ function checkUserValidation(userId) {
 module.exports = {
     findAccessCredentials,
     findAccessCredentialsById,
+    findAllSuperAdmin,
     createNewUsers,
     createUserAccessCredentials,
     findUserById,

@@ -252,7 +252,7 @@ function deleteProject(projectId) {
     });
 }
 
-async function updateProjectApprovalStatus({ projectId, model, identifier, projectStatus, approvalStatus, logMsg, comment }) {
+async function updateProjectApprovalStatus({ projectId, model, identifier, projectStatus, approvalStatus, isMember, updaterId }) {
     const result = await database.$transaction(async (transaction) => {
         await transaction[model].update({
             data: { approval_status: approvalStatus },
@@ -261,7 +261,11 @@ async function updateProjectApprovalStatus({ projectId, model, identifier, proje
         const project = await transaction.project.update({
             data: {
                 requesting_approval: approvalStatus == 'requesting',
-                status: projectStatus
+                status: projectStatus,
+                updater_id: updaterId,
+                members: {
+                    connect: isMember ? [] : { access_credentials_id: updaterId }
+                },
             },
             where: { id: projectId },
             ...omitIncludeOptions

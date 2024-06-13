@@ -97,7 +97,7 @@ async function updateProject(req, res) {
 
         if (project) {
             const payload = req.body;
-            const isMember = project.members.some(member => member.id === req.userId);
+            const isMember = project.members.some(member => member.access_credentials_id === req.userId);
 
             if (payload.project) {
                 if (payload.project.start_project) {
@@ -167,6 +167,11 @@ async function sendApprovalRequest(req, res) {
             return res.status(401).json(webResponses.errorResponse('Approval request can only be send by STAFF'));
         }
 
+        const admins = await userService.findAllSuperAdmin();
+        if (admins.length < 1) {
+            return res.status(404).json(webResponses.errorResponse('Cannot process the request. SUPERADMIN account is missing!'));
+        }
+
         const projectId = req.params.id;
         const { message } = req.body;
 
@@ -175,6 +180,7 @@ async function sendApprovalRequest(req, res) {
         changeApprovalStatus({
             req: req,
             res: res,
+            admins: admins,
             projectId: projectId,
             approvalStatus: 'requesting',
             approvalMessage: message,
@@ -225,7 +231,7 @@ async function declineApprovalRequest(req, res) {
             res: res,
             projectId: projectId,
             approvalStatus: 'declined',
-            approvalMessage: message,            
+            approvalMessage: message,
             responseMsg: `${user.user_name} has been declined the approval request`
         });
     } catch (e) {
@@ -234,13 +240,14 @@ async function declineApprovalRequest(req, res) {
     }
 }
 
-async function changeApprovalStatus({ req, res, projectId, approvalStatus, approvalMessage, responseMsg }) {
+async function changeApprovalStatus({ req, res, projectId, approvalStatus, approvalMessage, responseMsg, admins }) {
     try {
         const project = await projectService.findProject(projectId);
 
         let model;
         let identifier;
         if (project) {
+            const isMember = project.members.some(member => member.access_credentials_id === req.userId);        
             const currentProjectstatus = project.status;
 
             switch (currentProjectstatus) {
@@ -276,16 +283,18 @@ async function changeApprovalStatus({ req, res, projectId, approvalStatus, appro
                 model: model,
                 identifier: identifier,
                 projectStatus: newProjectStatus,
-                approvalStatus: approvalStatus
+                approvalStatus: approvalStatus,
+                isMember: isMember,
+                updaterId: req.userId
             });
 
             await commentService.createComment({
                 user_id: req.userId,
-                message: responseMsg,                
-                project_id: project.id,                
+                message: responseMsg,
+                project_id: project.id,
                 comment_type: 'log'
             });
-            
+
             await commentService.createComment({
                 user_id: req.userId,
                 message: approvalMessage,
@@ -293,8 +302,17 @@ async function changeApprovalStatus({ req, res, projectId, approvalStatus, appro
                 comment_type: 'comment'
             });
 
-            for (key in project.members) {
-                const member = project.members[key];
+            let targets = project.members;
+            if (admins && admins.length > 0) {
+                const combined = targets.concat(admins);
+
+                targets = combined.filter((item, index, self) =>
+                    index === self.findIndex((t) => t.access_credentials_id === item.access_credentials_id)
+                );
+            }
+
+            for (key in targets) {
+                const member = targets[key];
 
                 if (member.access_credentials_id != req.userId) {
                     await notificationService.createNotification({
