@@ -5,13 +5,13 @@ const bodyParser = require('body-parser');
 
 // Porto Route
 const authRouter = require('./routes/authentication/auth.routes');
-const productGuideProductTemplate = require('./routes/productGuideEditor/templates.routes');
-const productGuideMiscRouter = require('./routes/productGuideEditor/misc/misc.routes');
-const productGuidestepOneRouter = require('./routes/productGuideEditor/step1/step1.routes');
-const productGuideStepTwoRouter = require('./routes/productGuideEditor/step2/step2.routes');
-const productGuideStepThreeRouter = require('./routes/productGuideEditor/step3/step3.routes');
-const productGuidestepFourRouter = require('./routes/productGuideEditor/step4/step4.routes');
-const productGuideStepSixRouter = require('./routes/productGuideEditor/step6/step6.routes');
+const productGuideProductTemplate = require('./routes/productGuideEditor/editor/templates.routes');
+const productGuideMiscRouter = require('./routes/productGuideEditor/editor/misc/misc.routes');
+const productGuidestepOneRouter = require('./routes/productGuideEditor/editor/step1/step1.routes');
+const productGuideStepTwoRouter = require('./routes/productGuideEditor/editor/step2/step2.routes');
+const productGuideStepThreeRouter = require('./routes/productGuideEditor/editor/step3/step3.routes');
+const productGuidestepFourRouter = require('./routes/productGuideEditor/editor/step4/step4.routes');
+const productGuideStepSixRouter = require('./routes/productGuideEditor/editor/step6/step6.routes');
 
 /* Necessary variables */
 const PORT = process.env.PORT || 3001;
