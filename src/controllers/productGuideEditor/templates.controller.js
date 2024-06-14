@@ -18,6 +18,7 @@ async function addNewProduct(req, res, next) {
         const positioningUuid = uuidv4();
         const differentiationBrandingUuid = uuidv4();
         const operatingModelUuid = uuidv4();
+        const readinessUuid = uuidv4();
 
         /* Initialize uuid for sub-services */
         const indiciatorUuid = uuidv4();
@@ -60,11 +61,15 @@ async function addNewProduct(req, res, next) {
         await productTemplateService.addProductPositioningStoryTemplate(storyUuid, positioningUuid);
 
         /* Add a new template for product operating model */
+        
         await productTemplateService.addProductOperatingModelTemplate(productUuid, operatingModelUuid);
 
-        /* Operatimg model sub-services */
+        /* Operating model sub-services */
         await productTemplateService.addProductOperatingModelGtmHostTemplate(operatingModelGtmHostUuid, operatingModelUuid);
         await productTemplateService.addProductOperatingModelOrganizationHeaderTemplate(operatingModelOrganizationHeaderUuid, operatingModelUuid);
+
+        /* add a new template for roduct readiness */
+        await productTemplateService.addProductReadinessStatus(readinessUuid, productUuid);
             
         res.status(200).json(responses.successResponse('New product added!', product));
         

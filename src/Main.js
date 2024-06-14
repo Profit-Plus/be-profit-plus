@@ -11,6 +11,7 @@ const productGuidestepOneRouter = require('./routes/productGuideEditor/step1/ste
 const productGuideStepTwoRouter = require('./routes/productGuideEditor/step2/step2.routes');
 const productGuideStepThreeRouter = require('./routes/productGuideEditor/step3/step3.routes');
 const productGuidestepFourRouter = require('./routes/productGuideEditor/step4/step4.routes');
+const productGuideStepSixRouter = require('./routes/productGuideEditor/step6/step6.routes');
 
 /* Necessary variables */
 const PORT = process.env.PORT || 3001;
@@ -30,6 +31,7 @@ main.use('/profitplus/api', productGuidestepOneRouter);
 main.use('/profitplus/api', productGuideStepTwoRouter)
 main.use('/profitplus/api', productGuideStepThreeRouter);
 main.use('/profitplus/api', productGuidestepFourRouter);
+main.use('/profitplus/api', productGuideStepSixRouter);
 
 main.listen(PORT, () => {
     console.log('Server is running! port: ' + PORT);

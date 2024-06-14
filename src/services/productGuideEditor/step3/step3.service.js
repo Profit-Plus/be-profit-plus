@@ -17,7 +17,7 @@ function updateOperatingModeLocation(operatingModelId, location) {
 /**
  *  @function addGtomHost to add the details of GTOM Host based on its host option 
  */
-function addOpGtomHost(id, operatingModelId, data) {
+function addOpGtomHost(operatingModelId, data) {
     return database.product_op_gtm_host.update({
         where: {
             product_operating_model_uuid: operatingModelId

@@ -130,10 +130,12 @@ model product_overview {
     product_gallery product_gallery[]
     product_service product_service[]
     product_use_case product_use_case[]
+    product_readiness_description product_readiness_description[]
     product_positioning product_positioning?
     product_segmenting_targeting product_segmenting_targeting?
     product_differentiation_branding product_differentiation_branding?
     product_operating_model product_operating_model?
+    product_readiness_status product_readiness_status?
     
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -469,6 +471,7 @@ model product_op_management_systems {
     updated_at DateTime @updatedAt
 }
 
+// Product Use Case Schema
 model product_use_case {
     use_case_uuid String @id @default(uuid())
     product_uuid String
@@ -484,4 +487,33 @@ model product_use_case {
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
+}
+
+// Product Readiness schema
+enum product_status {
+    DEFINE
+    DESIGN
+    DEVELOP
+    DEPLOY
+    DELIVER
+}
+
+model product_readiness_status {
+    product_readiness_status_uuid String @id @default(uuid())
+    product_uuid String @unique
+    product_status product_status @default(DEFINE)
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+}
+
+model product_readiness_description {
+    product_readiness_description_uuid String @id @default(uuid())
+    product_uuid String
+    product_status product_status
+    analysis_description String
+    next_step_description String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
 }

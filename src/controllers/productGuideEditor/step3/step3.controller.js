@@ -73,7 +73,7 @@ async function updateOperatingModelDetails(req, res, next) {
         res.status(200).json(response.successResponse('Operating model details successfully updated'));
 
     } catch (error) {
-        if (error.message.includes(`Cannot read properties of null (reading 'product_segmenting_targeting')`)) {
+        if (error.message.includes(`Cannot read properties of null (reading 'product_operating_model')`)) {
             res.status(404).json(response.errorResponse('Invalid name of product'));  
 
         } else {
@@ -157,7 +157,7 @@ async function addOperatingModelGtmHost(req, res, next) {
         });
 
     } catch (error) {
-        if (error.message.includes(`Cannot read properties of null (reading 'product_positioning')`)) {
+        if (error.message.includes(`Cannot read properties of null (reading 'product_operating_model')`)) {
             res.status(404).json(response.errorResponse('Invalid name of product'));  
 
         } else {

@@ -1,3 +1,4 @@
+const { product_status } = require('@prisma/client');
 const { database } = require('../../helpers/configuration/db');
 
 /**
@@ -125,6 +126,19 @@ function addProductOperatingModelOrganizationHeaderTemplate(id, operatingModelId
     });
 }
 
+/**
+ *  @function addProductReadinessStatus to add a new readiness status template of a product
+ */
+function addProductReadinessStatus(id, productId) {
+    return database.product_readiness_status.create({
+        data: {
+            product_readiness_status_uuid: id,
+            product_uuid: productId,
+            product_status: product_status.DEFINE,
+        }
+    });
+}
+
 module.exports = {
     addProductOverviewTemplate,
     addProductStpdbTemplate,
@@ -134,5 +148,6 @@ module.exports = {
     addProductPositioningIndicatorsTemplate,
     addProductOperatingModelTemplate,
     addProductOperatingModelGtmHostTemplate,
-    addProductOperatingModelOrganizationHeaderTemplate
+    addProductOperatingModelOrganizationHeaderTemplate,
+    addProductReadinessStatus
 }
