@@ -109,7 +109,9 @@ model taxonomy {
     taxonomy_name String @unique
 
     created_at DateTime @default(now())
-    updated_at DateTime @updatedAt        
+    updated_at DateTime @updatedAt  
+
+    product_overview product_overview[]      
 }
 
 model product_overview {
@@ -126,6 +128,7 @@ model product_overview {
 
     //  Relation section
     units units @relation(fields: [unit_id], references: [unit_id])
+    taxonomy taxonomy @relation(fields: [taxonomy_uuid], references: [taxonomy_uuid])
     product_main_use product_main_use[]
     product_gallery product_gallery[]
     product_service product_service[]
