@@ -667,6 +667,9 @@ enum document_type {
   bast
   report
   nps
+  sph
+  spk
+  kfs
 }
 
 enum progress_enum {

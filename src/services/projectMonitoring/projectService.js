@@ -41,6 +41,7 @@ const omitIncludeOptions = {
             omit: {
                 baa_id: true,
                 bast_id: true,
+                kfs_id: true,
                 mom_readiness_id: true,
                 nde_confirmation_id: true,
                 nde_req_cfu_to_mid_id: true,
@@ -49,6 +50,7 @@ const omitIncludeOptions = {
             include: {
                 baa: true,
                 bast: true,
+                kfs: true,
                 mom_readiness: true,
                 nde_confirmation: true,
                 nde_req_cfu_to_mid: true,

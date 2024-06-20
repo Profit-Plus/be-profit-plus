@@ -14,7 +14,7 @@ async function createDocument(req, res) {
 
         form.parse(req, async function (error, fields, files) {
             const allowedExts = ['pdf', 'docx'];
-            const allowedDocTypes = ['nde', 'mom', 'requirement', 'baa', 'bast', 'report', 'nps'];
+            const allowedDocTypes = ['nde', 'mom', 'requirement', 'baa', 'bast', 'report', 'nps', 'sph', 'spk', 'kfs'];
             let docType;
             let uploadedDoc;
             let fileExt;
@@ -149,7 +149,7 @@ async function updateDocument(req, res) {
 
         form.parse(req, async function (error, fields, files) {
             const allowedExts = ['pdf', 'docx'];
-            const allowedDocTypes = ['nde', 'mom', 'requirement', 'baa', 'bast', 'report', 'nps'];
+            const allowedDocTypes = ['nde', 'mom', 'requirement', 'baa', 'bast', 'report', 'nps', 'sph', 'spk', 'kfs'];
             let uploadedDoc;
             let fileExt;
             let docType;
