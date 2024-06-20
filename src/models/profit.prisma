@@ -107,10 +107,12 @@ model project_ongoing {
   nde_confirmation_id    String?         @unique
   baa_id                 String?         @unique
   bast_id                String?         @unique
+  kfs_id                 String?         @unique
   approval_status        approval_status @default(draft)
   project                project?
   baa                    document?       @relation("BAA", fields: [baa_id], references: [id])
   bast                   document?       @relation("BAST", fields: [bast_id], references: [id])
+  kfs                    document?       @relation("KFS", fields: [kfs_id], references: [id])
   mom_readiness          document?       @relation("MOM_READINESS", fields: [mom_readiness_id], references: [id])
   nde_confirmation       document?       @relation("NDE_CONFIRMATION", fields: [nde_confirmation_id], references: [id])
   nde_req_cfu_to_mid     document?       @relation("NDE_REQ_CFU_TO_MID", fields: [nde_req_cfu_to_mid_id], references: [id])
@@ -177,6 +179,7 @@ model document {
   spk                     project_init?      @relation("SPK")
   baa                     project_ongoing?   @relation("BAA")
   bast                    project_ongoing?   @relation("BAST")
+  kfs                     project_ongoing?   @relation("KFS")
   mom_readiness           project_ongoing?   @relation("MOM_READINESS")
   nde_confirmation        project_ongoing?   @relation("NDE_CONFIRMATION")
   nde_req_cfu_to_mid      project_ongoing?   @relation("NDE_REQ_CFU_TO_MID")
@@ -201,7 +204,7 @@ model notification {
 model comment {
   id           String             @id @default(uuid())
   user_id      String
-  message      String  
+  message      String
   comment_type comment_type       @default(comment)
   created_at   DateTime           @default(now())
   updated_at   DateTime           @updatedAt

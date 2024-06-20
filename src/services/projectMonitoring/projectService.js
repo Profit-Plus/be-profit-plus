@@ -28,6 +28,7 @@ const omitIncludeOptions = {
                 spk_id: true
             },
             include: {
+                pic_midfielder: true,
                 lir_requirement: true,
                 mom_req: true,
                 nde_determination: true,
@@ -154,7 +155,7 @@ async function findAllProjects(params) {
         }
     };
 
-    const [data, total] = await database.$transaction([
+    const [data, total, totalInit, totalOngoing, totalDrop, totalCloseOut] = await database.$transaction([
         database.project.findMany({
             skip: params.limit * (params.page - 1),
             take: params.limit,
@@ -162,15 +163,25 @@ async function findAllProjects(params) {
                 [params.sort]: params.order
             },
             where: condition,
-            include: { customer: true }
+            include: { customer: true, solution: true },
+            omit: { solution_id: true }
         }),
-        database.project.count({ where: condition })
+        database.project.count({ where: condition }),
+        database.project.count({ where: { ...condition, status: 'initiation' } }),
+        database.project.count({ where: { ...condition, status: 'ongoing' } }),
+        database.project.count({ where: { ...condition, status: 'drop' } }),
+        database.project.count({ where: { ...condition, status: 'close_out' } })
     ]);
 
     return {
         page: params.page,
         limit: params.limit,
+        total_page: Math.ceil(total / params.limit),
         total: total,
+        total_init: totalInit,
+        total_ongoing: totalOngoing,
+        total_drop: totalDrop,
+        total_close_out: totalCloseOut,
         data: data
     };
 }

@@ -60,7 +60,18 @@ async function getAllProjects(req, res) {
 
         const project = await projectService.findAllProjects(params);
 
-        res.status(200).json(webResponses.successResponsePage('Projects data fetched successfully!', project.page, project.limit, project.total, project.data));
+        const meta = {
+            page: project.page,
+            limit: project.limit,
+            total_page: project.total_page,
+            total: project.total,
+            total_init: project.total_init,
+            total_ongoing: project.total_ongoing,
+            total_drop: project.total_drop,
+            total_close_out: project.total_close_out
+        }
+
+        res.status(200).json(webResponses.successResponsePageCustom('Projects data fetched successfully!', meta, project.data));
     } catch (e) {
         console.log(e);
         throw e;
