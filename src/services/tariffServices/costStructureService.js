@@ -1,7 +1,7 @@
-const { Prisma } = require('@prisma/client');
+const { type } = require('os');
 const { database } = require('../../helpers/utils/db/database');
 
-async function getCostStructure(sheetsId) {
+async function getCostStructure(sheetId) {
     const [listPackage, costStructureData] = await database.$transaction([
       database.packages.findMany({
         select:{
@@ -10,7 +10,7 @@ async function getCostStructure(sheetsId) {
           id: true,
         },
         where: {
-          sheets_id: sheetsId
+          sheet_id: sheetId
       }}),
       database.type.findMany({
         include: {
@@ -50,7 +50,7 @@ async function getCostStructure(sheetsId) {
           }
         },
         where: {
-          sheets_id: sheetsId
+          sheet_id: sheetId
         },
       })
     ])
@@ -61,7 +61,8 @@ async function getDetailList() {
     const detailList = await database.data.findMany(
       {select: {
         id: true,
-        event_module: true,
+        code: true,
+        event_module: true,        
         average_price: true,
         unit: true
       }}
@@ -73,7 +74,7 @@ async function getDetailList() {
 async function upsertCategory(sheetId, categoryData){
   const type = await database. type.findFirst({
     where:{
-      sheets_id: sheetId,
+      sheet_id: sheetId,
       type: categoryData.type
     }
   });
@@ -178,7 +179,7 @@ async function connectData(sheetId, connect) {
         id: true,
       },
       where: {
-        sheets_id: sheetId,
+        sheet_id: sheetId,
       },
     });
     
@@ -232,16 +233,16 @@ async function connectData(sheetId, connect) {
 async function createPackage(sheetId, packageData){
     const newPackage = await database.packages.create({
       data: {
-        sheets_id: sheetId,
+        sheet_id: sheetId,
         name: packageData.name,
         category: packageData.category
       }
     });
   
-    const getDataId = await database.sheets.findUnique({
+    const getDataId = await database.sheet.findUnique({
       where: { id: sheetId },
       select: {
-        types: {
+        type: {
           select: {
             categories: {
               select: {
@@ -257,8 +258,8 @@ async function createPackage(sheetId, packageData){
       },
     });
     
-    const dataIds = getDataId.types.flatMap(types =>
-      types.categories.flatMap(category =>
+    const dataIds = getDataId.type.flatMap(type =>
+      type.categories.flatMap(category =>
         category.category_data.map(categoryData => categoryData.data_id)
       )
     );
@@ -284,7 +285,7 @@ async function createPackage(sheetId, packageData){
         id: true
       },
       where: { 
-        sheets_id: sheetId 
+        sheet_id: sheetId 
       }
     });
   
@@ -303,7 +304,7 @@ async function createPackage(sheetId, packageData){
         id: true
       },
       where: { 
-        sheets_id: sheetId 
+        sheet_id: sheetId 
       }
     });
   
@@ -360,7 +361,7 @@ async function deletePackage(packageId){
 async function updateTotal(sheetId, total){
     const type = await database. type.findFirst({
       where:{
-        sheets_id: sheetId,
+        sheet_id: sheetId,
         type: total.type
       }
     });
