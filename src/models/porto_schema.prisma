@@ -133,7 +133,9 @@ model product_overview {
     product_gallery product_gallery[]
     product_service product_service[]
     product_use_case product_use_case[]
+    product_tariffing_packets product_tariffing_packets[]
     product_readiness_description product_readiness_description[]
+    solution_product solution_product[]
     product_positioning product_positioning?
     product_segmenting_targeting product_segmenting_targeting?
     product_differentiation_branding product_differentiation_branding?
@@ -492,6 +494,21 @@ model product_use_case {
     updated_at DateTime @updatedAt
 }
 
+// Product Tariffing
+model product_tariffing_packets {
+    product_tariffing_packets_uuid String @id @default(uuid())
+    product_uuid String
+    feature String
+    tariff String
+    payment_schema String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt   
+}
+
 // Product Readiness schema
 enum product_status {
     DEFINE
@@ -519,4 +536,25 @@ model product_readiness_description {
 
     // Relation section
     product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+}
+
+// Product Solution (dummy)
+model solution_formulation {
+    solution_formulation_uuid String @id @default(uuid())
+    solution_name String @unique
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    solution_product solution_product[]
+}
+
+model solution_product {
+    solution_product_uuid String @id @default(uuid())
+    solution_formulation_uuid String
+    product_uuid String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+    solution_formulation solution_formulation @relation(fields: [solution_formulation_uuid], references: [solution_formulation_uuid])
 }

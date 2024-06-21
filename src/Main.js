@@ -11,8 +11,10 @@ const productGuidestepOneRouter = require('./routes/productGuideEditor/editor/st
 const productGuideStepTwoRouter = require('./routes/productGuideEditor/editor/step2/step2.routes');
 const productGuideStepThreeRouter = require('./routes/productGuideEditor/editor/step3/step3.routes');
 const productGuidestepFourRouter = require('./routes/productGuideEditor/editor/step4/step4.routes');
+const productGuidestepFiveRouter = require('./routes/productGuideEditor/editor/step5/step5.routes');
 const productGuideStepSixRouter = require('./routes/productGuideEditor/editor/step6/step6.routes');
 const productListRouter = require('./routes/productGuideEditor/review/productList.routes');
+const newSolutionRouter = require('./routes/solutionFormulation/newSolution.routes');
 
 /* Necessary variables */
 const PORT = process.env.PORT || 3001;
@@ -32,8 +34,12 @@ main.use('/profitplus/api', productGuidestepOneRouter);
 main.use('/profitplus/api', productGuideStepTwoRouter)
 main.use('/profitplus/api', productGuideStepThreeRouter);
 main.use('/profitplus/api', productGuidestepFourRouter);
+main.use('/profitplus/api', productGuidestepFiveRouter);
 main.use('/profitplus/api', productGuideStepSixRouter);
 main.use('/profitplus/api', productListRouter);
+
+/* Solution formulation */
+main.use('/profitplus/api', newSolutionRouter);
 
 main.listen(PORT, () => {
     console.log('Server is running! port: ' + PORT);
