@@ -116,6 +116,7 @@ async function getProductSheet(query_sheet_id) {
                 }
             },
             approver_status:true,
+            updatedAt: true,
 
 
         },
