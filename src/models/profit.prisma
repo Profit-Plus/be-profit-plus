@@ -84,6 +84,8 @@ model project_init {
   potential_employee_trained Int             @default(0)
   nde_determination_id       String?         @unique
   potential_revenue          Int             @default(0)
+  created_at                 DateTime        @default(now())
+  updated_at                 DateTime        @default(now()) @updatedAt
   approval_status            approval_status @default(draft)
   project                    project?
   lir_requirement            document?       @relation("LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
@@ -108,6 +110,8 @@ model project_ongoing {
   baa_id                 String?         @unique
   bast_id                String?         @unique
   kfs_id                 String?         @unique
+  created_at             DateTime        @default(now())
+  updated_at             DateTime        @default(now()) @updatedAt
   approval_status        approval_status @default(draft)
   project                project?
   baa                    document?       @relation("BAA", fields: [baa_id], references: [id])
@@ -123,6 +127,8 @@ model project_drop {
   id                  String          @id @default(uuid())
   project_id          String
   nde_project_drop_id String?         @unique
+  created_at          DateTime        @default(now())
+  updated_at          DateTime        @default(now()) @updatedAt
   approval_status     approval_status @default(draft)
   project             project?
   nde_project_drop    document?       @relation("NDE_PROJECT_DROP", fields: [nde_project_drop_id], references: [id])
@@ -139,6 +145,8 @@ model project_close_out {
   nde_report_project_id      String?         @unique
   nps_id                     String?         @unique
   delivery_year              String?
+  created_at                 DateTime        @default(now())
+  updated_at                 DateTime        @default(now()) @updatedAt
   approval_status            approval_status @default(draft)
   project                    project?
   mom_reconciles             document?       @relation("MOM_RECONCILES", fields: [mom_reconciles_id], references: [id])
@@ -653,7 +661,7 @@ enum segment_enum {
 enum helix_enum {
   academy
   business
-  goverment
+  government
   community
   tech_prov
   subsidiary

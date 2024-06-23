@@ -12,6 +12,7 @@ const documentRouter = require('./routes/projectMonitoring/documentRoute');
 const projectRouter = require('./routes/projectMonitoring/projectRoute');
 const commentRouter = require('./routes/projectMonitoring/commentRoute');
 const notificationRouter = require('./routes/projectMonitoring/notificationRoute');
+const dashboardRouter = require('./routes/projectMonitoring/dashboardRoute');
 
 // Tarif Route  
 const searchRoute = require('./routes/tariffRoutes/searchRoute');
@@ -43,6 +44,7 @@ main.use(documentRouter);
 main.use(projectRouter);
 main.use(commentRouter);
 main.use(notificationRouter);
+main.use(dashboardRouter);
 
 // Tarif Use route
 main.use('/tariff/search', searchRoute);
