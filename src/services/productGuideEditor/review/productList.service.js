@@ -29,6 +29,37 @@ function getAllProduct() {
 }
 
 /**
+ *  @function getProductById to get a product by it's uuid
+ */
+function getProductById(id) {
+    return database.product_overview.findFirst({
+        where: {
+            product_uuid: id
+        },
+        select: {
+            product_uuid: true,
+            units: {
+                select: {
+                    units_name: true
+                }
+            },
+            product_name: true,
+            product_description: true,
+            taxonomy: {
+                select: {
+                    taxonomy_name: true
+                }
+            },
+            product_logo_dir: true,
+            product_playbook_dir: true,
+            product_marketing_collateral_dir: true,
+            created_at: true,
+            updated_at: true
+        }
+    });
+}
+
+/**
  *  @function countProduct to get the number of product existed in database
  */
 function countProduct() {
@@ -37,5 +68,6 @@ function countProduct() {
 
 module.exports = {
     getAllProduct,
+    getProductById,
     countProduct
 }
