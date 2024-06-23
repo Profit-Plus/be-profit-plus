@@ -11,8 +11,6 @@ async function createOffering(req, res) {
 
     const parsedSheetId = parseInt(sheet_id);
     try {
-        
-
         const createdData = await offeringService.createOffer(parsedSheetId, offer_name);
         res.json( webResponses.successResponse('Data Created successfully', createdData) );
     } catch (error) {
@@ -54,8 +52,25 @@ async function updateOffering(req, res){
     }
 }
 
+async function updateStatusOffering (req, res){
+    const { offering_id, package_id } = req.params;
+    const { package_status } = req.body;
+    console.log(package_status)
+
+    const parsedOfferingId = parseInt(offering_id);
+    const parsedPackageId = parseInt(package_id);
+    try{
+        const updatedData = await offeringService.updateStatusOffering(parsedOfferingId, parsedPackageId, package_status);
+        res.json(webResponses.successResponse('Data updated successfully', updatedData));
+    } catch (error){
+        console.error(error);
+        res.status(500).json(webResponses.errorResponse('Failed to update data'));
+    }
+}
+
 module.exports = {
     createOffering,
     getOffering,
-    updateOffering
+    updateOffering,
+    updateStatusOffering
 };

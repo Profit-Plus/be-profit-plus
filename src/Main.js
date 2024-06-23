@@ -4,18 +4,21 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-
-
-// Tarif Route  
-const searchRoute = require('./routes/tariffRoutes/searchRoute');
-const sheetRoute = require('./routes/tariffRoutes/searchRoute');
-const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
-const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
-const costStructureRoute = require('./routes/tariffRoutes/costStructureRoute')
-
 // GTOM Route
 const picRouter = require('./routes/projectMonitoring/picRoute');
 const customerRouter = require('./routes/projectMonitoring/customerRoute');
+const documentRouter = require('./routes/projectMonitoring/documentRoute')
+
+// Tarif Route  
+const searchRoute = require('./routes/tariffRoutes/searchRoute');
+const sheetRoute = require('./routes/tariffRoutes/sheetRoute');
+const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
+const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
+const costStructureRoute = require('./routes/tariffRoutes/costStructureRoute')
+const productRoute = require('./routes/tariffRoutes/productRoute');
+const dashboard = require('./routes/tariffRoutes/dashboardSSORoute');
+const solution = require('./routes/tariffRoutes/solutionTariffRoute');
+
 
 // Porto Route
 const authRouter = require('./routes/auth/auth.routes');
@@ -27,15 +30,18 @@ const stepThreeRouter = require('./routes/productGuide/stepTwo.routes');
 const PORT = process.env.PORT || 3001;
 const main = express();
 
+/* Use express */
+
 main.use(cors());
 main.use(bodyParser.json());
-main.use(bodyParser.urlencoded ({
+main.use(bodyParser.urlencoded({
     extended: false
 }));
 
 // GTOM Use route
 main.use(picRouter);
 main.use(customerRouter);
+main.use(documentRouter);
 
 // Tarif Use route
 main.use('/tariff/search', searchRoute);
@@ -43,6 +49,9 @@ main.use('/tariff/sheet', sheetRoute);
 main.use('/tariff/master-package', masterPackageRoute);
 main.use('/tariff/offering', offeringRoute);
 main.use('/tariff/cost-structure', costStructureRoute);
+main.use('/tariff/product', productRoute);
+main.use('/tariff/dashboard', dashboard);
+main.use('/tariff/solution', solution);
 
 // Porto Use route
 main.use(authRouter);

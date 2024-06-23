@@ -113,9 +113,9 @@ async function deleteCustomer(req, res) {
         const customer = await customerService.findCustomer(customerId);
 
         if (customer) {
-            await customerService.deleteCustomer(customerId);
+            const deletedCustomer = await customerService.deleteCustomer(customerId);
 
-            res.status(200).json(webResponses.successResponse('Customer deleted successfully!', customer));
+            res.status(200).json(webResponses.successResponse('Customer deleted successfully!', deletedCustomer));
         }
         else {
             res.status(404).json(webResponses.errorResponse('Customer not found!'));

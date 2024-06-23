@@ -1,7 +1,4 @@
-const { json } = require('body-parser');
 const { database } = require('../../helpers/utils/db/database');
-const { query } = require('express');
-const { count } = require('console');
 
 async function createOffer(query_sheet_id, query_offer_name) {
     const offering = await database.offering.create({
@@ -37,7 +34,7 @@ async function getOffering(query_sheet_id) {
     const offering = await database.offering.findMany({
             select:{
                 id:true,
-                sheet_id:true,
+                sheets_id:true,
                 offer_name:true,
                 unit:true,
                 user_target:true,
@@ -50,18 +47,12 @@ async function getOffering(query_sheet_id) {
                     select:{
                         package_id:true,
                         offering_id:true,
+                        package_status:true,
                         package:{
                             select:{
                                 id:true,
-                                name:true,
                                 category:true,
-                                target_sales:true,
-                                payback_period:true,
-                                operational_time:true,
-                                excess_capacity:true,
-                                capex:true,
-                                opex:true,
-                                cogs:true,
+                                name:true,
                                 tariff:true,
                             },
                         },
@@ -69,9 +60,10 @@ async function getOffering(query_sheet_id) {
                 },
             },
             where: {
-                sheet_id: query_sheet_id
+                sheets_id: query_sheet_id
             },
     });
+
     const count_offer_package = await database.offering_package.count({
         where: {
             offering_id: offering.id
@@ -125,8 +117,25 @@ async function updateOffer(query_offer_id, query_offer_name, query_unit, query_u
     return null;
 }
 
+async function updateStatusOffering(query_offer_id, query_package_id, query_status){
+    const offering = await database.offering_package.update({
+        where: {
+            package_id_offering_id: {
+                offering_id: query_offer_id,
+                package_id: query_package_id 
+            }
+        },
+        data: {
+            package_status: query_status
+        }
+    });
+    return offering;
+
+}
+
 module.exports = {
     createOffer,
     getOffering,
-    updateOffer
+    updateOffer,
+    updateStatusOffering
 };
