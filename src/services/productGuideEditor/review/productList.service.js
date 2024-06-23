@@ -31,10 +31,10 @@ function getAllProduct() {
 /**
  *  @function getProductById to get a product by it's uuid
  */
-function getProductById(id) {
+function getProductByName(name) {
     return database.product_overview.findFirst({
         where: {
-            product_uuid: id
+            product_name: name
         },
         select: {
             product_uuid: true,
@@ -68,6 +68,6 @@ function countProduct() {
 
 module.exports = {
     getAllProduct,
-    getProductById,
+    getProductByName,
     countProduct
 }
