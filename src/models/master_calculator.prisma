@@ -170,7 +170,7 @@ model packages {
     update_at        DateTime      @updatedAt
     delete_at        DateTime?
 
-     offering_packages       offering_package[]
+    offering_packages       offering_package[]
     totals                  total[]
     data_package            data_package[]
     sheets                  sheet?                   @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -181,8 +181,11 @@ model packages {
 model offering {
     id              Int    @id @default(autoincrement())
     offer_name      String
+    header          String @default("")
     unit            offering_unit_enum @default(Unit)
     user_target     Int  @default(0)
+    bussines_model   bussines_model_enum @default(Subscription)
+    total_price     Float @default(0)
 
     offering_packages offering_package[]
      sheets            sheet?            @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)

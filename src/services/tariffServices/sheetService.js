@@ -5,6 +5,7 @@ async function getSheet(){
         select: {
             id: true,
             name: true,
+            updatedAt: true,
         },
     });
 }
@@ -19,10 +20,15 @@ async function getSheetById(id){
 }
 
 
-async function createSheet(name){
+async function createSheet(name, query_taxonomy_id){
     return database.product.create({
         data: {
-            name
+            name,
+            product_sheet: {
+                create: {
+                    taxonomy_id: query_taxonomy_id, 
+                }
+            }
         },
     });
 }
