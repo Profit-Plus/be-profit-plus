@@ -68,22 +68,22 @@ async function userLogin(req, res, next) {
         /* Validate the request body of loginCredentials */
         const { error, value } = authValidator.loginCredentialsValidation(loginCredentials);
         if (error) {
-            res.status(400).json(response.errorResponse({ error: error.details[0].message }));
-            next(new Error('Failed validation!'));
+            return res.status(400).json(response.errorResponse({ error: error.details[0].message }));
+            // next(new Error('Failed validation!'));
         }
 
         /* Check if the email belongs to existed user */
         const existedEmail = await userService.findAccessCredentials(value.email);
         if (!existedEmail) {
-            res.status(400).json(response.errorResponse("Wrong credentials!"));
-            next(new Error('Wrong credentials!'));
+            return res.status(400).json(response.errorResponse("Invalid email!"));
+            // next(new Error('Wrong credentials!'));
         }
 
         /* Compare the password that inputted with the password inside the database*/
         const validPassword = await bcrypt.compare(value.password, existedEmail.password);
         if (!validPassword) {
-            res.status(400).json(response.errorResponse("Wrong credentials!"));
-            next(new Error('Wrong credentials!'));
+            return res.status(400).json(response.errorResponse("Invalid password"));
+            // next(new Error('Wrong credentials!'));
         }
 
         /* If no errors occured, generate access and refresh token */
@@ -100,7 +100,8 @@ async function userLogin(req, res, next) {
         /* Send responses */
         res.status(200).json(response.successResponse('Log in success!', { 
             accessToken, 
-            refreshToken 
+            refreshToken,
+            userProperties
         }));
 
     } catch (error) {
