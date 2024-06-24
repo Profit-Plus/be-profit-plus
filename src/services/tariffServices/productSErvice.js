@@ -137,19 +137,9 @@ async function updateProductSheet(query_sheet_id, req) {
             nomor: req.nomor,
             limitation: req.limitation,
             recommendation: req.recommendation,
-            taxonomy: {
-                connect: {
-                    id: req.taxonomy_id
-                }
-            },
             sub_taxonomy: {
                 connect: {
                     id: req.sub_taxonomy_id
-                }
-            },
-            product: {
-                connect: {
-                    id: req.product_id
                 }
             },
             owner: {

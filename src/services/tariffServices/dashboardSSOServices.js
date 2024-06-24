@@ -83,6 +83,14 @@ async function getSso() {
     return result;
 }
 
+async function getSsoById(id){
+    return database.sso.findUnique({
+        where: {
+            id,
+        },
+    });
+}
+
 async function createSso(product_id){
     return database.sso.create({
         data: {
@@ -124,5 +132,6 @@ async function updateSso(id, time_start, time_end, business_model, year, status,
 module.exports = {
     getSso,
     createSso,
-    updateSso
+    updateSso,
+    getSsoById
 };

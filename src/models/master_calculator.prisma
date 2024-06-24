@@ -72,8 +72,8 @@ model sheet {
 model product_sheet {
     id         Int      @id @default(autoincrement())
     nomor Int @unique @default(0)
-    limitation String @default("")
-    recommendation String @default("")
+    limitation String @db.LongText @default("")
+    recommendation String @db.LongText @default("")
     description String @default("")
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
