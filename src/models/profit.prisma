@@ -23,24 +23,35 @@ model product {
 }
 
 model sso {
-    id                        Int                 @id @default(autoincrement())
-    time_start                String?
-    time_end                  String?
-    createdAt                 DateTime            @default(now())
-    updatedAt                 DateTime            @updatedAt
-    business_model            bussines_model_enum @default(Subscription)
-    year                      Int                 @default(2024)
-    status                    String              @default("Draft")
-    status_hold               Boolean             @default(false)
-    data_collection           Boolean             @default(false)
-    data_calculation          Boolean             @default(false)
-    draft_tariff_validation   Boolean             @default(false)
-    presentation_draft_tariff Boolean             @default(false)
-    request_draft_tariff      Boolean             @default(false)
-    NDE_determination_tariff  Boolean             @default(false)
-    work_time                 DateTime?           @default(now())
-    archivement               Int                 @default(0)
-    description               String              @default("")
+    id                                Int                 @id @default(autoincrement())
+    time_start                        String?
+    time_end                          String?
+    createdAt                         DateTime            @default(now())
+    updatedAt                         DateTime            @updatedAt
+    business_model                    bussines_model_enum @default(Subscription)
+    year                              Int                 @default(2024)
+    status                            String              @default("Draft")
+    status_hold                       Boolean             @default(false)
+    data_collection                   Int                 @default(0)
+    data_collection_boolean           Boolean             @default(false)
+    data_calculation                  Int                 @default(0)
+    data_calculation_boolean          Boolean             @default(false)
+    draft_tariff_validation           Int                 @default(0)
+    draft_tariff_validation_boolean   Boolean             @default(false)
+    presentation_draft_tariff         Int                 @default(0)
+    presentation_draft_tariff_boolean Boolean             @default(false)
+    request_draft_tariff              Int                 @default(0)
+    request_draft_tariff_boolean      Boolean             @default(false)
+    NDE_determination_tariff          Int                 @default(0)
+    NDE_determination_tariff_boolean  Boolean             @default(false)
+    work_time                         String?             @default("2 Hari")
+    work_time_num                     Int                 @default(1)
+    achievement                       Int                 @default(0)
+    progress                          Int                 @default(0)
+    description                       String              @default("")
+    evidence_tariff_link              String              @default("docs.google.com")
+    evidence_tariff_text              String              @default("Link")
+    
 
     sheet_id     Int     @default(1)
     sheet        sheet   @relation(fields: [sheet_id], references: [id])
@@ -61,9 +72,8 @@ model sheet {
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
-    product product?
-
-    tariff_status tariff_status_enum @default(None)
+    product       product?
+    tariff_status tariff_status_enum @default(None) /////////////////
     packages      packages[]
     type          type[]
     offering      offering[]
@@ -195,7 +205,9 @@ model offering_package {
     package_id  Int
     offering    offering @relation(fields: [offering_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     offering_id Int
+    package_status Boolean @default(false)
 
+    
     @@id([package_id, offering_id])
 }
 
@@ -310,7 +322,10 @@ enum offering_unit_enum {
 
 enum bussines_model_enum {
     Subscription
-    One_Time_Charge
+    OTC
+    Licensing
+    Freemium
+    Pay_per_Use
 }
 
 enum satuan_target_enum {
