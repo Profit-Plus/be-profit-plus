@@ -1,10 +1,10 @@
 {
   "name": "profit-plus",
   "version": "1.0.0",
-  "description": "",
+  "description": "Before getting started, make sure you have the following prerequisites:",
   "main": "index.js",
   "scripts": {
-    "start": "node ./src/Main.js --watch",
+    "start": "node --watch ./src/Main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,22 +21,27 @@
   },
   "homepage": "https://github.com/Profit-Plus/profit-plus-api#readme",
   "dependencies": {
-    "@prisma/client": "^5.11.0",
+    "@prisma/client": "^5.13.0",
+    "ajv": "^8.13.0",
+    "ajv-errors": "^3.0.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
+    "formidable": "^3.5.1",
+    "fs": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.2",    
+    "mv": "^2.1.1",
     "mysql": "^2.18.1",
-    "prisma": "^5.11.0",
     "uuid": "^9.0.1"
   },
   "prisma": {
-    "schema": "src/models/profit.prisma"
+    "schema": "src/models/master_calculator.prisma"
   },
   "devDependencies": {
+    "@prisma/client": "^5.13.0",
     "@types/node": "^20.11.29",
-    "prisma": "^5.11.0",
+    "prisma": "^5.13.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.2"
   }
