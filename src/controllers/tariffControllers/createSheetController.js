@@ -36,7 +36,18 @@ async function getTypesBySheetId(req, res) {
     }
 }
 
+async function getAllSheets(req, res) {
+    try {
+        const sheets = await createSheetService.getAllSheets();
+        res.status(200).json(webResponses.successResponse('Sheets fetched successfully', sheets));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(webResponses.errorResponse('Failed to fetch sheets'));
+    }
+}
+
 module.exports = {
     createSheet,
-    getTypesBySheetId
+    getTypesBySheetId,
+    getAllSheets
 };
