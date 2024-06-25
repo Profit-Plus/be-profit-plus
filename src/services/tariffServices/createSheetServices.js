@@ -2,56 +2,36 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-async function getNextNomor() {
-    const maxNomor = await prisma.product_sheet.aggregate({
-        _max: {
-            nomor: true
+async function createSheet(data) {
+    const newSheet = await prisma.sheet.create({
+        data: {
+            name: data.name,
+            product_sheet: {
+                create: {
+                    taxonomy: {
+                        connect: { id: data.taxonomy }
+                    }
+                }
+            }
         }
     });
 
-    return maxNomor._max.nomor + 1 || 1;
-}
-
-async function createSheet(data) {
-    return await prisma.$transaction(async (prisma) => {
-        // Create new taxonomy
-        const newTaxonomy = await prisma.taxonomy.create({
+    // Create types for the new sheet
+    const types = ['CAPEX', 'OPEX', 'COGS'];
+    const typePromises = types.map(typeEnum => {
+        return prisma.type.create({
             data: {
-                name: data.taxonomyName
-            }
-        });
-
-        // Create new sheet with the created taxonomy
-        const newSheet = await prisma.sheet.create({
-            data: {
-                name: data.name,
-                product_sheet: {
-                    create: {
-                        taxonomy: {
-                            connect: { id: newTaxonomy.id }
-                        }
-                    }
+                type: typeEnum,
+                sheet: {
+                    connect: { id: newSheet.id }
                 }
             }
         });
-
-        // Create types for the new sheet
-        const types = ['CAPEX', 'OPEX', 'COGS'];
-        const typePromises = types.map(typeEnum => {
-            return prisma.type.create({
-                data: {
-                    type: typeEnum,
-                    sheet: {
-                        connect: { id: newSheet.id }
-                    }
-                }
-            });
-        });
-
-        await Promise.all(typePromises);
-
-        return newSheet;
     });
+
+    await Promise.all(typePromises);
+
+    return newSheet;
 }
 
 // async function getAllSheets() {
