@@ -19,7 +19,7 @@ model product {
     sheet_id Int   @unique
 
     product_sheet product_sheet[]
-    ssos          sso[]
+    sso           sso[]
 }
 
 model sso {
@@ -28,7 +28,7 @@ model sso {
     time_end                  String?
     createdAt                 DateTime            @default(now())
     updatedAt                 DateTime            @updatedAt
-    business_model            bussines_model_enum @default(Subscription)
+    business_model            business_model_enum @default(Subscription)
     year                      Int                 @default(2024)
     status                    String              @default("Draft")
     status_hold               Boolean             @default(false)
@@ -71,9 +71,9 @@ model sheet {
 
 model product_sheet {
     id             Int      @id @default(autoincrement())
-    nomor          Int?     @unique
-    limitation     String   @default("") @db.LongText
-    recommendation String   @default("") @db.LongText
+    nomor          Int      @unique @default(0)
+    limitation     String   @default("")
+    recommendation String   @default("")
     description    String   @default("")
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
@@ -92,7 +92,7 @@ model product_sheet {
     owner            unit         @relation("owner", fields: [owner_id], references: [id])
     owner_id         Int          @default(1)
     owner_status     Boolean      @default(false)
-    drafer           user         @relation("drafter", fields: [drafter_id], references: [id])
+    drafter          user         @relation("drafter", fields: [drafter_id], references: [id])
     drafter_id       Int          @default(1)
     drafter_status   Boolean      @default(false)
     reviewer         user         @relation("reviewer", fields: [reviewer_id], references: [id])
@@ -155,10 +155,10 @@ model sub_taxonomy {
 model packages {
     id               Int                 @id @default(autoincrement())
     name             String
-    category         category_enum // Main feature/Add on
-    bussines_model   bussines_model_enum @default(Subscription)
+    category         category_enum
+    business_model   business_model_enum @default(Subscription)
     target_sales     Int                 @default(10)
-    satuan_target    satuan_target_enum  @default(User)
+    unit_target      unit_target_enum    @default(User)
     payback_period   Int                 @default(1)
     operational_time Int                 @default(12)
     excess_capacity  Int                 @default(0)
@@ -166,29 +166,26 @@ model packages {
     opex             Float               @default(0)
     cogs             Float               @default(0)
     tariff           Float               @default(0)
-    create_at        DateTime            @default(now())
-    update_at        DateTime            @updatedAt
-    delete_at        DateTime?
+    createdAt        DateTime            @default(now())
+    updatedAt        DateTime            @updatedAt
+    deletedAt        DateTime?
 
-    offering_packages offering_package[]
-    totals            total[]
-    data_package      data_package[]
-    sheets            sheet?             @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    sheets_id         Int?
+    offering_package offering_package[]
+    totals           total[]
+    data_package     data_package[]
+    sheet            sheet?             @relation(fields: [sheet_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheet_id         Int?
 }
 
 model offering {
-    id             Int                 @id @default(autoincrement())
-    offer_name     String
-    header         String              @default("")
-    unit           offering_unit_enum  @default(Unit)
-    user_target    Int                 @default(0)
-    bussines_model bussines_model_enum @default(Subscription)
-    total_price    Float               @default(0)
+    id          Int                @id @default(autoincrement())
+    offer_name  String
+    unit        offering_unit_enum @default(Unit)
+    user_target Int                @default(0)
 
     offering_packages offering_package[]
-    sheets            sheet?             @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    sheets_id         Int?
+    sheet             sheet?             @relation(fields: [sheet_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheet_id          Int?
 }
 
 model offering_package {
@@ -207,8 +204,8 @@ model type {
 
     categories categories[]
     totals     total[]
-    sheets     sheet?       @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    sheets_id  Int?
+    sheet      sheet?       @relation(fields: [sheet_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheet_id   Int?
 }
 
 model categories {
@@ -229,15 +226,43 @@ model data {
     code          String?
     grade         String?
     average_price Float?
-    create_at     DateTime  @default(now())
-    update_at     DateTime  @updatedAt
-    delete_at     DateTime?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+    deletedAt     DateTime?
 
-    category      categories      @relation(fields: [category_id], references: [id])
-    category_id   Int
-    components    components[]
+    category      categories?      @relation(fields: [category_id], references: [id])
+    category_id   Int?
+    components    data_component[]
     data_package  data_package[]
     category_data category_data[]
+}
+
+model component {
+    id             Int       @id @default(autoincrement())
+    name           String
+    code           String?
+    item           String?
+    unit           Int?
+    specs          String?
+    price_per_unit Float?
+    quantity       Int?
+    note           String?
+    createdAt      DateTime  @default(now())
+    updatedAt      DateTime  @updatedAt
+    deletedAt      DateTime?
+
+    data_relation data_component[]
+}
+
+model data_component {
+    data_id      Int
+    component_id Int
+    createdAt    DateTime @default(now())
+
+    data      data      @relation(fields: [data_id], references: [id])
+    component component @relation(fields: [component_id], references: [id])
+
+    @@id([data_id, component_id])
 }
 
 model category_data {
@@ -260,22 +285,6 @@ model data_package {
     information String?
 
     @@id([data_id, package_id])
-}
-
-model components {
-    id           Int       @id @default(autoincrement())
-    name         String
-    item         String?
-    unit         Int?
-    specs        String?
-    priceperunit Float?
-    quantity     Int?
-    create_at    DateTime  @default(now())
-    update_at    DateTime  @updatedAt
-    delete_at    DateTime?
-
-    data    data @relation(fields: [data_id], references: [id], onDelete: Cascade)
-    data_id Int
 }
 
 // Total cost for each type (capex/opex/cogs) in a package
@@ -312,12 +321,12 @@ enum offering_unit_enum {
     Package
 }
 
-enum bussines_model_enum {
+enum business_model_enum {
     Subscription
-    One_Time_Charge
+    OneTimeCharge
 }
 
-enum satuan_target_enum {
+enum unit_target_enum {
     User
     Unit
     Project
