@@ -13,5 +13,6 @@ router.use((req, res, next) => {
 
 router.post('/createsheet', createSheetController.createSheet);
 router.get('/types/:sheetId', createSheetController.getTypesBySheetId);
+router.get('/allsheets', createSheetController.getAllSheets);
 
 module.exports = router;
