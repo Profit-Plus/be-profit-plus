@@ -10,6 +10,7 @@ notificationRouter.use('/notifications', authenticationMiddleware.authenticateUs
 notificationRouter.post('/notifications', notificationController.createNotification);
 notificationRouter.get('/notifications', notificationController.getAllNotifications);
 notificationRouter.get('/notifications/:id', notificationController.getNotification);
+notificationRouter.put('/notifications/:id', notificationController.updateNotification);
 notificationRouter.delete('/notifications/:id', notificationController.deleteNotification);
 
 module.exports = notificationRouter;

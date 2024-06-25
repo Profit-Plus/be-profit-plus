@@ -38,7 +38,7 @@ async function getAllNotifications(req, res) {
             limit: Number(req.query.limit),
             search: req.query.search ?? '',
             sort: req.query.sort ?? 'created_at',
-            order: req.query.order ?? 'desc',                        
+            order: req.query.order ?? 'desc',
             start_date: req.query.start_date,
             end_date: req.query.end_date,
             read: parseStringToBoolean(req.query.read),
@@ -78,6 +78,33 @@ async function getNotification(req, res) {
     }
 }
 
+async function updateNotification(req, res) {
+    try {
+        const isUpdateNotificationValid = notificationValidator.isUpdateNotificationValid();
+
+        if (!isUpdateNotificationValid(req.body)) {
+            return res.status(400).json(webResponses.errorResponse(formatErrorMessage(isUpdateNotificationValid.errors[0])));
+        }
+
+        const notificationId = req.params.id;
+        const notification = await notificationService.findNotification(notificationId);
+
+        if (notification) {
+            const payload = req.body;
+
+            const updatedNotification = await notificationService.updateNotification(notificationId, payload);
+
+            res.status(200).json(webResponses.successResponse('Notification updated successfully!', updatedNotification));
+        }
+        else {
+            res.status(404).json(webResponses.errorResponse('Notification not found!'));
+        }
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
 async function deleteNotification(req, res) {
     try {
         const notificationId = req.params.id;
@@ -101,6 +128,7 @@ async function deleteNotification(req, res) {
 module.exports = {
     createNotification,
     getNotification,
+    updateNotification,
     getAllNotifications,
     deleteNotification
 }

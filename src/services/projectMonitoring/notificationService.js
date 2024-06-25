@@ -58,6 +58,15 @@ function findNotification(notificationId) {
     });
 }
 
+function updateNotification(notificationId, payload) {
+    return database.notification.update({
+        data: payload,
+        where: {
+            id: notificationId
+        }
+    });
+}
+
 function deleteNotification(notificationId) {
     return database.notification.delete({
         where: {
@@ -70,5 +79,6 @@ module.exports = {
     createNotification,
     findAllNotifications,
     findNotification,
+    updateNotification,
     deleteNotification
 }

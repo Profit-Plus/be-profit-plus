@@ -46,4 +46,21 @@ function isCreateNotificationValid() {
     return validate;
 }
 
-module.exports = { isCreateNotificationValid, isGetAllNotificationsValid }
+function isUpdateNotificationValid() {
+    const schema = {
+        type: 'object',
+        properties: {
+            header: { type: 'string', minLength: 1, maxLength: 68 },
+            content: { type: 'string', minLength: 1, maxLength: 68 },
+            receiver_id: { type: 'string' },
+            read: { type: 'boolean' }
+        },
+        additionalProperties: true
+    };
+
+    const validate = ajv.compile(schema);
+
+    return validate;
+}
+
+module.exports = { isCreateNotificationValid, isGetAllNotificationsValid, isUpdateNotificationValid }
