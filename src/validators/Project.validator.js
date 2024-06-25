@@ -68,7 +68,7 @@ function isUpdateProjectValid() {
             project_init: {
                 type: 'object',
                 properties: {
-                    helix: { type: 'string', enum: ['academy', 'business', 'goverment', 'community', 'tech_prov', 'subsidiary'] },
+                    helix: { type: 'string', enum: ['academy', 'business', 'government', 'community', 'tech_prov', 'subsidiary'] },
                     nde_request_id: { type: 'string' },
                     midfielder: { type: 'string' },
                     related_unit: { type: 'string' },

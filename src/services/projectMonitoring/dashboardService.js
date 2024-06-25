@@ -10,7 +10,8 @@ async function fetchProjectSummary(params) {
                 created_at: {
                     gte: params.start_date,
                     lt: params.end_date
-                }
+                },
+                deleted_at: null
             }
         }),
         database.project_init.aggregate({
@@ -21,7 +22,8 @@ async function fetchProjectSummary(params) {
                 created_at: {
                     gte: params.start_date,
                     lt: params.end_date
-                }
+                },
+                deleted_at: null
             }
         }),
         database.project_close_out.aggregate({
@@ -33,7 +35,8 @@ async function fetchProjectSummary(params) {
                 created_at: {
                     gte: params.start_date,
                     lt: params.end_date
-                }
+                },
+                deleted_at: null
             }
         }),
         database.project.aggregate({
@@ -44,7 +47,8 @@ async function fetchProjectSummary(params) {
                 created_at: {
                     gte: params.start_date_compare,
                     lt: params.end_date_compare
-                }
+                },
+                deleted_at: null
             }
         }),
         database.project_init.aggregate({
@@ -55,7 +59,8 @@ async function fetchProjectSummary(params) {
                 created_at: {
                     gte: params.start_date_compare,
                     lt: params.end_date_compare
-                }
+                },
+                deleted_at: null
             }
         }),
         database.project_close_out.aggregate({
@@ -67,7 +72,8 @@ async function fetchProjectSummary(params) {
                 created_at: {
                     gte: params.start_date_compare,
                     lt: params.end_date_compare
-                }
+                },
+                deleted_at: null
             }
         }),
     ]);
@@ -114,7 +120,8 @@ async function fetchProjectProgress(params) {
         created_at: {
             gte: params.start_date,
             lt: params.end_date
-        }
+        },
+        deleted_at: null
     }
 
     const [init, ongoing, closeOut] = await database.$transaction([
@@ -136,10 +143,11 @@ async function fetchProjectPartnership(params) {
         created_at: {
             gte: params.start_date,
             lt: params.end_date
-        }
+        },
+        deleted_at: null
     }
 
-    const [total, academy, business, goverment, community, techProv, subsidiary] = await database.$transaction([
+    const [total, academy, business, government, community, techProv, subsidiary] = await database.$transaction([
         database.project_init.count({ where: condition }),
         database.project_init.count({ where: { ...condition, helix: 'academy' } }),
         database.project_init.count({ where: { ...condition, helix: 'business' } }),
@@ -162,7 +170,7 @@ async function fetchProjectPartnership(params) {
         total: total,
         ranges: ranges,        
         labels: ['Academy', 'Business', 'Community', 'Government', 'Tech', 'Subsidiary'],
-        values: [academy, business, goverment, community, techProv, subsidiary],
+        values: [academy, business, government, community, techProv, subsidiary],
         colors: ['#659B83', '#D7B251', '#50A5B2', '#652B87', '#3E6AAB', '#B33828']
     };
 }

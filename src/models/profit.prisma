@@ -47,7 +47,6 @@ model project {
   passcode             String
   created_at           DateTime             @default(now())
   updated_at           DateTime             @updatedAt
-  solution_id          String?              @unique
   tariff               Int                  @default(0)
   deleted_at           DateTime?
   creator_id           String?
@@ -63,7 +62,7 @@ model project {
   project_drop         project_drop?        @relation(fields: [project_drop_id], references: [id])
   project_init         project_init?        @relation(fields: [project_init_id], references: [id])
   project_ongoing      project_ongoing?     @relation(fields: [project_ongoing_id], references: [id])
-  solution             project_solution?    @relation(fields: [solution_id], references: [id])
+  selected_product     selected_product[]
   updated_by           access_credentials?  @relation("UPDATER", fields: [updater_id], references: [access_credentials_id])
 }
 
@@ -86,6 +85,7 @@ model project_init {
   potential_revenue          Int             @default(0)
   created_at                 DateTime        @default(now())
   updated_at                 DateTime        @default(now()) @updatedAt
+  deleted_at                 DateTime?
   approval_status            approval_status @default(draft)
   project                    project?
   lir_requirement            document?       @relation("LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
@@ -112,6 +112,7 @@ model project_ongoing {
   kfs_id                 String?         @unique
   created_at             DateTime        @default(now())
   updated_at             DateTime        @default(now()) @updatedAt
+  deleted_at             DateTime?
   approval_status        approval_status @default(draft)
   project                project?
   baa                    document?       @relation("BAA", fields: [baa_id], references: [id])
@@ -129,6 +130,7 @@ model project_drop {
   nde_project_drop_id String?         @unique
   created_at          DateTime        @default(now())
   updated_at          DateTime        @default(now()) @updatedAt
+  deleted_at          DateTime?
   approval_status     approval_status @default(draft)
   project             project?
   nde_project_drop    document?       @relation("NDE_PROJECT_DROP", fields: [nde_project_drop_id], references: [id])
@@ -147,6 +149,7 @@ model project_close_out {
   delivery_year              String?
   created_at                 DateTime        @default(now())
   updated_at                 DateTime        @default(now()) @updatedAt
+  deleted_at                 DateTime?
   approval_status            approval_status @default(draft)
   project                    project?
   mom_reconciles             document?       @relation("MOM_RECONCILES", fields: [mom_reconciles_id], references: [id])
@@ -227,49 +230,43 @@ enum comment_type {
   log
 }
 
-model project_solution {
-  id            String                    @id @default(uuid())
-  solution_name String
-  project       project?
-  items         project_solution_detail[]
-}
-
-model project_solution_detail {
-  id                  String           @id @default(uuid())
-  product_id          Int?
-  package_id          Int?
-  project_solution_id String
-  package             packages?        @relation(fields: [package_id], references: [id])
-  product             product?         @relation(fields: [product_id], references: [id])
-  project_solution    project_solution @relation(fields: [project_solution_id], references: [id])
+model selected_product {
+  id          String    @id @default(uuid())
+  product_id  Int?
+  offering_id Int?
+  offering    offering? @relation(fields: [offering_id], references: [id])
+  product     product?  @relation(fields: [product_id], references: [id])
+  project     project   @relation(fields: [project_id], references: [id])
+  project_id  String
+  deleted_at  DateTime?
 }
 
 model product {
-  id                      Int                       @id @default(autoincrement())
-  category_id             Int
-  taxonomy_id             Int
-  unit_id                 String
-  year                    Int
-  name                    String
-  branding                String
-  evidence_tariff         String
-  evidence_product        String
-  playbook                String
-  product_profile         String
-  is_active               Boolean
-  progress_enum           progress_enum             @default(aquisition)
-  offerings               offering[]
-  operating_model         operating_model[]
-  packages                packages[]
-  category                category                  @relation(fields: [category_id], references: [category_id])
-  taxonomy                taxonomy                  @relation(fields: [taxonomy_id], references: [taxonomy_id])
-  units                   units                     @relation(fields: [unit_id], references: [unit_id])
-  product_services        product_services[]
-  product_use_case        product_use_case[]
-  project_solution_detail project_solution_detail[]
-  segment_targeting       segment_targeting[]
-  stpdb                   stpdb[]
-  types                   type[]
+  id                Int                 @id @default(autoincrement())
+  category_id       Int
+  taxonomy_id       Int
+  unit_id           String
+  year              Int
+  name              String
+  branding          String
+  evidence_tariff   String
+  evidence_product  String
+  playbook          String
+  product_profile   String
+  is_active         Boolean
+  progress_enum     progress_enum       @default(aquisition)
+  offerings         offering[]
+  operating_model   operating_model[]
+  packages          packages[]
+  category          category            @relation(fields: [category_id], references: [category_id])
+  taxonomy          taxonomy            @relation(fields: [taxonomy_id], references: [taxonomy_id])
+  units             units               @relation(fields: [unit_id], references: [unit_id])
+  product_services  product_services[]
+  product_use_case  product_use_case[]
+  segment_targeting segment_targeting[]
+  stpdb             stpdb[]
+  types             type[]
+  selected_product  selected_product[]
 }
 
 //  Authentication Schema
@@ -528,26 +525,25 @@ model st_targeting_user {
 }
 
 model packages {
-  id                      Int                       @id @default(autoincrement())
-  name                    String
-  category                category_enum
-  target_sales            Int                       @default(10)
-  payback_period          Int                       @default(1)
-  operational_time        Int                       @default(12)
-  excess_capacity         Int                       @default(0)
-  capex                   Float                     @default(0)
-  opex                    Float                     @default(0)
-  cogs                    Float                     @default(0)
-  tariff                  Float                     @default(0)
-  create_at               DateTime                  @default(now())
-  update_at               DateTime                  @updatedAt
-  delete_at               DateTime?
-  product_id              Int
-  data_package            data_package[]
-  offering_packages       offering_package[]
-  product                 product                   @relation(fields: [product_id], references: [id])
-  project_solution_detail project_solution_detail[]
-  totals                  total[]
+  id                Int                @id @default(autoincrement())
+  name              String
+  category          category_enum
+  target_sales      Int                @default(10)
+  payback_period    Int                @default(1)
+  operational_time  Int                @default(12)
+  excess_capacity   Int                @default(0)
+  capex             Float              @default(0)
+  opex              Float              @default(0)
+  cogs              Float              @default(0)
+  tariff            Float              @default(0)
+  create_at         DateTime           @default(now())
+  update_at         DateTime           @updatedAt
+  delete_at         DateTime?
+  product_id        Int
+  data_package      data_package[]
+  offering_packages offering_package[]
+  product           product            @relation(fields: [product_id], references: [id])
+  totals            total[]
 }
 
 model offering {
@@ -556,6 +552,7 @@ model offering {
   product_id        Int
   product           product            @relation(fields: [product_id], references: [id])
   offering_packages offering_package[]
+  selected_product  selected_product[]
 }
 
 model offering_package {

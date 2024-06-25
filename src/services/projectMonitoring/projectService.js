@@ -9,7 +9,6 @@ const omitIncludeOptions = {
         project_close_out_id: true,
         creator_id: true,
         updater_id: true,
-        solution_id: true,
         pic_external_id: true,
         pic_lira_id: true
     },
@@ -87,14 +86,14 @@ const omitIncludeOptions = {
         updated_by: {
             omit: { password: true }
         },
-        solution: {
+        selected_product: {
             include: {
-                items: {
-                    include: {
-                        package: true,
-                        product: true
-                    }
-                }
+                product: true,
+                offering: true
+            },
+            omit: {
+                product_id: true,
+                offering_id: true
             }
         },
         pic_external: true,
@@ -116,16 +115,6 @@ async function createProject(payload) {
         const closeout = await transaction.project_close_out.create({
             data: { project_id: payload.project.id }
         });
-        const solution = await transaction.project_solution.create({
-            data: { solution_name: payload.solution.solution_name }
-        });
-        await transaction.project_solution_detail.createMany({
-            data: payload.solution.items.map((item) => ({
-                ...item,
-                project_solution_id: solution.id
-            }))
-        });
-
         const project = await transaction.project.create({
             data: {
                 ...payload.project,
@@ -135,9 +124,14 @@ async function createProject(payload) {
                 project_init_id: init.id,
                 project_ongoing_id: ongoing.id,
                 project_drop_id: drop.id,
-                project_close_out_id: closeout.id,
-                solution_id: solution.id
+                project_close_out_id: closeout.id
             }
+        });
+        await transaction.selected_product.createMany({
+            data: payload.selected_product.map((item) => ({
+                ...item,
+                project_id: project.id
+            }))
         });
 
         return project;
@@ -165,8 +159,8 @@ async function findAllProjects(params) {
                 [params.sort]: params.order
             },
             where: condition,
-            include: { customer: true, solution: true },
-            omit: { solution_id: true }
+            include: { customer: true, selected_product: true },
+            omit: { customer_id: true }
         }),
         database.project.count({ where: condition }),
         database.project.count({ where: { ...condition, status: 'initiation' } }),
@@ -195,7 +189,7 @@ function findProject(projectId) {
     });
 }
 
-async function updateProject({ projectId, projectInitId, projectOngoingId, projectDropId, projectCloseOutId, projectSolutionId, isMember, payload }) {
+async function updateProject({ projectId, projectInitId, projectOngoingId, projectDropId, projectCloseOutId, isMember, payload }) {
     const result = await database.$transaction(async (transaction) => {
         if (payload.project_init) {
             await transaction.project_init.update({
@@ -221,24 +215,16 @@ async function updateProject({ projectId, projectInitId, projectOngoingId, proje
                 where: { id: projectCloseOutId }
             });
         }
-        if (payload.solution) {
-            await transaction.project_solution.update({
-                data: {
-                    solution_name: payload.solution.solution_name
-                },
-                where: { id: projectSolutionId }
+        if (payload.selected_product && payload.selected_product.length > 0) {
+            await transaction.selected_product.deleteMany({
+                where: { project_id: projectId }
             });
-            if (payload.solution && payload.solution.items.length > 0) {
-                await transaction.project_solution_detail.deleteMany({
-                    where: { project_solution_id: projectSolutionId }
-                });
-                await transaction.project_solution_detail.createMany({
-                    data: payload.solution.items.map((item) => ({
-                        ...item,
-                        project_solution_id: projectSolutionId
-                    }))
-                });
-            }
+            await transaction.selected_product.createMany({
+                data: payload.selected_product.map((item) => ({
+                    ...item,
+                    project_id: project.id
+                }))
+            });
         }
         const project = await transaction.project.update({
             data: {
@@ -258,10 +244,15 @@ async function updateProject({ projectId, projectInitId, projectOngoingId, proje
 }
 
 function deleteProject(projectId) {
-    return database.project.delete({
-        where: {
-            id: projectId
-        }
+    return database.$transaction(async (transaction) => {
+        const project = await database.project.delete({ where: { id: projectId } })
+        await transaction.project_init.delete({ where: { id: project.project_init_id } })
+        await transaction.project_ongoing.delete({ where: { id: project.project_ongoing_id } })
+        await transaction.project_close_out.delete({ where: { id: project.project_close_out_id } })
+        await transaction.project_drop.delete({ where: { id: project.project_drop_id } })
+        await transaction.selected_product.deleteMany({ where: { project_id: projectId } })
+        await transaction.comment.deleteMany({ where: { project_id: projectId } })
+        await transaction.notification.deleteMany({ where: { url: { contains: projectId } } })
     });
 }
 

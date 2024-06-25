@@ -137,7 +137,6 @@ async function updateProject(req, res) {
                 projectOngoingId: project.project_ongoing.id,
                 projectDropId: project.project_drop.id,
                 projectCloseOutId: project.project_close_out.id,
-                projectSolutionId: project.solution.id,
                 isMember: isMember,
                 payload: payload
             });
@@ -171,6 +170,33 @@ async function deleteProject(req, res) {
         throw e;
     }
 }
+
+async function dropProject(req, res) {
+    try {
+        const projectId = req.params.id;
+        const project = await projectService.findProject(projectId);
+
+        if (project) {
+            const isMember = project.members.some(member => member.access_credentials_id === req.userId);
+            const payload = {
+                project: {
+                    status: 'drop',
+                    updater_id: req.userId
+                }
+            }
+            const deletedProject = await projectService.updateProject({ projectId: projectId, payload: payload, isMember: isMember });
+
+            res.status(200).json(webResponses.successResponse('Project dropped successfully!', deletedProject));
+        }
+        else {
+            res.status(404).json(webResponses.errorResponse('Project not found!'));
+        }
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
 
 async function sendApprovalRequest(req, res) {
     try {
@@ -258,7 +284,7 @@ async function changeApprovalStatus({ req, res, projectId, approvalStatus, appro
         let model;
         let identifier;
         if (project) {
-            const isMember = project.members.some(member => member.access_credentials_id === req.userId);        
+            const isMember = project.members.some(member => member.access_credentials_id === req.userId);
             const currentProjectstatus = project.status;
 
             switch (currentProjectstatus) {
@@ -352,6 +378,7 @@ module.exports = {
     getAllProjects,
     updateProject,
     deleteProject,
+    dropProject,
     sendApprovalRequest,
     approveApprovalRequest,
     declineApprovalRequest

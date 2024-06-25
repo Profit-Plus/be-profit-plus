@@ -13,6 +13,7 @@ projectRouter.get('/projects/:id', projectController.getProject);
 projectRouter.put('/projects/:id', projectController.updateProject);
 projectRouter.delete('/projects/:id', projectController.deleteProject);
 
+projectRouter.post('/projects/:id/drop', projectController.dropProject);
 projectRouter.post('/projects/:id/approval/request', projectController.sendApprovalRequest);
 projectRouter.post('/projects/:id/approval/approve', projectController.approveApprovalRequest);
 projectRouter.post('/projects/:id/approval/decline', projectController.declineApprovalRequest);
