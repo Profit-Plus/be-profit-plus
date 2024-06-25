@@ -72,8 +72,8 @@ model sheet {
 model product_sheet {
     id         Int      @id @default(autoincrement())
     nomor Int @unique @default(0)
-    limitation String @default("")
-    recommendation String @default("")
+    limitation String @db.LongText @default("")
+    recommendation String @db.LongText @default("")
     description String @default("")
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
@@ -170,7 +170,7 @@ model packages {
     update_at        DateTime      @updatedAt
     delete_at        DateTime?
 
-     offering_packages       offering_package[]
+    offering_packages       offering_package[]
     totals                  total[]
     data_package            data_package[]
     sheets                  sheet?                   @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -181,8 +181,11 @@ model packages {
 model offering {
     id              Int    @id @default(autoincrement())
     offer_name      String
+    header          String @default("")
     unit            offering_unit_enum @default(Unit)
     user_target     Int  @default(0)
+    bussines_model   bussines_model_enum @default(Subscription)
+    total_price     Float @default(0)
 
     offering_packages offering_package[]
      sheets            sheet?            @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -194,6 +197,7 @@ model offering_package {
     package_id  Int
     offering    offering @relation(fields: [offering_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     offering_id Int
+    package_status Boolean @default(false)
 
     @@id([package_id, offering_id])
 }
@@ -215,6 +219,7 @@ model categories {
     type          type            @relation(fields: [type_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     type_id       String
     category_data category_data[]
+    data          data[]
 }
 
 model data {
@@ -229,8 +234,10 @@ model data {
     update_at     DateTime  @updatedAt
     delete_at     DateTime?
 
-    components    components[]
-    data_package  data_package[]
+    category     categories     @relation(fields: [category_id], references: [id])
+    category_id  Int
+    components   components[]
+    data_package data_package[]
     category_data category_data[]
 }
 

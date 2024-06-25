@@ -15,6 +15,8 @@ const sheetRoute = require('./routes/tariffRoutes/sheetRoute');
 const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
 const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
 const productRoute = require('./routes/tariffRoutes/productRoute');
+const dashboard = require('./routes/tariffRoutes/dashboardSSORoute');
+const solution = require('./routes/tariffRoutes/solutionTariffRoute');
 
 
 // Porto Route
@@ -46,6 +48,8 @@ main.use('/tariff/sheet', sheetRoute);
 main.use('/tariff/masterPackage', masterPackageRoute);
 main.use('/tariff/offering', offeringRoute);
 main.use('/tariff/product', productRoute);
+main.use('/tariff/dashboard', dashboard);
+main.use('/tariff/solution', solution);
 
 // Porto Use route
 main.use(authRouter);
