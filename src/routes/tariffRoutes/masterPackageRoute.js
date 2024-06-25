@@ -1,16 +1,24 @@
+// File path: /routes/masterRoute.js
+
 const express = require('express');
 const router = express.Router();
-const masterPackageController = require('../../controllers/tariffControllers/masterPackageController');
 
-router.post('/data', masterPackageController.createData);
-router.get('/data', masterPackageController.getAllData);
-router.get('/data/:id', masterPackageController.getDataById);
-router.put('/data/:id', masterPackageController.updateData);
-router.delete('/data/:id', masterPackageController.deleteData);
-router.post('/component', masterPackageController.createComponent);
-router.get('/component', masterPackageController.getAllComponents);
-router.get('/component/:id', masterPackageController.getComponentById);
-router.put('/component/:id', masterPackageController.updateComponent);
-router.delete('/component/:id', masterPackageController.deleteComponent);
+const masterController = require('../../controllers/tariffControllers/masterPackageController');
+
+// Middleware untuk menambahkan header CORS
+router.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+    next();
+});
+
+router.get('/getAllData', masterController.getAllData);
+router.get('/getDataById/:data_id', masterController.getDataById);
+router.post('/createData', masterController.createData);
+router.put('/updateDataById/:data_id', masterController.updateDataById);
+router.delete('/deleteDataById/:data_id', masterController.deleteDataById);
+router.delete('/deleteComponentById/:component_id', masterController.deleteComponentById);
+router.post('/addRelation', masterController.addRelation);
 
 module.exports = router;

@@ -1,139 +1,216 @@
-// controllers/tariffControllers/masterPackage/masterPackageController.js
+// File path: /controllers/masterController.js
 
-const masterPackageService = require('../../services/tariffServices/masterPackageService');
+const masterService = require('../../services/tariffServices/masterPackageService');
+const Ajv = require('ajv');
 const webResponses = require('../../helpers/web/webResponses');
+const MasterValidator = require("../../validators/MasterPackage.validator");
 
-async function createData(req, res) {
-    const { event_module, nature, pic, description, source, unit, code, grade, category_id } = req.body;
-    const category_id_parsed = parseInt(category_id)
-    try {
-        const createdData = await masterPackageService.createData(event_module, nature, pic, description, source, unit, code, grade, category_id_parsed);
-        res.json( webResponses.successResponse('Data Created successfully', createdData) );
-    } catch (error) {
-        console.error(error);
-        res.status(500).json( webResponses.errorResponse('Failed to create data') );
-    }
-}
+const ajv = new Ajv();
 
 async function getAllData(req, res) {
     try {
-        const data = await masterPackageService.getAllData();
-        res.json(webResponses.successResponse( 'Data fetched successfully', data));
-    } catch (error) {
-        console.error(error);
-        res.status(500).json( webResponses.errorResponse('Failed to fetch data') );
-    }
-}
-
-
-async function getDataById(req, res) {
-    const id = req.params.id;
-    try {
-        const data = await masterPackageService.getDataById(parseInt(id));
-        if (!data) {
-            return res.status(404).json( webResponses.errorResponse('data not found') );
-        }
+        const data = await masterService.getAllData();
         res.json(webResponses.successResponse('Data fetched successfully', data));
     } catch (error) {
         console.error(error);
-        res.status(500).json( webResponses.errorResponse('Failed to fetch data') );
+        res.status(500).json(webResponses.errorResponse('Failed to fetch data'));
     }
 }
 
-async function updateData(req, res) {
-    const id = req.params.id;
-    const { event_module, nature, pic, description, source, unit, code, grade, category_id } = req.body;
+async function getDataById(req, res) {
+    const { data_id } = req.params;
     try {
-        const updatedData = await masterPackageService.updateData(parseInt(id), event_module, nature, pic, description, source, unit, code, grade, parseInt(category_id));
-        res.json(webResponses.successResponse('Data updated successfully', updatedData));
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json( webResponses.errorResponse('Failed to update data') );
-
-    }
-}
-
-async function deleteData(req, res) {
-    const id = req.params.id;
-    try {
-        await masterPackageService.deleteData(parseInt(id));
-        res.json( webResponses.successResponse('Data deleted successfully'));
-    } catch (error) {
-        console.error(error);
-        res.status(500).json( webResponses.errorResponse('Failed to delete data') );
-
-    }
-}
-
-async function createComponent(req, res) {
-    const { name, item, unit, specs, priceperunit, quantity, data_id } = req.body;
-    try {
-        const createdComponent = await masterPackageService.createComponent(name, item, unit, specs, priceperunit, quantity, parseInt(data_id));
-        res.json( webResponses.successResponse('Component created successfully', createdComponent) );
-    } catch (error) {
-        console.error(error);
-        res.status(500).json( webResponses.errorResponse('Failed to create componenent') );
-
-    }
-}
-
-async function getAllComponents(req, res) {
-    try {
-        const components = await masterPackageService.getAllComponents();
-        res.json( webResponses.successResponse('Components fetched successfully', components) );
-    } catch (error) {
-        console.error(error);
-        res.status(500).json( webResponses.errorResponse('Failed to fetch componenents') );
-    }
-}
-
-async function getComponentById(req, res) {
-    const id = req.params.id;
-    try {
-        const component = await masterPackageService.getComponentById(parseInt(id));
-        if (!component) {
-        return res.status(404).json( webResponses.errorResponse('Component not found') );
+        const data = await masterService.getDataById(parseInt(data_id));
+        if (!data) {
+            res.status(404).json(webResponses.errorResponse('Data not found'));
+        } else {
+            res.json(webResponses.successResponse('Detail fetched successfully', data));
         }
-        res.json( webResponses.successResponse('Component fetched successfully', component) );
     } catch (error) {
         console.error(error);
-        res.status(500).json( webResponses.errorResponse('Failed to fetch componenent') );
+        res.status(500).json(webResponses.errorResponse('Failed to fetch data'));
     }
 }
 
-async function updateComponent(req, res) {
-    const id = req.params.id;    
-    const { name, item, unit, specs, priceperunit, quantity, data_id } = req.body;
+async function createData(req, res) {
+    const data = req.body;
+    const validate = ajv.compile(MasterValidator.createData);
+    
+    if (!validate(data)) {
+        res.status(400).json(webResponses.errorResponse('Invalid input! ' + validate.errors[0].message));
+        return;
+    }
+
     try {
-        const updatedComponent = await masterPackageService.updateComponent(parseInt(id), name, item, unit, specs, priceperunit, quantity, parseInt(data_id));
-        res.json( webResponses.successResponse('Component fetched successfully', updatedComponent) );
+        const newData = await masterService.createData(data);
+        res.json(webResponses.successResponse('Data created successfully', newData));
     } catch (error) {
         console.error(error);
-        res.status(500).json( webResponses.errorResponse('Failed to update componenent', updatedComponent) );
+        res.status(500).json(webResponses.errorResponse('Failed to create data'));
     }
 }
 
-async function deleteComponent(req, res) {
-    const id = req.params.id;
+async function updateDataById(req, res) {
+    const { data_id } = req.params;
+    const updatedData = req.body;
+    const validate = ajv.compile(MasterValidator.updateData);
+    
+    if (!validate(updatedData)) {
+        res.status(400).json(webResponses.errorResponse('Invalid input! ' + validate.errors[0].message));
+        return;
+    }
+
     try {
-        await masterPackageService.deleteComponent(parseInt(id));
-        res.json( webResponses.successResponse('Data deleted successfully') );
+        const data = await masterService.updateDataById(parseInt(data_id), updatedData);
+        res.json(webResponses.successResponse('Data updated successfully', data));
     } catch (error) {
         console.error(error);
-        res.status(500).json( webResponses.errorResponse('Failed to delete componenent') );
+        res.status(500).json(webResponses.errorResponse('Failed to update data'));
+    }
+}
+
+async function deleteDataById(req, res) {
+    const { data_id } = req.params;
+    try {
+        const data = await masterService.deleteDataById(parseInt(data_id));
+        res.json(webResponses.successResponse('Data deleted successfully', data));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(webResponses.errorResponse('Failed to delete data'));
+    }
+}
+
+async function deleteComponentById(req, res) {
+    const { component_id } = req.params;
+    try {
+        const componentRelation = await masterService.deleteComponentById(parseInt(component_id));
+        res.json(webResponses.successResponse('Component relation deleted successfully', componentRelation));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(webResponses.errorResponse('Failed to delete component relation'));
+    }
+}
+
+async function addRelation(req, res) {
+    const { data_id, component_id } = req.body;
+    try {
+        const newRelation = await masterService.addRelation(parseInt(data_id), parseInt(component_id));
+        res.json(webResponses.successResponse('Relation added successfully', newRelation));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(webResponses.errorResponse('Failed to add relation'));
     }
 }
 
 module.exports = {
-    createData,
     getAllData,
     getDataById,
-    updateData,
-    deleteData,
-    createComponent,
-    getAllComponents,
-    getComponentById,
-    updateComponent,
-    deleteComponent,
+    createData,
+    updateDataById,
+    deleteDataById,
+    deleteComponentById,
+    addRelation
 };
+
+
+// // File path: /controllers/masterController.js
+
+// const masterService = require('../../services/tariffServices/masterPackageService');
+// const Ajv = require('ajv');
+// const webResponses = require('../../helpers/web/webResponses');
+// const MasterValidator = require("../../validators/MasterPackage.validator");
+
+// const ajv = new Ajv();
+
+// async function getAllData(req, res) {
+//     try {
+//         const data = await masterService.getAllData();
+//         res.json(webResponses.successResponse('Data fetched successfully', data));
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json(webResponses.errorResponse('Failed to fetch data'));
+//     }
+// }
+
+// async function getDataById(req, res) {
+//     const { data_id } = req.params;
+//     try {
+//         const data = await masterService.getDataById(parseInt(data_id));
+//         if (!data) {
+//             res.status(404).json(webResponses.errorResponse('Data not found'));
+//         } else {
+//             res.json(webResponses.successResponse('Detail fetched successfully', data));
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json(webResponses.errorResponse('Failed to fetch data'));
+//     }
+// }
+
+// async function createDataById(req, res) {
+//     const data = req.body;
+//     const validate = ajv.compile(MasterValidator.createData);
+    
+//     if (!validate(data)) {
+//         res.status(400).json(webResponses.errorResponse('Invalid input! ' + validate.errors[0].message));
+//         return;
+//     }
+
+//     try {
+//         const newData = await masterService.createDataById(data);
+//         res.json(webResponses.successResponse('Data created successfully', newData));
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json(webResponses.errorResponse('Failed to create data'));
+//     }
+// }
+
+// async function updateDataById(req, res) {
+//     const { data_id } = req.params;
+//     const updatedData = req.body;
+//     const validate = ajv.compile(MasterValidator.updateData);
+    
+//     if (!validate(updatedData)) {
+//         res.status(400).json(webResponses.errorResponse('Invalid input! ' + validate.errors[0].message));
+//         return;
+//     }
+
+//     try {
+//         const data = await masterService.updateDataById(parseInt(data_id), updatedData);
+//         res.json(webResponses.successResponse('Data updated successfully', data));
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json(webResponses.errorResponse('Failed to update data'));
+//     }
+// }
+
+// async function deleteDataById(req, res) {
+//     const { data_id } = req.params;
+//     try {
+//         const data = await masterService.deleteDataById(parseInt(data_id));
+//         res.json(webResponses.successResponse('Data deleted successfully', data));
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json(webResponses.errorResponse('Failed to delete data'));
+//     }
+// }
+
+// async function deleteComponentById(req, res) {
+//     const { component_id } = req.params;
+//     try {
+//         const componentRelation = await masterService.deleteComponentById(parseInt(component_id));
+//         res.json(webResponses.successResponse('Component relation deleted successfully', componentRelation));
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json(webResponses.errorResponse('Failed to delete component relation'));
+//     }
+// }
+
+// module.exports = {
+//     getAllData,
+//     getDataById,
+//     createDataById,
+//     updateDataById,
+//     deleteDataById,
+//     deleteComponentById
+// };
