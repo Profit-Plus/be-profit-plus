@@ -9,49 +9,49 @@ datasource db {
 }
 
 model product {
-    id         Int      @id @default(autoincrement())
+    id          Int      @id @default(autoincrement())
     name        String
     description String?
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
-    sheet sheet @relation(fields: [sheet_id], references: [id])
-    sheet_id Int @unique
+    sheet    sheet @relation(fields: [sheet_id], references: [id])
+    sheet_id Int   @unique
 
     product_sheet product_sheet[]
-    ssos sso[]
+    ssos          sso[]
 }
 
-model sso{
-    id          Int      @id @default(autoincrement())
-    time_start     String?
-    time_end       String?
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-    business_model bussines_model_enum @default(Subscription)
-    year           Int @default(2024)
-    status        String @default("Draft")
-    status_hold   Boolean @default(false)
-    data_collection Boolean @default(false)
-    data_calculation Boolean @default(false)
-    draft_tariff_validation Boolean @default(false)
-    presentation_draft_tariff Boolean @default(false)
-    request_draft_tariff Boolean @default(false)
-    NDE_determination_tariff Boolean @default(false)
-    work_time DateTime? @default(now())
-    archivement Int @default(0)
-    description String @default("")
-    
-    sheet_id Int @default(1)
-    sheet sheet @relation(fields: [sheet_id], references: [id])
-    product_id Int @default(1)
-    product product @relation(fields: [product_id], references: [id])
-    requester_id Int @default(1)
-    requester unit @relation("requester", fields: [requester_id], references: [id])
-    drafter_id Int @default(1)
-    pic user @relation("pic", fields: [drafter_id], references: [id])
-    owner_id Int @default(1)
-    owner unit @relation("owner",fields: [owner_id], references: [id])
+model sso {
+    id                        Int                 @id @default(autoincrement())
+    time_start                String?
+    time_end                  String?
+    createdAt                 DateTime            @default(now())
+    updatedAt                 DateTime            @updatedAt
+    business_model            bussines_model_enum @default(Subscription)
+    year                      Int                 @default(2024)
+    status                    String              @default("Draft")
+    status_hold               Boolean             @default(false)
+    data_collection           Boolean             @default(false)
+    data_calculation          Boolean             @default(false)
+    draft_tariff_validation   Boolean             @default(false)
+    presentation_draft_tariff Boolean             @default(false)
+    request_draft_tariff      Boolean             @default(false)
+    NDE_determination_tariff  Boolean             @default(false)
+    work_time                 DateTime?           @default(now())
+    archivement               Int                 @default(0)
+    description               String              @default("")
+
+    sheet_id     Int     @default(1)
+    sheet        sheet   @relation(fields: [sheet_id], references: [id])
+    product_id   Int     @default(1)
+    product      product @relation(fields: [product_id], references: [id])
+    requester_id Int     @default(1)
+    requester    unit    @relation("requester", fields: [requester_id], references: [id])
+    drafter_id   Int     @default(1)
+    pic          user    @relation("pic", fields: [drafter_id], references: [id])
+    owner_id     Int     @default(1)
+    owner        unit    @relation("owner", fields: [owner_id], references: [id])
 }
 
 model sheet {
@@ -61,58 +61,58 @@ model sheet {
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
-    product          product?
-    packages          packages[]
-    type              type[]
-    offering          offering[]
-    product_sheet     product_sheet?
-    sso               sso[]
+    product       product?
+    packages      packages[]
+    type          type[]
+    offering      offering[]
+    product_sheet product_sheet?
+    sso           sso[]
 }
 
 model product_sheet {
-    id         Int      @id @default(autoincrement())
-    nomor Int @unique @default(0)
-    limitation String @db.LongText @default("")
-    recommendation String @db.LongText @default("")
-    description String @default("")
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    id             Int      @id @default(autoincrement())
+    nomor          Int?     @unique
+    limitation     String   @default("") @db.LongText
+    recommendation String   @default("") @db.LongText
+    description    String   @default("")
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
 
-    sheet sheet                 @relation(fields: [sheet_id], references: [id])
-    sheet_id Int                @unique
-    taxonomy taxonomy           @relation(fields: [taxonomy_id], references: [id])
-    taxonomy_id Int
-    sub_taxonomy sub_taxonomy   @relation(fields: [sub_taxonomy_id], references: [id])
-    sub_taxonomy_id Int @default(1)
-    product product             @relation(fields: [product_id], references: [id])
-    product_id Int  @default(1)
-    requester unit             @relation("requester", fields: [requester_id], references: [id])
-    requester_id Int @default(1)
-    requester_status Boolean @default(false)
-    owner unit                 @relation("owner", fields: [owner_id], references: [id])
-    owner_id Int @default(1)
-    owner_status Boolean @default(false)
-    drafer user                @relation("drafter",fields: [drafter_id], references: [id])
-    drafter_id Int @default(1)
-    drafter_status Boolean @default(false)
-    reviewer user              @relation("reviewer",fields: [reviewer_id], references: [id])
-    reviewer_id Int @default(1)
-    reviewer_status Boolean @default(false)
-    approver user              @relation("approver",fields: [approver_id], references: [id])
-    approver_id Int @default(1)
-    approver_status Boolean @default(false)
+    sheet            sheet        @relation(fields: [sheet_id], references: [id])
+    sheet_id         Int          @unique
+    taxonomy         taxonomy     @relation(fields: [taxonomy_id], references: [id])
+    taxonomy_id      Int
+    sub_taxonomy     sub_taxonomy @relation(fields: [sub_taxonomy_id], references: [id])
+    sub_taxonomy_id  Int          @default(1)
+    product          product      @relation(fields: [product_id], references: [id])
+    product_id       Int          @default(1)
+    requester        unit         @relation("requester", fields: [requester_id], references: [id])
+    requester_id     Int          @default(1)
+    requester_status Boolean      @default(false)
+    owner            unit         @relation("owner", fields: [owner_id], references: [id])
+    owner_id         Int          @default(1)
+    owner_status     Boolean      @default(false)
+    drafer           user         @relation("drafter", fields: [drafter_id], references: [id])
+    drafter_id       Int          @default(1)
+    drafter_status   Boolean      @default(false)
+    reviewer         user         @relation("reviewer", fields: [reviewer_id], references: [id])
+    reviewer_id      Int          @default(1)
+    reviewer_status  Boolean      @default(false)
+    approver         user         @relation("approver", fields: [approver_id], references: [id])
+    approver_id      Int          @default(1)
+    approver_status  Boolean      @default(false)
 }
 
 model unit {
-    id          Int      @id @default(autoincrement())
-    name        String
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    id        Int      @id @default(autoincrement())
+    name      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     product_sheets_requested product_sheet[] @relation("requester")
-    product_sheets_owned product_sheet[] @relation("owner")
-    sso_requested sso[] @relation("requester")
-    sso_owned sso[] @relation("owner")
+    product_sheets_owned     product_sheet[] @relation("owner")
+    sso_requested            sso[]           @relation("requester")
+    sso_owned                sso[]           @relation("owner")
 }
 
 model taxonomy {
@@ -133,10 +133,10 @@ model user {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    drafter product_sheet[] @relation("drafter")
+    drafter  product_sheet[] @relation("drafter")
     reviewer product_sheet[] @relation("reviewer")
     approver product_sheet[] @relation("approver")
-    pic_sso sso[] @relation("pic")
+    pic_sso  sso[]           @relation("pic")
 }
 
 model sub_taxonomy {
@@ -146,58 +146,57 @@ model sub_taxonomy {
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
-    taxonomy taxonomy @relation(fields: [taxonomy_id], references: [id])
+    taxonomy    taxonomy @relation(fields: [taxonomy_id], references: [id])
     taxonomy_id Int
 
     product_sheet product_sheet[]
 }
 
 model packages {
-    id               Int           @id @default(autoincrement())
+    id               Int                 @id @default(autoincrement())
     name             String
     category         category_enum // Main feature/Add on
     bussines_model   bussines_model_enum @default(Subscription)
-    target_sales     Int           @default(10)
-    satuan_target    satuan_target_enum @default(User)
-    payback_period   Int           @default(1)
-    operational_time Int           @default(12)
-    excess_capacity  Int           @default(0)
-    capex            Float         @default(0)
-    opex             Float         @default(0)
-    cogs             Float         @default(0)
-    tariff           Float         @default(0)
-    create_at        DateTime      @default(now())
-    update_at        DateTime      @updatedAt
+    target_sales     Int                 @default(10)
+    satuan_target    satuan_target_enum  @default(User)
+    payback_period   Int                 @default(1)
+    operational_time Int                 @default(12)
+    excess_capacity  Int                 @default(0)
+    capex            Float               @default(0)
+    opex             Float               @default(0)
+    cogs             Float               @default(0)
+    tariff           Float               @default(0)
+    create_at        DateTime            @default(now())
+    update_at        DateTime            @updatedAt
     delete_at        DateTime?
 
-    offering_packages       offering_package[]
-    totals                  total[]
-    data_package            data_package[]
-    sheets                  sheet?                   @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    sheets_id               Int?
-
+    offering_packages offering_package[]
+    totals            total[]
+    data_package      data_package[]
+    sheets            sheet?             @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheets_id         Int?
 }
 
 model offering {
-    id              Int    @id @default(autoincrement())
-    offer_name      String
-    header          String @default("")
-    unit            offering_unit_enum @default(Unit)
-    user_target     Int  @default(0)
-    bussines_model   bussines_model_enum @default(Subscription)
-    total_price     Float @default(0)
+    id             Int                 @id @default(autoincrement())
+    offer_name     String
+    header         String              @default("")
+    unit           offering_unit_enum  @default(Unit)
+    user_target    Int                 @default(0)
+    bussines_model bussines_model_enum @default(Subscription)
+    total_price    Float               @default(0)
 
     offering_packages offering_package[]
-     sheets            sheet?            @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheets            sheet?             @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     sheets_id         Int?
 }
 
 model offering_package {
-    package     packages @relation(fields: [package_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    package_id  Int
-    offering    offering @relation(fields: [offering_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    offering_id Int
-    package_status Boolean @default(false)
+    package        packages @relation(fields: [package_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    package_id     Int
+    offering       offering @relation(fields: [offering_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    offering_id    Int
+    package_status Boolean  @default(false)
 
     @@id([package_id, offering_id])
 }
@@ -208,7 +207,7 @@ model type {
 
     categories categories[]
     totals     total[]
-    sheets     sheet?      @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheets     sheet?       @relation(fields: [sheets_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     sheets_id  Int?
 }
 
@@ -234,10 +233,10 @@ model data {
     update_at     DateTime  @updatedAt
     delete_at     DateTime?
 
-    category     categories     @relation(fields: [category_id], references: [id])
-    category_id  Int
-    components   components[]
-    data_package data_package[]
+    category      categories      @relation(fields: [category_id], references: [id])
+    category_id   Int
+    components    components[]
+    data_package  data_package[]
     category_data category_data[]
 }
 
