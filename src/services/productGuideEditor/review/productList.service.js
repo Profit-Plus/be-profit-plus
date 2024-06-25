@@ -22,6 +22,8 @@ function getAllProduct() {
             product_logo_dir: true,
             product_playbook_dir: true,
             product_marketing_collateral_dir: true,
+            product_profile_link: true,
+            product_website_link: true,
             created_at: true,
             updated_at: true
         }
@@ -53,6 +55,8 @@ function getProductByName(name) {
             product_logo_dir: true,
             product_playbook_dir: true,
             product_marketing_collateral_dir: true,
+            product_profile_link: true,
+            product_website_link: true,
             created_at: true,
             updated_at: true
         }

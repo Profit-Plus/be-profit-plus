@@ -63,8 +63,20 @@ async function addNewTeam(req, res, next) {
     }
 }
 
+async function getAllUnits(req, res, next) {
+    try {
+        /* Get all units from database */
+        const units = await userService.getAllUnit();
+        res.status(200).json(response.successResponse('Fetching all units', units));
+    } catch (error) {
+        res.status(500).json(response.errorResponse('Failed to fetch datas'));
+        next(error);
+    }
+}
+
 module.exports = {
     addNewLevel,
     addNewUnit,
-    addNewTeam
+    addNewTeam,
+    getAllUnits
 }

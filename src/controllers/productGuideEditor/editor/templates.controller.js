@@ -1,5 +1,6 @@
 const productTemplateService = require('../../../services/productGuideEditor/editor/templates.service');
 const miscService = require('../../../services/productGuideEditor/editor/misc/misc.service');
+const userService = require('../../../services/authentication/user.service');
 const responses = require('../../../helpers/web/webResponses');
 
 const { v4: uuidv4 } = require('uuid');
@@ -8,9 +9,13 @@ const { v4: uuidv4 } = require('uuid');
  *  @function addNewProduct to add a new name of a product
  */
 async function addNewProduct(req, res, next) {
+    const product = req.body;
+    if (product.name === undefined || product.name === '') {
+        res.status(400).json(responses.errorResponse('Product name is required!'));
+        return;
+    }
     try {
         /* Initialize request body */
-        const product = req.body;
 
         /* Initialize uuid for each services */
         const productUuid = uuidv4();
@@ -33,8 +38,17 @@ async function addNewProduct(req, res, next) {
         ]
 
         /* Get unit ID and taxonomy ID by their name */
-        const unitId = await miscService.getUnitIDByName('undefined');
-        const taxonomyId = await miscService.getTaxonomyIdByName('undefined');
+        var unitId = await miscService.getUnitIDByName('undefined');
+        var taxonomyId = await miscService.getTaxonomyIdByName('undefined');
+
+        if (!unitId ) {
+            const unit = await userService.addNewUnit(uuidv4(), { unitName: 'undefined' });
+            unitId = { unit_id: unit.unit_id }
+        }
+        if (!taxonomyId) {
+            const taxonomy = await miscService.addNewTaxonomy(uuidv4(), { name: 'undefined' });
+            taxonomyId = { taxonomy_uuid: taxonomy.taxonomy_uuid}
+        }
 
         /* Add a new template for product overview */
         await productTemplateService.addProductOverviewTemplate(productUuid, unitId.unit_id, taxonomyId.taxonomy_uuid, product);

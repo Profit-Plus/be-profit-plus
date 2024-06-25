@@ -13,6 +13,51 @@ function addNewTaxonomy(id, taxonomy) {
     })
 }
 
+
+/**
+ * @function getAllTaxonomy to get all the taxonomy from the database
+ * @returns {Object} taxonomy
+ **/
+
+function getAllTaxonomy() {
+    return database.taxonomy.findMany({
+        where: {
+            taxonomy_name: {
+                not: 'undefined' 
+            }
+        },
+        select:{
+            taxonomy_name: true
+        }
+    });
+}
+
+
+// function getAllProduct() {
+//     return database.product_overview.findMany({
+//         select: {
+//             product_uuid: true,
+//             units: {
+//                 select: {
+//                     units_name: true
+//                 }
+//             },
+//             product_name: true,
+//             product_description: true,
+//             taxonomy: {
+//                 select: {
+//                     taxonomy_name: true
+//                 }
+//             },
+//             product_logo_dir: true,
+//             product_playbook_dir: true,
+//             product_marketing_collateral_dir: true,
+//             created_at: true,
+//             updated_at: true
+//         }
+//     });
+// }
+
 /**
  *  @function getTaxonomyIdByName to get a taxonomy ID based on its name
  */
@@ -26,6 +71,8 @@ function getTaxonomyIdByName(name) {
         }
     });
 }
+
+
 
 /**
  *  @function getUnitIDByName to get a unit ID based on its name
@@ -129,6 +176,7 @@ function getProductOperatingModelIdByProductName(name) {
 
 module.exports = {
     addNewTaxonomy,
+    getAllTaxonomy,
     getTaxonomyIdByName,
     getUnitIDByName,
     getProductIdByName,

@@ -10,5 +10,6 @@ authRouter.post('/auth/generate-new-token', authController.generateNewToken);
 authRouter.post('/register/add-new-level', miscController.addNewLevel);
 authRouter.post('/register/add-new-unit', miscController.addNewUnit);
 authRouter.post('/register/add-new-team', miscController.addNewTeam);
+authRouter.get('/product/get-units', miscController.getAllUnits);
 
 module.exports = authRouter;

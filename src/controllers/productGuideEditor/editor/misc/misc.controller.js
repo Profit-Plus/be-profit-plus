@@ -29,6 +29,18 @@ async function addNewTaxonomy(req, res, next) {
     }
 }
 
+async function getAllTaxonomy(req, res, next) {
+    try {
+        /* Get all taxonomy from database */
+        const taxonomy = await miscService.getAllTaxonomy();
+        res.status(200).json(response.successResponse('Fetching all taxonomy', taxonomy));
+    } catch (error) {
+        res.status(500).json(response.errorResponse('Failed to fetch datas'));
+        next(error);
+    }
+}
+
 module.exports = {
-    addNewTaxonomy
+    addNewTaxonomy,
+    getAllTaxonomy,
 }

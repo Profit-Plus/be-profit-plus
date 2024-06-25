@@ -87,21 +87,96 @@ function addProductMainUse(id, productId, properties) {
         data: {
             product_main_use_uuid: id,
             product_uuid: productId,
-            product_main_use_name: properties.name,
+            product_main_use_name: properties.product_main_use_name
+        }
+    });
+}
+
+function getProductMainUse(id){
+    const { product_uuid } = id;
+    return database.product_main_use.findMany({
+        where: {
+            product_uuid: product_uuid
+        }
+    });
+}
+
+function getProductMainUseByMainUseID(id){
+    const { product_main_use_uuid } = id;
+    return database.product_main_use.findFirst({
+        where: {
+            product_main_use_uuid: product_main_use_uuid
+        }
+    });
+}
+
+function updateProductMainUse(id, properties) {
+    return database.product_main_use.update({
+        where: {
+            product_main_use_uuid: id
+        },
+        data: {
+            product_main_use_name: properties.product_main_use_name
+        }
+    });
+}
+
+function deleteProductMainUse(id) {
+    return database.product_main_use.delete({
+        where: {
+            product_main_use_uuid: id
         }
     });
 }
 
 /**
  *  @function addProductService to add some services of a product
- */
+*/
 function addProductService(id, productId, properties) {
     return database.product_service.createMany({
         data: {
             product_service_uuid: id,
             product_uuid: productId,
-            product_service_name: properties.name,
-            product_service_desc: properties.description
+            product_service_name: properties.product_service_name,
+            product_service_desc: properties.product_service_desc
+        }
+    });
+}
+
+function getProductService(id){
+    const { product_uuid } = id;
+    return database.product_service.findMany({
+        where: {
+            product_uuid: product_uuid
+        }
+    });
+}
+
+function getProductServiceByServiceID(id){
+    const { product_service_uuid } = id;
+    return database.product_service.findFirst({
+        where: {
+            product_service_uuid: product_service_uuid
+        }
+    });
+}
+
+function updateProductService(id, properties) {
+    return database.product_service.update({
+        where: {
+            product_service_uuid: id
+        },
+        data: {
+            product_service_name: properties.product_service_name,
+            product_service_desc: properties.product_service_desc
+        }
+    });
+}
+
+function deleteProductService(id) {
+    return database.product_service.delete({
+        where: {
+            product_service_uuid: id
         }
     });
 }
@@ -123,6 +198,14 @@ module.exports = {
     updateProductOverview,
     updateFileDirProductOverview,
     getProductIdByName,
+    getProductMainUse,
+    getProductMainUseByMainUseID,
+    updateProductMainUse,
+    deleteProductMainUse,
+    getProductService,
+    getProductServiceByServiceID,
+    updateProductService,
+    deleteProductService,
     addProductMainUse,
     addProductService,
     addProductGallery

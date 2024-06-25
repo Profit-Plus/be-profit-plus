@@ -1,4 +1,5 @@
 const stepOneService = require('../../../../services/productGuideEditor/editor/step1/step1.service');
+const productListService = require('../../../../services/productGuideEditor/review/productList.service');
 const miscService = require('../../../../services/productGuideEditor/editor/misc/misc.service');
 const response = require('../../../../helpers/web/webResponses');
 
@@ -29,6 +30,7 @@ async function updateProductOverviewDetail(req, res, next) {
                 const productUnitInCharge = String(fields.unitInCharge);
                 const productDescription = String(fields.description);
                 const productTaxonomy = String(fields.taxonomy);
+                console.log(productUnitInCharge,productTaxonomy)
                 const productProfile = String(fields.profileLink);
                 const productWeb = String(fields.webLink);
 
@@ -145,12 +147,31 @@ async function addMainUse(req, res, next) {
         /* Get product ID by its name */
         const productId = await miscService.getProductIdByName(productName);
 
-        /* Add main uses of product to database */
-        await Promise.all(mainUses.map(async (item) => {
-            /* Generate uuid */
-            const id = uuidv4();
+        if (!productId) {
+            res.status(404).json(response.errorResponse('Product not found'));
+            return;
+        }
 
-            await stepOneService.addProductMainUse(id, productId.product_uuid, item);
+        var getMainUses = await stepOneService.getProductMainUse(productId);
+
+        getMainUses.map(async (item) => {
+            if (!mainUses.find(mainUse => mainUse.product_main_use_id === item.product_main_use_uuid)) {
+                await stepOneService.deleteProductMainUse(item.product_main_use_uuid);
+            }
+        })
+        await Promise.all(mainUses.map(async (item) => {
+            if (!item.product_main_use_id) {
+                const id = uuidv4();
+                await stepOneService.addProductMainUse(id, productId.product_uuid, item);
+            } else {
+                var mainUse = await stepOneService.getProductMainUseByMainUseID(item.product_main_use_id);
+                if (!mainUse) {
+                    const id = uuidv4();
+                    await stepOneService.addProductMainUse(id, productId.product_uuid, item);
+                } else {
+                    await stepOneService.updateProductMainUse(item.product_main_use_id, item);
+                }
+            }
         }))
 
         res.status(200).json(response.successResponse('New services added!'));
@@ -172,6 +193,36 @@ async function addMainUse(req, res, next) {
 /**
  *  @function addMainUse to add a new main uses of a product
  */
+
+async function getMainUse(req, res, next) {
+    const productName = String(req.query.product);
+    if (!productName) {
+        res.status(400).json(response.errorResponse('No product provided'));
+        return;
+    }
+    try {
+        const productId = await miscService.getProductIdByName(productName);
+
+        if (!productId) {
+            res.status(404).json(response.errorResponse('Product not found'));
+            return;
+        }
+
+        const mainUses = await stepOneService.getProductMainUse(productId);
+        console.log(mainUses)
+
+        if (mainUses.length === 0) {
+            res.status(404).json(response.errorResponse('No main uses found'));
+            return;
+        }
+
+        res.status(200).json(response.successResponse('Main uses retrieved', mainUses));
+    } catch (error) {
+        res.status(500).json(response.errorResponse('Internal server error'));
+        next(error);
+    }
+}
+
 async function addServices(req, res, next) {
     try {
         /* Initialize request body and request params */
@@ -181,13 +232,33 @@ async function addServices(req, res, next) {
         /* Get product ID by its name */
         const productId = await miscService.getProductIdByName(productName);
         
-        /* Add services of a product to database */
-        await Promise.all(services.map(async (item) => {
-            /* Generate uuid */
-            const id = uuidv4();
+        if (!productId) {
+            res.status(404).json(response.errorResponse('Product not found'));
+            return;
+        }
 
-            await stepOneService.addProductService(id, productId.product_uuid.toString(), item);
-        }));
+        var getProductServices = await stepOneService.getProductService(productId);
+
+        await Promise.all(getProductServices.map(async (item) => {
+            if (!services.find(service => service.product_service_id === item.product_service_uuid)) {
+                await stepOneService.deleteProductService(item.product_service_uuid);
+            }
+        }))
+
+        await Promise.all(services.map(async (item) => {
+            if (!item.product_service_id) {
+                const id = uuidv4();
+                await stepOneService.addProductService(id, productId.product_uuid, item);
+            } else {
+                var service = await stepOneService.getProductServiceByServiceID(item.product_service_id);
+                if (!service) {
+                    const id = uuidv4();
+                    await stepOneService.addProductService(id, productId.product_uuid, item);
+                } else {
+                    await stepOneService.updateProductService(item.product_service_id, item);
+                }
+            }
+        }))
 
         res.status(200).json(response.successResponse('New services added!'));
 
@@ -283,9 +354,38 @@ async function addGallery(req, res, next) {
     }
 }
 
+async function getDetail(req, res, next) {
+    const productName = req.query.product;
+    if (!productName) {
+        res.status(400).json(response.errorResponse('No product provided'));
+        return;
+    }
+    try {
+        const productId = await miscService.getProductIdByName(productName);
+
+        if (!productId) {
+            res.status(404).json(response.errorResponse('Product not found'));
+            return;
+        }
+
+        const product = await productListService.getProductByName(productName);
+        const productMainUse = await stepOneService.getProductMainUse(productId);
+        const productServices = await stepOneService.getProductService(productId);
+
+        product.product_main_uses = productMainUse;
+        product.product_services = productServices;
+        res.status(200).json(response.successResponse('Product detail retrieved', product));
+    } catch (error) {
+        res.status(500).json(response.errorResponse('Internal server error'));
+        next(error);
+    }
+}
+
 module.exports = {
     updateProductOverviewDetail,
     addServices,
     addMainUse,
-    addGallery
+    getMainUse,
+    addGallery,
+    getDetail
 }

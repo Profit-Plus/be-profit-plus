@@ -2,6 +2,7 @@
 require("dotenv").config();
 const express = require('express')
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 // Porto Route
 const authRouter = require('./routes/authentication/auth.routes');
@@ -19,7 +20,7 @@ const newSolutionRouter = require('./routes/solutionFormulation/newSolution.rout
 /* Necessary variables */
 const PORT = process.env.PORT || 3001;
 const main = express();
-
+main.use(cors());
 main.use(bodyParser.json());
 main.use(bodyParser.urlencoded ({
     extended: false

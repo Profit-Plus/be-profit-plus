@@ -84,6 +84,17 @@ function addNewUnit(id, unit) {
     })
 }
 
+function getAllUnit() {
+    return database.units.findMany({
+        where: {
+            units_name: { not: 'undefined' }
+        },
+        select:{
+            units_name: true
+        }
+    });
+}
+
 function addNewTeam(id, team) {
     return database.teams.create({
         data: {
@@ -113,5 +124,6 @@ module.exports = {
     addNewLevel,
     addNewUnit,
     addNewTeam,
-    checkUserValidation
+    checkUserValidation,
+    getAllUnit
 };

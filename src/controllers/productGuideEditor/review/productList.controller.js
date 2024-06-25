@@ -8,7 +8,7 @@ async function getProducts(req, res, next) {
     try {
         /* Initialize query param */
         const product = String(req.query.product);
-
+        console.log(product)
         if (!product.length) {
             /* Get all products from database */
             const products = await productListService.getAllProduct();
@@ -16,6 +16,10 @@ async function getProducts(req, res, next) {
         } else {
             /* Get product details by UUID  */
             const productDetails = await productListService.getProductByName(product);
+            if (!productDetails) {
+                res.status(404).json(response.errorResponse('Product not found'));
+                return;
+            }
             res.status(200).json(response.successResponse('Fetching all products', productDetails));
         }
         
