@@ -162,11 +162,21 @@ async function findAllProjects(params) {
             include: { customer: true, selected_product: true },
             omit: { customer_id: true }
         }),
-        database.project.count({ where: condition }),
-        database.project.count({ where: { ...condition, status: 'initiation' } }),
-        database.project.count({ where: { ...condition, status: 'ongoing' } }),
-        database.project.count({ where: { ...condition, status: 'drop' } }),
-        database.project.count({ where: { ...condition, status: 'close_out' } })
+        database.project.count({
+            where: {
+                topic: { contains: params.search },
+                requesting_approval: params.requesting_approval,                
+                created_at: {
+                    gte: params.start_date ? new Date(params.start_date) : undefined,
+                    lt: params.end_date ? new Date(new Date(params.end_date).getTime() + 24 * 60 * 60 * 1000) : undefined
+                },
+                deleted_at: null
+            }
+        }),
+        database.project.count({ where: { ...condition, deleted_at: null, status: 'initiation' } }),
+        database.project.count({ where: { ...condition, deleted_at: null, status: 'ongoing' } }),
+        database.project.count({ where: { ...condition, deleted_at: null, status: 'drop' } }),
+        database.project.count({ where: { ...condition, deleted_at: null, status: 'close_out' } })
     ]);
 
     return {
