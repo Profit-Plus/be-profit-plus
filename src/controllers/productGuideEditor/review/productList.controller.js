@@ -20,8 +20,18 @@ async function getProducts(req, res, next) {
                 res.status(404).json(response.errorResponse('Product not found'));
                 return;
             }
-            const extractedProductLogo = productDetails.product_logo_dir.split('.')[1];
-            productDetails.product_logo_dir = 'http://localhost:3001/product/logo/' + productDetails.product_name + '.' + extractedProductLogo;
+            if (productDetails.product_logo_dir !== 'undefined') {
+                const extractedProductLogo = productDetails.product_logo_dir.split('.')[1];
+                productDetails.product_logo_dir = 'http://localhost:3001/product/logo/' + productDetails.product_name + '.' + extractedProductLogo;
+            }
+            if (productDetails.product_playbook_dir !== 'undefined') {
+                const extractedProductPlaybook = productDetails.product_playbook_dir.split('.')[1];
+                productDetails.product_playbook_dir = 'http://localhost:3001/product/playbook/' + productDetails.product_name + '.' + extractedProductPlaybook;
+            }
+            if (productDetails.product_marketing_collateral_dir !== 'undefined') {
+                const extractedProductMarketing = productDetails.product_marketing_collateral_dir.split('.')[1];
+                productDetails.product_marketing_collateral_dir = 'http://localhost:3001/product/marketing/' + productDetails.product_name + '.' + extractedProductMarketing;
+            }
             res.status(200).json(response.successResponse('Fetching all products', productDetails));
         }
         
