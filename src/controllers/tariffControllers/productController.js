@@ -49,7 +49,7 @@ async function getTaxonomy(req, res){
 async function getSubTaxonomy(req, res){
     const { taxonomy_id } = req.params;
 
-    const parsedTaxonomyId = parseInt(taxonomy_id);
+    const parsedTaxonomyId = taxonomy_id;
     try{
         const getData = await productService.getSubTaxonomy(parsedTaxonomyId);
         res.status(200).json( webResponses.successResponse('Data fetched successfully', getData) );

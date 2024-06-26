@@ -843,15 +843,15 @@ model sso {
     archivement               Int                 @default(0)
     description               String              @default("")
 
-    sheet_id     Int     @default(1)
-    sheet        sheet   @relation(fields: [sheet_id], references: [id])
+    sheet_id     Int?
+    sheet        sheet?   @relation(fields: [sheet_id], references: [id])
     product_overview_id   String?
     product_overview      product_overview? @relation(fields: [product_overview_id], references: [product_uuid])
-    requester_id String?
+    requester_id String?  @default("1")
     requester    units?    @relation("requester", fields: [requester_id], references: [unit_id])
-    drafter_id   String?
+    drafter_id   String?  @default("1")
     pic          users?    @relation("pic", fields: [drafter_id], references: [user_id])
-    owner_id     String?
+    owner_id     String?  @default("1")
     owner        units?    @relation("owner", fields: [owner_id], references: [unit_id])
 }
 
@@ -871,7 +871,7 @@ model sheet {
 
 model product_sheet {
     id             Int      @id @default(autoincrement())
-    nomor          Int      @unique @default(0)
+    nomor          Int      @default(0)
     limitation     String   @default("")
     recommendation String   @default("")
     description    String   @default("")
@@ -881,25 +881,25 @@ model product_sheet {
     sheet            sheet        @relation(fields: [sheet_id], references: [id])
     sheet_id         Int          @unique
     taxonomy         taxonomy     @relation(fields: [taxonomy_id], references: [taxonomy_uuid])
-    taxonomy_id      String
+    taxonomy_id      String       @default("1")
     sub_taxonomy     sub_taxonomy @relation(fields: [sub_taxonomy_id], references: [id])
     sub_taxonomy_id  Int          @default(1)
     product_overview          product_overview?      @relation(fields: [product_overview_id], references: [product_uuid])
-    product_overview_id       String?
+    product_overview_id       String?   @default("1")
     requester        units?         @relation("requester", fields: [requester_id], references: [unit_id])
-    requester_id     String?
+    requester_id     String?      @default("1")
     requester_status Boolean      @default(false)
     owner            units?         @relation("owner", fields: [owner_id], references: [unit_id])
-    owner_id         String?
+    owner_id         String?      @default("1")
     owner_status     Boolean      @default(false)
     drafter          users?         @relation("drafter", fields: [drafter_id], references: [user_id])
-    drafter_id       String?
+    drafter_id       String?      @default("1")
     drafter_status   Boolean      @default(false)
     reviewer         users?         @relation("reviewer", fields: [reviewer_id], references: [user_id])
-    reviewer_id      String?
+    reviewer_id      String?      @default("1")
     reviewer_status  Boolean      @default(false)
     approver         users?         @relation("approver", fields: [approver_id], references: [user_id])
-    approver_id      String?
+    approver_id      String?      @default("1")
     approver_status  Boolean      @default(false)
 }
 

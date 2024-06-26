@@ -8,8 +8,9 @@ async function createSheet(data) {
             name: data.name,
             product_sheet: {
                 create: {
+                    nomor:12,
                     taxonomy: {
-                        connect: { id: data.taxonomy }
+                        connect: { taxonomy_uuid: data.taxonomy }
                     }
                 }
             }
