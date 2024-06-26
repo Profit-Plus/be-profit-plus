@@ -48,17 +48,17 @@ main.use(bodyParser.urlencoded({
     extended: false
 }));
 
-// GTOM Use route
-main.use(picRouter);
-main.use(customerRouter);
-main.use(documentRouter);
-main.use(projectRouter);
-main.use(commentRouter);
-main.use(notificationRouter);
-main.use(dashboardRouter);
-
 //Auth Use route
 main.use('/profitplus/api', authRouter);
+
+// GTOM Use route
+main.use('/profitplus/api', picRouter);
+main.use('/profitplus/api', customerRouter);
+main.use('/profitplus/api', documentRouter);
+main.use('/profitplus/api', projectRouter);
+main.use('/profitplus/api', commentRouter);
+main.use('/profitplus/api', notificationRouter);
+main.use('/profitplus/api', dashboardRouter);
 
 // Tarif Use route
 main.use('/tariff/search', searchRoute);

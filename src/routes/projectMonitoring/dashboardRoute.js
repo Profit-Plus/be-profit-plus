@@ -4,7 +4,7 @@ const dashboardController = require('../../controllers/projectMonitoring/dashboa
 const authenticationMiddleware = require('../../middlewares/authentication/auth.middleware');
 
 // Use Auth Middleware
-dashboardRouter.use('/pics', authenticationMiddleware.authenticateUser);
+dashboardRouter.use('/dashboard', authenticationMiddleware.authenticateUser);
 
 // Define Routes
 dashboardRouter.get('/dashboard/project-summary', dashboardController.getProjectSummary);

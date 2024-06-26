@@ -88,11 +88,11 @@ const omitIncludeOptions = {
         },
         selected_product: {
             include: {
-                product: true,
+                product_overview: true,
                 offering: true
             },
             omit: {
-                product_id: true,
+                product_overview_id: true,
                 offering_id: true
             }
         },
