@@ -46,6 +46,28 @@ async function addProductReadinesStatus(req, res, next) {
     }
 }
 
+async function getProductReadinessStatus(req, res, next) {
+    try {
+        /* Initialize query param */
+        const product = String(req.query.product).toLowerCase();
+
+        /* Get the product Id by its name */
+        const productId = (await miscService.getProductIdByName(product)).product_uuid;
+
+        /* Get product readiness status */
+        const readiness = await stepSixService.getProductReadiness(productId);
+
+        /* Get product readiness description */
+        const readinessDesc = await stepSixService.getProductReadinessDescription(productId);
+
+        res.status(200).json(response.successResponse('Fetching product readiness', { readiness, readinessDesc }));
+    } catch (error) {
+        res.status(500).json(response.errorResponse('Internal Server error'));
+        next(error);
+    }
+}
+
 module.exports = {
-    addProductReadinesStatus
+    addProductReadinesStatus,
+    getProductReadinessStatus
 }

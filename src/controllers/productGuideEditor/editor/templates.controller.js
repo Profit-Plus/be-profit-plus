@@ -1,5 +1,6 @@
 const productTemplateService = require('../../../services/productGuideEditor/editor/templates.service');
 const miscService = require('../../../services/productGuideEditor/editor/misc/misc.service');
+const userService = require('../../../services/authentication/user.service');
 const responses = require('../../../helpers/web/webResponses');
 
 const { v4: uuidv4 } = require('uuid');
@@ -8,14 +9,20 @@ const { v4: uuidv4 } = require('uuid');
  *  @function addNewProduct to add a new name of a product
  */
 async function addNewProduct(req, res, next) {
+    const product = req.body;
+    if (product.name === undefined || product.name === '') {
+        res.status(400).json(responses.errorResponse('Product name is required!'));
+        return;
+    }
     try {
         /* Initialize request body */
-        const product = req.body;
 
         /* Initialize uuid for each services */
         const productUuid = uuidv4();
         const segmentingTargetingUuid = uuidv4();
         const positioningUuid = uuidv4();
+        const featureUuid = uuidv4();
+        const legendUuid = uuidv4();
         const differentiationBrandingUuid = uuidv4();
         const operatingModelUuid = uuidv4();
         const readinessUuid = uuidv4();
@@ -33,8 +40,17 @@ async function addNewProduct(req, res, next) {
         ]
 
         /* Get unit ID and taxonomy ID by their name */
-        const unitId = await miscService.getUnitIDByName('undefined');
-        const taxonomyId = await miscService.getTaxonomyIdByName('undefined');
+        var unitId = await miscService.getUnitIDByName('undefined');
+        var taxonomyId = await miscService.getTaxonomyIdByName('undefined');
+
+        if (!unitId ) {
+            const unit = await userService.addNewUnit(uuidv4(), { unitName: 'undefined' });
+            unitId = { unit_id: unit.unit_id }
+        }
+        if (!taxonomyId) {
+            const taxonomy = await miscService.addNewTaxonomy(uuidv4(), { name: 'undefined' });
+            taxonomyId = { taxonomy_uuid: taxonomy.taxonomy_uuid}
+        }
 
         /* Add a new template for product overview */
         await productTemplateService.addProductOverviewTemplate(productUuid, unitId.unit_id, taxonomyId.taxonomy_uuid, product);
@@ -44,7 +60,9 @@ async function addNewProduct(req, res, next) {
             productUuid, 
             segmentingTargetingUuid, 
             positioningUuid, 
-            differentiationBrandingUuid
+            differentiationBrandingUuid,
+            featureUuid,
+            legendUuid
         );
         
         /* Add a new template for STPDB sub-services */
@@ -85,31 +103,6 @@ async function addNewProduct(req, res, next) {
     }
 }
 
-/**
- *  @function getProducts to get all the products from the list if query param null 
- */
-async function getProducts(req, res, next) {
-    try {
-        /* Initialize query param */
-        const product = String(req.query.product);
-
-        if (!product.length) {
-            /* Get all products from database */
-            const products = await productTemplateService.getAllProduct();
-            res.status(200).json(responses.successResponse('Fetching all products', products));
-        } else {
-            /* Get product details by UUID  */
-            const productDetails = await productTemplateService.getProductByName(product);
-            res.status(200).json(responses.successResponse(`Fetching ${product}`, productDetails));
-        }
-        
-    } catch (error) {
-        res.status(500).json(responses.errorResponse('Failed to fetch datas'));
-        next(error);
-    }
-}
-
 module.exports = {
-    addNewProduct,
-    getProducts
+    addNewProduct
 }

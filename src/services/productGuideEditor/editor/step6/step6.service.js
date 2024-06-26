@@ -14,9 +14,26 @@ function updateProductReadiness(productId, status) {
     });
 }
 
+function getProductReadiness(productId) {
+    return database.product_readiness_status.findFirst({
+        where: {
+            product_uuid: productId
+        }
+    });
+}
+
+function getProductReadinessDescription(productId) {
+    return database.product_readiness_description.findMany({
+        where: {
+            product_uuid: productId
+        }
+    });
+}
+
 /**
  *  @function addProductReadinessDescription to add a description for each status in a product 
  */
+
 function addProductReadinessDescription(id, productId, description) {
     return database.product_readiness_description.create({
         data: {
@@ -31,5 +48,7 @@ function addProductReadinessDescription(id, productId, description) {
 
 module.exports = {
     updateProductReadiness,
-    addProductReadinessDescription
+    addProductReadinessDescription,
+    getProductReadiness,
+    getProductReadinessDescription
 }

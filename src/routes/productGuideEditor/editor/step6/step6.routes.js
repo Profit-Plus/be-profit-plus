@@ -1,8 +1,9 @@
 const stepSixController = require('../../../../controllers/productGuideEditor/editor/step6/step6.controller');
 const express = require('express');
 
-const productGuideEditorStep6Router = express.Router();
+const productGuideEditorStepSixRouter = express.Router();
 
-productGuideEditorStep6Router.post('/product/update-product-readiness', stepSixController.addProductReadinesStatus);
+productGuideEditorStepSixRouter.post('/product/update-product-readiness', stepSixController.addProductReadinesStatus);
+productGuideEditorStepSixRouter.get('/product/get-product-readiness', stepSixController.getProductReadinessStatus);
 
-module.exports = productGuideEditorStep6Router;
+module.exports = productGuideEditorStepSixRouter;
