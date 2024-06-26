@@ -1,4 +1,4 @@
-const { type } = require('os');
+
 const { database } = require('../../helpers/utils/db/database');
 
 async function getCostStructure(sheetId) {

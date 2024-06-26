@@ -1,7 +1,6 @@
 
 const { database } = require('../../helpers/utils/db/database');
 
-
 async function getSso() {
     const ssoResult = await database.sso.findMany({
         select: {
@@ -39,20 +38,11 @@ async function getSso() {
                     name: true
                 }
             },
-            product_id: true,
-            product:{
+            product_overview_id: true,
+            product_overview:{
                 select: {
-                    name: true,
-                    description: true,                
-                    product_sheet: {
-                        select: {
-                            taxonomy: {
-                                select: {
-                                    name: true
-                                }
-                            }
-                        }
-                    }
+                    product_uuid: true,
+                    product_name: true
                 }
             },
             requester:{
@@ -79,8 +69,6 @@ async function getSso() {
             },
         }
     });
-
-    console.log(ssoResult);
     const result = []
 
     for (ssoKey in ssoResult){

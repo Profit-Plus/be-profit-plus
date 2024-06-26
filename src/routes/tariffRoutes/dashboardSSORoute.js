@@ -10,13 +10,5 @@ router.get('/unit', dashboardSSOController.getUnit);
 router.put('/sso/:id', dashboardSSOController.updateSso);
 
 router.post('/sso', dashboardSSOController.createSso);
-// router.get('/total-product', dashboardSSOController.getTotalProduct);
-// router.get('/last-product', dashboardSSOController.lastProduct);
-// router.get('/total-type-by-product/:productId', dashboardSSOController.getTotalTypeByProductId);
-// router.get('/total-category-by-product/:productId', dashboardSSOController.getTotalCategoryByProductId);
-// router.get('/total-product-last-month', dashboardSSOController.getTotalProductLastMonth);
-// router.get('/test', dashboardSSOController.queryParamsTest);
 
 module.exports = router;
-
-// Path: src/routes/tariffRoutes/dashboardOverviewRoute.js
