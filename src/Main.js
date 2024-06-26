@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require('express')
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const fs = require('fs');
 
 // Porto Route
 const authRouter = require('./routes/authentication/auth.routes');
@@ -16,6 +17,8 @@ const productGuidestepFiveRouter = require('./routes/productGuideEditor/editor/s
 const productGuideStepSixRouter = require('./routes/productGuideEditor/editor/step6/step6.routes');
 const productListRouter = require('./routes/productGuideEditor/review/productList.routes');
 const newSolutionRouter = require('./routes/solutionFormulation/newSolution.routes');
+const path = require('path');
+
 
 /* Necessary variables */
 const PORT = process.env.PORT || 3001;
@@ -29,6 +32,7 @@ main.use(bodyParser.urlencoded ({
 main.use('/profitplus/api', authRouter);
 
 /* Product Management routes */
+main.use('/uploads', express.static(path.join(__dirname, 'src', 'resources', 'resources', 'uploads', 'logo')));
 main.use('/profitplus/api', productGuideMiscRouter);
 main.use('/profitplus/api', productGuideProductTemplate);
 main.use('/profitplus/api', productGuidestepOneRouter);
@@ -41,6 +45,40 @@ main.use('/profitplus/api', productListRouter);
 
 /* Solution formulation */
 main.use('/profitplus/api', newSolutionRouter);
+
+main.get('/product-logo/:filename', (req, res) => {
+    const fileName = req.params.filename;
+    const dirName = __dirname.split(path.sep).pop();
+    // removing __dirname's src
+    const convertedDir = __dirname.split(path.sep).slice(0, -1).join(path.sep);
+    const imagePath = path.join(convertedDir, 'resources', 'uploads', 'logo', fileName);
+    console.log(imagePath);
+    // Check if the file exists
+    if (fs.existsSync(imagePath)) {
+      // Send the file to the client
+      res.sendFile(imagePath);
+    } else {
+      // File not found
+      res.status(404).send('Image not found');
+    }
+});
+
+main.get('/product-marketcollateral/:filename', (req, res) => {
+    const fileName = req.params.filename;
+    const dirName = __dirname.split(path.sep).pop();
+    // removing __dirname's src
+    const convertedDir = __dirname.split(path.sep).slice(0, -1).join(path.sep);
+    const pdfPath = path.join(convertedDir, 'resources', 'uploads', 'marketcoll', fileName);
+    console.log(pdfPath);
+    // Check if the file exists
+    if (fs.existsSync(pdfPath)) {
+      // Send the file to the client
+      res.sendFile(pdfPath);
+    } else {
+      // File not found
+      res.status(404).send('Image not found');
+    }
+});
 
 main.listen(PORT, () => {
     console.log('Server is running! port: ' + PORT);

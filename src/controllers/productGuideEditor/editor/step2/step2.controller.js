@@ -83,7 +83,7 @@ async function segmentingTargetingController(req, res, next) {
         if (legendPoses && legendPoses.length > 0) {
             const getlegendPoses = await stepTwoService.getSegmentingTargetingLegendPos(segmentingTargetingId);
             await Promise.all(getlegendPoses.map(async (item) => {
-                if (!legendPos.find(legendPos => legendPos.legends_pos_uuid === item.legends_pos_uuid)) {
+                if (!legendPos.find(legendPos => item.legends_uuid === legendPos.legends_uuid && item.penta_helix_uuid === legendPos.penta_helix_uuid && item.feature_uuid === legendPos.feature_uuid)) {
                     await stepTwoService.deleteSegmentingTargetingLegendPos(item.legends_pos_uuid, segmentingTargetingId);
                 }
             }));

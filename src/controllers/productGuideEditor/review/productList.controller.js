@@ -1,5 +1,6 @@
 const productListService = require('../../../services/productGuideEditor/review/productList.service');
 const response = require('../../../helpers/web/webResponses');
+const fs = require('fs');
 
 /**
  *  @function getProducts to get all the products from the list if query param null 
@@ -8,7 +9,6 @@ async function getProducts(req, res, next) {
     try {
         /* Initialize query param */
         const product = String(req.query.product);
-        console.log(product)
         if (!product.length) {
             /* Get all products from database */
             const products = await productListService.getAllProduct();
@@ -29,6 +29,29 @@ async function getProducts(req, res, next) {
     }
 }
 
+async function getPicture(req, res, next) {
+    try {
+        const productName = String(req.params.id);
+        const productDetails = await productListService.getProductByName(productName);
+        if (!productDetails) {
+            res.status(404).json(response.errorResponse('Product not found'));
+            return;
+        }
+        const picture = productDetails.product_logo_dir;
+        const fileExist = fs.existsSync(picture)
+        console.log(picture, fileExist)
+        if (!fileExist) {
+            res.status(404).json(response.errorResponse('File not found'));
+            return;
+        }
+        res.status(200).sendFile(picture);
+    } catch (error) {
+        res.status(500).json(response.errorResponse('Failed to fetch picture'));
+        next(error);
+    }
+}
+
 module.exports = {
-    getProducts
+    getProducts,
+    getPicture
 }
