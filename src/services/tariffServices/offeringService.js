@@ -130,12 +130,20 @@ async function updateStatusOffering(query_offer_id, query_package_id, query_stat
         }
     });
     return offering;
+}
 
+async function deleteOffering (query_offer_id){
+    return await database.offering.delete({
+        where:{
+            id: query_offer_id
+        }
+    });
 }
 
 module.exports = {
     createOffer,
     getOffering,
     updateOffer,
-    updateStatusOffering
+    updateStatusOffering,
+    deleteOffering
 };

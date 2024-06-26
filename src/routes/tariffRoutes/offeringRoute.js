@@ -6,7 +6,7 @@ const offeringCalculationController = require('../../controllers/tariffControlle
 router.post('/createOffering/:sheet_id', offeringCalculationController.createOffering);
 router.get('/getOffering/:sheet_id', offeringCalculationController.getOffering);
 router.get('/getDetailsOfferingById/:sheet_id', );
-router.delete('/deleteOffering', );
+router.delete('/deleteOffering', offeringCalculationController.deleteOffering);
 router.put('/updateOffer/:offering_id', offeringCalculationController.updateOffering);
 router.put('/updateStatusOffering/:offering_id/:package_id', offeringCalculationController.updateStatusOffering);
 
