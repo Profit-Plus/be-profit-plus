@@ -20,6 +20,7 @@ const dashboard = require('./routes/tariffRoutes/dashboardSSORoute');
 const solution = require('./routes/tariffRoutes/solutionTariffRoute');
 const createSheet = require('./routes/tariffRoutes/createSheetRoute');
 const masterDataRoute = require('./routes/tariffRoutes/componentRoutes');
+const CostCalculation = require('./routes/tariffRoutes/calculationRoute');
 
 
 // Porto Route
@@ -55,6 +56,7 @@ main.use('/tariff/dashboard', dashboard);
 main.use('/tariff/solution', solution);
 main.use('/tariff/createSheet', createSheet);
 main.use('/tariff/component', masterDataRoute);
+main.use('/tariff/calculation', CostCalculation)
 
 // Porto Use route
 main.use(authRouter);
