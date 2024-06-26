@@ -15,6 +15,7 @@ const searchRoute = require('./routes/tariffRoutes/searchRoute');
 const sheetRoute = require('./routes/tariffRoutes/sheetRoute');
 const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
 const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
+const costStructureRoute = require('./routes/tariffRoutes/costStructureRoute')
 const productRoute = require('./routes/tariffRoutes/productRoute');
 const dashboard = require('./routes/tariffRoutes/dashboardSSORoute');
 const solution = require('./routes/tariffRoutes/solutionTariffRoute');
@@ -34,8 +35,8 @@ const PORT = process.env.PORT || 3001;
 const main = express();
 
 /* Use express */
-main.use(cors());
 
+main.use(cors());
 main.use(bodyParser.json());
 main.use(bodyParser.urlencoded({
     extended: false
@@ -49,8 +50,9 @@ main.use(documentRouter);
 // Tarif Use route
 main.use('/tariff/search', searchRoute);
 main.use('/tariff/sheet', sheetRoute);
-main.use('/tariff/masterPackage', masterPackageRoute);
+main.use('/tariff/master-package', masterPackageRoute);
 main.use('/tariff/offering', offeringRoute);
+main.use('/tariff/cost-structure', costStructureRoute);
 main.use('/tariff/product', productRoute);
 main.use('/tariff/dashboard', dashboard);
 main.use('/tariff/solution', solution);

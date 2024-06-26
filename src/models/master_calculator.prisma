@@ -19,28 +19,38 @@ model product {
     sheet_id Int   @unique
 
     product_sheet product_sheet[]
-    sso           sso[]
+    ssos          sso[]
 }
 
 model sso {
-    id                        Int                 @id @default(autoincrement())
-    time_start                String?
-    time_end                  String?
-    createdAt                 DateTime            @default(now())
-    updatedAt                 DateTime            @updatedAt
-    business_model            business_model_enum @default(Subscription)
-    year                      Int                 @default(2024)
-    status                    String              @default("Draft")
-    status_hold               Boolean             @default(false)
-    data_collection           Boolean             @default(false)
-    data_calculation          Boolean             @default(false)
-    draft_tariff_validation   Boolean             @default(false)
-    presentation_draft_tariff Boolean             @default(false)
-    request_draft_tariff      Boolean             @default(false)
-    NDE_determination_tariff  Boolean             @default(false)
-    work_time                 DateTime?           @default(now())
-    archivement               Int                 @default(0)
-    description               String              @default("")
+    id                                Int                 @id @default(autoincrement())
+    time_start                        String?
+    time_end                          String?
+    createdAt                         DateTime            @default(now())
+    updatedAt                         DateTime            @updatedAt
+    business_model                    bussines_model_enum @default(Subscription)
+    year                              Int                 @default(2024)
+    status                            String              @default("Draft")
+    status_hold                       Boolean             @default(false)
+    data_collection                   Int                 @default(0)
+    data_collection_boolean           Boolean             @default(false)
+    data_calculation                  Int                 @default(0)
+    data_calculation_boolean          Boolean             @default(false)
+    draft_tariff_validation           Int                 @default(0)
+    draft_tariff_validation_boolean   Boolean             @default(false)
+    presentation_draft_tariff         Int                 @default(0)
+    presentation_draft_tariff_boolean Boolean             @default(false)
+    request_draft_tariff              Int                 @default(0)
+    request_draft_tariff_boolean      Boolean             @default(false)
+    NDE_determination_tariff          Int                 @default(0)
+    NDE_determination_tariff_boolean  Boolean             @default(false)
+    work_time                         String?             @default("2 Hari")
+    work_time_num                     Int                 @default(1)
+    achievement                       Int                 @default(0)
+    progress                          Int                 @default(0)
+    description                       String              @default("")
+    evidence_tariff_link              String              @default("docs.google.com")
+    evidence_tariff_text              String              @default("Link")
 
     sheet_id     Int     @default(1)
     sheet        sheet   @relation(fields: [sheet_id], references: [id])
@@ -57,11 +67,12 @@ model sso {
 model sheet {
     id          Int      @id @default(autoincrement())
     name        String
-    description String?
+    description String
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
     product       product?
+    tariff_status tariff_status_enum @default(None) /////////////////
     packages      packages[]
     type          type[]
     offering      offering[]
@@ -92,7 +103,7 @@ model product_sheet {
     owner            unit         @relation("owner", fields: [owner_id], references: [id])
     owner_id         Int          @default(1)
     owner_status     Boolean      @default(false)
-    drafter          user         @relation("drafter", fields: [drafter_id], references: [id])
+    drafer           user         @relation("drafter", fields: [drafter_id], references: [id])
     drafter_id       Int          @default(1)
     drafter_status   Boolean      @default(false)
     reviewer         user         @relation("reviewer", fields: [reviewer_id], references: [id])
@@ -155,10 +166,10 @@ model sub_taxonomy {
 model packages {
     id               Int                 @id @default(autoincrement())
     name             String
-    category         category_enum
-    business_model   business_model_enum @default(Subscription)
+    category         category_enum // Main feature/Add on
+    bussines_model   bussines_model_enum @default(Subscription)
     target_sales     Int                 @default(10)
-    unit_target      unit_target_enum    @default(User)
+    satuan_target    satuan_target_enum  @default(User)
     payback_period   Int                 @default(1)
     operational_time Int                 @default(12)
     excess_capacity  Int                 @default(0)
@@ -166,15 +177,15 @@ model packages {
     opex             Float               @default(0)
     cogs             Float               @default(0)
     tariff           Float               @default(0)
-    createdAt        DateTime            @default(now())
-    updatedAt        DateTime            @updatedAt
-    deletedAt        DateTime?
+    create_at        DateTime            @default(now())
+    update_at        DateTime            @updatedAt
+    delete_at        DateTime?
 
-    offering_package offering_package[]
-    totals           total[]
-    data_package     data_package[]
-    sheet            sheet?             @relation(fields: [sheet_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    sheet_id         Int?
+    offering_packages offering_package[]
+    totals            total[]
+    data_package      data_package[]
+    sheet             sheet?             @relation(fields: [sheet_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheet_id          Int?
 }
 
 model offering {
@@ -194,6 +205,7 @@ model offering_package {
     offering       offering @relation(fields: [offering_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     offering_id    Int
     package_status Boolean  @default(false)
+
 
     @@id([package_id, offering_id])
 }
@@ -215,7 +227,6 @@ model categories {
     type          type            @relation(fields: [type_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     type_id       String
     category_data category_data[]
-    data          data[]
 }
 
 model data {
@@ -230,9 +241,7 @@ model data {
     updatedAt     DateTime  @updatedAt
     deletedAt     DateTime?
 
-    category      categories?      @relation(fields: [category_id], references: [id])
-    category_id   Int?
-    components    data_component[]
+    components    components[]
     data_package  data_package[]
     category_data category_data[]
 }
@@ -275,16 +284,33 @@ model category_data {
 }
 
 model data_package {
-    data        data     @relation(fields: [data_id], references: [id], onDelete: Cascade)
+    data        data     @relation(fields: [data_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     data_id     Int
-    package     packages @relation(fields: [package_id], references: [id])
+    package     packages @relation(fields: [package_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     package_id  Int
     quantity    Int?
     frequency   Int?
     excess      Float?
+    total       Float?
     information String?
 
     @@id([data_id, package_id])
+}
+
+model components {
+    id           Int       @id @default(autoincrement())
+    name         String
+    item         String?
+    unit         Int?
+    specs        String?
+    priceperunit Float?
+    quantity     Int?
+    create_at    DateTime  @default(now())
+    update_at    DateTime  @updatedAt
+    delete_at    DateTime?
+
+    data    data @relation(fields: [data_id], references: [id])
+    data_id Int
 }
 
 // Total cost for each type (capex/opex/cogs) in a package
@@ -323,7 +349,10 @@ enum offering_unit_enum {
 
 enum business_model_enum {
     Subscription
-    OneTimeCharge
+    OTC
+    Licensing
+    Freemium
+    Pay_per_Use
 }
 
 enum unit_target_enum {
