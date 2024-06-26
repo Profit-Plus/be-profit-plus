@@ -4,10 +4,16 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+const cors = require('cors');
+
 // GTOM Route
 const picRouter = require('./routes/projectMonitoring/picRoute');
 const customerRouter = require('./routes/projectMonitoring/customerRoute');
-const documentRouter = require('./routes/projectMonitoring/documentRoute')
+const documentRouter = require('./routes/projectMonitoring/documentRoute');
+const projectRouter = require('./routes/projectMonitoring/projectRoute');
+const commentRouter = require('./routes/projectMonitoring/commentRoute');
+const notificationRouter = require('./routes/projectMonitoring/notificationRoute');
+const dashboardRouter = require('./routes/projectMonitoring/dashboardRoute');
 
 // Tarif Route  
 const searchRoute = require('./routes/tariffRoutes/searchRoute');
@@ -20,7 +26,7 @@ const solution = require('./routes/tariffRoutes/solutionTariffRoute');
 
 
 // Porto Route
-const authRouter = require('./routes/auth/auth.routes');
+const authRouter = require('./routes/authentication/auth.routes');
 const stepOneRouter = require('./routes/productGuide/stepOne.routes');
 const stepTwoRouter = require('./routes/productGuide/stepOne.routes');
 const stepThreeRouter = require('./routes/productGuide/stepTwo.routes');
@@ -32,6 +38,7 @@ const main = express();
 /* Use express */
 main.use(cors());
 
+main.use(cors());
 main.use(bodyParser.json());
 main.use(bodyParser.urlencoded({
     extended: false
@@ -41,6 +48,10 @@ main.use(bodyParser.urlencoded({
 main.use(picRouter);
 main.use(customerRouter);
 main.use(documentRouter);
+main.use(projectRouter);
+main.use(commentRouter);
+main.use(notificationRouter);
+main.use(dashboardRouter);
 
 // Tarif Use route
 main.use('/tariff/search', searchRoute);

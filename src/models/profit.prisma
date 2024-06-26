@@ -11,128 +11,159 @@ datasource db {
 model pic {
   id             String         @id @default(uuid())
   name           String
-  phone          String         @unique(map: "pic_phone_key")
+  phone          String
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
   role           pic_role_enum
   deleted_at     DateTime?
   pic_external   project[]      @relation("EXTERNAL_PIC")
-  pic_segment    project[]      @relation("SEGMENT_PIC")
+  pic_lira       project[]      @relation("LIRA_PIC")
   pic_midfielder project_init[]
 }
 
 model customer {
-  id         Int       @id @default(autoincrement())
-  name       String    @unique(map: "customer_name_key")
+  id         String    @id @default(uuid())
+  name       String
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
+  project    project[]
 }
 
 model project {
-  id                    String             @id @default(uuid())
-  start_date            DateTime
-  end_date              DateTime
-  subscription_duration Int?
-  customer              String
-  topic                 String
-  status                project_status     @default(initiation)
-  pic_external_id       String
-  segment               segment_enum
-  pic_segment_id        String
-  project_init_id       String?            @unique
-  project_ongoing_id    String?            @unique
-  project_drop_id       String?            @unique
-  project_close_out_id  String?            @unique
-  passcode              String
-  created_at            DateTime           @default(now())
-  updated_at            DateTime           @updatedAt
-  solution_id           String?            @unique
-  deleted_at            DateTime?
-  creator_id            Int?
-  updater_id            Int?
-  comments              comment?
-  created_by            users?             @relation("CREATOR", fields: [creator_id], references: [user_id])
-  pic_external          pic                @relation("EXTERNAL_PIC", fields: [pic_external_id], references: [id])
-  pic_segment           pic                @relation("SEGMENT_PIC", fields: [pic_segment_id], references: [id])
-  project_close_out     project_close_out? @relation(fields: [project_close_out_id], references: [id])
-  project_drop          project_drop?      @relation(fields: [project_drop_id], references: [id])
-  project_init          project_init?      @relation(fields: [project_init_id], references: [id])
-  project_ongoing       project_ongoing?   @relation(fields: [project_ongoing_id], references: [id])
-  solution              project_solution?  @relation(fields: [solution_id], references: [id])
-  updated_by            users?             @relation("UPDATER", fields: [updater_id], references: [user_id])
+  id                   String               @id @default(uuid())
+  start_project        DateTime
+  end_project          DateTime
+  customer_id          String
+  topic                String
+  status               project_status       @default(initiation)
+  pic_external_id      String?
+  segment              segment_enum
+  pic_lira_id          String?
+  project_init_id      String?              @unique
+  project_ongoing_id   String?              @unique
+  project_drop_id      String?              @unique
+  project_close_out_id String?              @unique
+  passcode             String
+  created_at           DateTime             @default(now())
+  updated_at           DateTime             @updatedAt
+  tariff               Int                  @default(0)
+  deleted_at           DateTime?
+  creator_id           String?
+  updater_id           String?
+  members              access_credentials[] @relation("PROJECT_MEMBERS")
+  requesting_approval  Boolean              @default(false)
+  comments             comment[]
+  customer             customer             @relation(fields: [customer_id], references: [id])
+  created_by           access_credentials?  @relation("CREATOR", fields: [creator_id], references: [access_credentials_id])
+  pic_external         pic?                 @relation("EXTERNAL_PIC", fields: [pic_external_id], references: [id])
+  pic_lira             pic?                 @relation("LIRA_PIC", fields: [pic_lira_id], references: [id])
+  project_close_out    project_close_out?   @relation(fields: [project_close_out_id], references: [id])
+  project_drop         project_drop?        @relation(fields: [project_drop_id], references: [id])
+  project_init         project_init?        @relation(fields: [project_init_id], references: [id])
+  project_ongoing      project_ongoing?     @relation(fields: [project_ongoing_id], references: [id])
+  selected_product     selected_product[]
+  updated_by           access_credentials?  @relation("UPDATER", fields: [updater_id], references: [access_credentials_id])
 }
 
 model project_init {
-  id                         String     @id @default(uuid())
-  nde_request_id             String?    @unique
-  midfielder                 String
-  related_unit               String
-  pic_midfielder_id          String
-  mom_req_id                 String?    @unique
-  helix                      helix_enum
-  lir_requirement_id         String?    @unique
-  requester                  String
-  impact                     String
-  potential_employee_trained Int
-  nde_determination_id       String?    @unique
-  tariff                     Int
-  potential_revenue          Int
-  is_approved                Boolean    @default(false)
+  id                         String          @id @default(uuid())
+  project_id                 String
+  nde_request_id             String?         @unique
+  midfielder                 String?
+  related_unit               String?
+  pic_midfielder_id          String?
+  mom_req_id                 String?         @unique
+  helix                      helix_enum?
+  lir_requirement_id         String?         @unique
+  sph_id                     String?         @unique
+  spk_id                     String?         @unique
+  requester                  String?
+  impact                     String?
+  potential_employee_trained Int             @default(0)
+  nde_determination_id       String?         @unique
+  potential_revenue          Int             @default(0)
+  created_at                 DateTime        @default(now())
+  updated_at                 DateTime        @default(now()) @updatedAt
+  deleted_at                 DateTime?
+  approval_status            approval_status @default(draft)
   project                    project?
-  lir_requirement            document?  @relation("LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
-  mom_req                    document?  @relation("MOM_REQ", fields: [mom_req_id], references: [id])
-  nde_determination          document?  @relation("NDE_DETERMINATION", fields: [nde_determination_id], references: [id])
-  nde_request                document?  @relation("NDE_REQUEST", fields: [nde_request_id], references: [id])
-  pic_midfielder             pic        @relation(fields: [pic_midfielder_id], references: [id])
+  lir_requirement            document?       @relation("LIR_REQUIREMENT", fields: [lir_requirement_id], references: [id])
+  sph                        document?       @relation("SPH", fields: [sph_id], references: [id])
+  spk                        document?       @relation("SPK", fields: [spk_id], references: [id])
+  mom_req                    document?       @relation("MOM_REQ", fields: [mom_req_id], references: [id])
+  nde_determination          document?       @relation("NDE_DETERMINATION", fields: [nde_determination_id], references: [id])
+  nde_request                document?       @relation("NDE_REQUEST", fields: [nde_request_id], references: [id])
+  pic_midfielder             pic?            @relation(fields: [pic_midfielder_id], references: [id])
 }
 
 model project_ongoing {
-  id                     String    @id @default(uuid())
-  nde_req_cfu_to_mid_id  String?   @unique
-  nde_req_mid_to_tcuc_id String?   @unique
-  UIC                    String
-  start_access           DateTime
-  end_access             DateTime
-  mom_readiness_id       String?   @unique
-  nde_confirmation_id    String?   @unique
-  baa_id                 String?   @unique
-  bast_id                String?   @unique
-  is_approved            Boolean   @default(false)
+  id                     String          @id @default(uuid())
+  project_id             String
+  nde_req_cfu_to_mid_id  String?         @unique
+  nde_req_mid_to_tcuc_id String?         @unique
+  UIC                    String?
+  start_access           DateTime?
+  end_access             DateTime?
+  mom_readiness_id       String?         @unique
+  nde_confirmation_id    String?         @unique
+  baa_id                 String?         @unique
+  bast_id                String?         @unique
+  kfs_id                 String?         @unique
+  created_at             DateTime        @default(now())
+  updated_at             DateTime        @default(now()) @updatedAt
+  deleted_at             DateTime?
+  approval_status        approval_status @default(draft)
   project                project?
-  baa                    document? @relation("BAA", fields: [baa_id], references: [id])
-  bast                   document? @relation("BAST", fields: [bast_id], references: [id])
-  mom_readiness          document? @relation("MOM_READINESS", fields: [mom_readiness_id], references: [id])
-  nde_confirmation       document? @relation("NDE_CONFIRMATION", fields: [nde_confirmation_id], references: [id])
-  nde_req_cfu_to_mid     document? @relation("NDE_REQ_CFU_TO_MID", fields: [nde_req_cfu_to_mid_id], references: [id])
-  nde_req_mid_to_tcuc    document? @relation("NDE_REQ_MID_TO_TCUC", fields: [nde_req_mid_to_tcuc_id], references: [id])
+  baa                    document?       @relation("BAA", fields: [baa_id], references: [id])
+  bast                   document?       @relation("BAST", fields: [bast_id], references: [id])
+  kfs                    document?       @relation("KFS", fields: [kfs_id], references: [id])
+  mom_readiness          document?       @relation("MOM_READINESS", fields: [mom_readiness_id], references: [id])
+  nde_confirmation       document?       @relation("NDE_CONFIRMATION", fields: [nde_confirmation_id], references: [id])
+  nde_req_cfu_to_mid     document?       @relation("NDE_REQ_CFU_TO_MID", fields: [nde_req_cfu_to_mid_id], references: [id])
+  nde_req_mid_to_tcuc    document?       @relation("NDE_REQ_MID_TO_TCUC", fields: [nde_req_mid_to_tcuc_id], references: [id])
 }
 
 model project_drop {
-  id                  String    @id @default(uuid())
-  nde_project_drop_id String?   @unique
-  is_approved         Boolean   @default(false)
+  id                  String          @id @default(uuid())
+  project_id          String
+  nde_project_drop_id String?         @unique
+  created_at          DateTime        @default(now())
+  updated_at          DateTime        @default(now()) @updatedAt
+  deleted_at          DateTime?
+  approval_status     approval_status @default(draft)
   project             project?
-  nde_project_drop    document? @relation("NDE_PROJECT_DROP", fields: [nde_project_drop_id], references: [id])
+  nde_project_drop    document?       @relation("NDE_PROJECT_DROP", fields: [nde_project_drop_id], references: [id])
 }
 
 model project_close_out {
-  id                         String    @id @default(uuid())
-  mom_reconciles_id          String?   @unique
-  nde_revenue_recognition_id String?   @unique
-  employee_trained           Int
-  revenue_in                 Int
-  report_project_id          String?   @unique
-  nde_report_project_id      String?   @unique
-  nps_id                     String?   @unique
-  delivery_year              String
-  is_approved                Boolean   @default(false)
+  id                         String          @id @default(uuid())
+  project_id                 String
+  mom_reconciles_id          String?         @unique
+  nde_revenue_recognition_id String?         @unique
+  employee_trained           Int             @default(0)
+  revenue_in                 Int             @default(0)
+  report_project_id          String?         @unique
+  nde_report_project_id      String?         @unique
+  nps_id                     String?         @unique
+  delivery_year              String?
+  created_at                 DateTime        @default(now())
+  updated_at                 DateTime        @default(now()) @updatedAt
+  deleted_at                 DateTime?
+  approval_status            approval_status @default(draft)
   project                    project?
-  mom_reconciles             document? @relation("MOM_RECONCILES", fields: [mom_reconciles_id], references: [id])
-  nde_report_project         document? @relation("NDE_REPORT_PROJECT", fields: [nde_report_project_id], references: [id])
-  nde_revenue_recognition    document? @relation("NDE_REVENUE_RECOGNITION", fields: [nde_revenue_recognition_id], references: [id])
-  nps                        document? @relation("NPS", fields: [nps_id], references: [id])
-  report_project             document? @relation("REPORT_PROJECT", fields: [report_project_id], references: [id])
+  mom_reconciles             document?       @relation("MOM_RECONCILES", fields: [mom_reconciles_id], references: [id])
+  nde_report_project         document?       @relation("NDE_REPORT_PROJECT", fields: [nde_report_project_id], references: [id])
+  nde_revenue_recognition    document?       @relation("NDE_REVENUE_RECOGNITION", fields: [nde_revenue_recognition_id], references: [id])
+  nps                        document?       @relation("NPS", fields: [nps_id], references: [id])
+  report_project             document?       @relation("REPORT_PROJECT", fields: [report_project_id], references: [id])
+}
+
+enum approval_status {
+  draft
+  requesting
+  approved
+  declined
 }
 
 model document {
@@ -155,8 +186,11 @@ model document {
   mom_req                 project_init?      @relation("MOM_REQ")
   nde_determination       project_init?      @relation("NDE_DETERMINATION")
   nde_request             project_init?      @relation("NDE_REQUEST")
+  sph                     project_init?      @relation("SPH")
+  spk                     project_init?      @relation("SPK")
   baa                     project_ongoing?   @relation("BAA")
   bast                    project_ongoing?   @relation("BAST")
+  kfs                     project_ongoing?   @relation("KFS")
   mom_readiness           project_ongoing?   @relation("MOM_READINESS")
   nde_confirmation        project_ongoing?   @relation("NDE_CONFIRMATION")
   nde_req_cfu_to_mid      project_ongoing?   @relation("NDE_REQ_CFU_TO_MID")
@@ -164,155 +198,188 @@ model document {
 }
 
 model notification {
-  id          Int       @id @default(autoincrement())
+  id          String             @id @default(uuid())
   header      String
   content     String
-  category    String
-  url         String
-  read        Boolean   @default(false)
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
-  receiver_id Int
-  sender_id   Int?
+  url         String?
+  read        Boolean            @default(false)
+  created_at  DateTime           @default(now())
+  updated_at  DateTime           @updatedAt
+  receiver_id String
+  sender_id   String
   deleted_at  DateTime?
-  receiver    users     @relation("RECEIVER", fields: [receiver_id], references: [user_id])
-  sender      users?    @relation("SENDER", fields: [sender_id], references: [user_id])
+  receiver    access_credentials @relation("RECEIVER", fields: [receiver_id], references: [access_credentials_id])
+  sender      access_credentials @relation("SENDER", fields: [sender_id], references: [access_credentials_id])
 }
 
 model comment {
-  id         Int       @id @default(autoincrement())
-  user_id    Int
-  comment    String
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  project_id String    @unique
-  deleted_at DateTime?
-  project    project   @relation(fields: [project_id], references: [id])
-  user       users     @relation(fields: [user_id], references: [user_id])
+  id           String             @id @default(uuid())
+  user_id      String
+  message      String
+  comment_type comment_type       @default(comment)
+  created_at   DateTime           @default(now())
+  updated_at   DateTime           @updatedAt
+  project_id   String
+  deleted_at   DateTime?
+  project      project            @relation(fields: [project_id], references: [id])
+  user         access_credentials @relation(fields: [user_id], references: [access_credentials_id])
 }
 
-model project_solution {
-  id              String                    @id @default(uuid())
-  solution_name   String
-  created_at      DateTime                  @default(now())
-  updated_at      DateTime                  @updatedAt
-  deleted_at      DateTime?
-  project         project?
-  solution_detail project_solution_detail[]
+enum comment_type {
+  comment
+  log
 }
 
-model project_solution_detail {
-  id                  String           @id @default(uuid())
-  product_id          Int
-  package_id          Int
-  project_solution_id String
-  package             packages         @relation(fields: [package_id], references: [id])
-  product             product          @relation(fields: [product_id], references: [id])
-  project_solution    project_solution @relation(fields: [project_solution_id], references: [id])
+model selected_product {
+  id                  String            @id @default(uuid())
+  product_overview_id Int?
+  offering_id         Int?
+  offering            offering?         @relation(fields: [offering_id], references: [id])
+  product_overview    product_overview? @relation(fields: [product_overview_id], references: [id])
+  project             project           @relation(fields: [project_id], references: [id])
+  project_id          String
+  deleted_at          DateTime?
 }
 
-model product {
-  id                      Int                       @id @default(autoincrement())
-  category_id             Int
-  taxonomy_id             Int
-  units_name              String
-  year                    Int
-  name                    String
-  branding                String
-  evidence_tariff         String
-  evidence_product        String
-  playbook                String
-  product_profile         String
-  is_active               Boolean
-  progress_enum           progress_enum             @default(aquisition)
-  offerings               offering[]
-  operating_model         operating_model[]
-  packages                packages[]
-  category                category                  @relation(fields: [category_id], references: [category_id])
-  taxonomy                taxonomy                  @relation(fields: [taxonomy_id], references: [taxonomy_id])
-  units                   units                     @relation(fields: [units_name], references: [units_name])
-  product_services        product_services[]
-  product_use_case        product_use_case[]
-  project_solution_detail project_solution_detail[]
-  segment_targeting       segment_targeting[]
-  stpdb                   stpdb[]
-  types                   type[]
+model product_overview {
+  id                Int                 @id @default(autoincrement())
+  category_id       Int
+  taxonomy_id       Int
+  unit_id           String
+  year              Int
+  name              String
+  branding          String
+  evidence_tariff   String
+  evidence_product  String
+  playbook          String
+  product_profile   String
+  is_active         Boolean
+  progress_enum     progress_enum       @default(aquisition)
+  offerings         offering[]
+  operating_model   operating_model[]
+  packages          packages[]
+  category          category            @relation(fields: [category_id], references: [category_id])
+  taxonomy          taxonomy            @relation(fields: [taxonomy_id], references: [taxonomy_id])
+  units             units               @relation(fields: [unit_id], references: [unit_id])
+  product_services  product_services[]
+  product_use_case  product_use_case[]
+  segment_targeting segment_targeting[]
+  stpdb             stpdb[]
+  types             type[]
+  selected_product  selected_product[]
 }
 
-model units {
-  units_name  String       @id @unique
-  product     product[]
-  unit_leader unit_leader?
-  users       users[]
-}
-
+//  Authentication Schema
 model users {
-  user_id              Int               @id @default(autoincrement())
-  units_name           String
-  level_name           String
-  login_credentials_id String            @unique
-  team_name            String
-  display_name         String            @default("User")
-  comment              comment[]
-  user_as_receiver     notification[]    @relation("RECEIVER")
-  user_as_sender       notification[]    @relation("SENDER")
-  user_as_creator      project[]         @relation("CREATOR")
-  user_as_updater      project[]         @relation("UPDATER")
-  unit_leader          unit_leader?
-  levels               levels            @relation(fields: [level_name], references: [level_name])
-  login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id])
-  teams                teams             @relation(fields: [team_name], references: [team_name])
-  units                units             @relation(fields: [units_name], references: [units_name])
+  user_id               String @id @default(uuid())
+  units_name            String // foreign key of units
+  level_name            String // foreign key of levels
+  access_credentials_id String @unique // foreign key of login_credentials
+  team_name             String //  Foreign key of teams
+
+  // Relations section
+  unit_leader        unit_leader? // 1 to 1 relation with unit_leader
+  units              units              @relation(fields: [units_name], references: [units_name]) // 1 to Many relation with units
+  levels             levels             @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
+  access_credentials access_credentials @relation(fields: [access_credentials_id], references: [access_credentials_id]) // 1 to 1 relation with login_credentials
+  teams              teams              @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
-model login_credentials {
-  login_credentials_id String          @id @default(uuid())
-  email                String          @unique
-  password             String
-  refresh_token        refresh_token[]
-  users                users?
-}
+model access_credentials {
+  access_credentials_id String @id @default(uuid())
+  user_name             String
+  email                 String @unique
+  password              String
 
-model teams {
-  team_name String  @id @unique
-  users     users[]
+  // Relations section
+  users         users?
+  refresh_token refresh_token[]
+
+  user_as_creator  project[]      @relation("CREATOR")
+  user_as_updater  project[]      @relation("UPDATER")
+  user_as_member   project[]      @relation("PROJECT_MEMBERS")
+  user_as_sender   notification[] @relation("SENDER")
+  user_as_receiver notification[] @relation("RECEIVER")
+  comment          comment[]
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
 }
 
 model refresh_token {
-  id                   String            @id @unique @default(uuid())
-  hashed_token         String
-  login_credentials_id String
-  revoked              Boolean           @default(false)
-  created_at           DateTime          @default(now())
-  updated_at           DateTime          @updatedAt
-  login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id], onDelete: Cascade)
+  id                    String @id @unique @default(uuid())
+  hashed_token          String
+  access_credentials_id String
+
+  // Relations section
+  access_credentials access_credentials @relation(fields: [access_credentials_id], references: [access_credentials_id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
+// Insert a default data named '-'
+model units {
+  unit_id          String             @id @default(uuid())
+  units_name       String             @unique
+  users            users[] // 1 to many relation with users
+  unit_leader      unit_leader? // 1 to 1 relation with unit_leader
+  product_overview product_overview[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model teams {
+  team_id   String @id @default(uuid())
+  team_name String @unique
+
+  // Relations section
+  users users[] //   1 to many relation with users
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+// Add new entity named unit_leader
 model unit_leader {
-  leader_id  Int    @id @default(autoincrement())
-  user_id    Int    @unique
-  units_name String @unique
-  units      units  @relation(fields: [units_name], references: [units_name])
-  users      users  @relation(fields: [user_id], references: [user_id])
+  leader_id  String @id @default(uuid())
+  user_id    String @unique //  Foreign key of user
+  units_name String @unique // Foreign key of unit
+
+  // Relations section
+  users users @relation(fields: [user_id], references: [user_id])
+  units units @relation(fields: [units_name], references: [units_name])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model levels {
-  level_name String  @id @unique
-  users      users[]
+  level_id   String @id @default(uuid())
+  level_name String @unique
+
+  // Relations section
+  users users[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model taxonomy {
-  taxonomy_id   Int       @id @default(autoincrement())
-  name          String
-  taxonomy_desc String
-  product       product[]
+  taxonomy_id      Int                @id @default(autoincrement())
+  name             String
+  taxonomy_desc    String
+  product_overview product_overview[]
 }
 
 model category {
-  category_id   Int       @id @default(autoincrement())
-  name          String
-  category_desc String
-  product       product[]
+  category_id      Int                @id @default(autoincrement())
+  name             String
+  category_desc    String
+  product_overview product_overview[]
 }
 
 model differentiation {
@@ -332,42 +399,42 @@ model dif_enabler_collection {
 
 model stpdb {
   stpdb_id                Int                 @id @default(autoincrement())
-  product_id              Int
+  product_overview_id     Int
   dif_id                  Int
   branding                String
   positioning_description String
   segment_targeting       segment_targeting[]
   st_positioning          st_positioning[]
   differentiation         differentiation     @relation(fields: [dif_id], references: [dif_id])
-  product                 product             @relation(fields: [product_id], references: [id])
+  product_overview        product_overview    @relation(fields: [product_overview_id], references: [id])
 }
 
 model product_services {
-  ps_id       Int     @id @default(autoincrement())
-  product_id  Int
-  name        String
-  description String
-  product     product @relation(fields: [product_id], references: [id])
+  ps_id               Int              @id @default(autoincrement())
+  product_overview_id Int
+  name                String
+  description         String
+  product_overview    product_overview @relation(fields: [product_overview_id], references: [id])
 }
 
 model product_use_case {
-  puc_id     Int     @id @default(autoincrement())
-  product_id Int
-  logo       String
-  desc       String
-  product    product @relation(fields: [product_id], references: [id])
+  puc_id              Int              @id @default(autoincrement())
+  product_overview_id Int
+  logo                String
+  desc                String
+  product_overview    product_overview @relation(fields: [product_overview_id], references: [id])
 }
 
 model operating_model {
-  om_id            Int                @id @default(autoincrement())
-  product_id       Int
-  partnership      String
-  om_business_flow om_business_flow[]
-  om_information   om_information[]
-  om_location      om_location[]
-  om_mgt_systems   om_mgt_systems[]
-  om_supplier      om_supplier[]
-  product          product            @relation(fields: [product_id], references: [id])
+  om_id               Int                @id @default(autoincrement())
+  product_overview_id Int
+  partnership         String
+  om_business_flow    om_business_flow[]
+  om_information      om_information[]
+  om_location         om_location[]
+  om_mgt_systems      om_mgt_systems[]
+  om_supplier         om_supplier[]
+  product_overview    product_overview   @relation(fields: [product_overview_id], references: [id])
 }
 
 model om_business_flow {
@@ -424,14 +491,14 @@ model om_info_node {
 }
 
 model segment_targeting {
-  st_id             Int                 @id @default(autoincrement())
-  product_id        Int
-  stpdb_id          Int
-  desc              String
-  product           product             @relation(fields: [product_id], references: [id])
-  stpdb             stpdb               @relation(fields: [stpdb_id], references: [stpdb_id])
-  st_future_growth  st_future_growth[]
-  st_targeting_user st_targeting_user[]
+  st_id               Int                 @id @default(autoincrement())
+  product_overview_id Int
+  stpdb_id            Int
+  desc                String
+  product_overview    product_overview    @relation(fields: [product_overview_id], references: [id])
+  stpdb               stpdb               @relation(fields: [stpdb_id], references: [stpdb_id])
+  st_future_growth    st_future_growth[]
+  st_targeting_user   st_targeting_user[]
 }
 
 model st_positioning {
@@ -458,34 +525,34 @@ model st_targeting_user {
 }
 
 model packages {
-  id                      Int                       @id @default(autoincrement())
-  name                    String
-  category                category_enum
-  target_sales            Int                       @default(10)
-  payback_period          Int                       @default(1)
-  operational_time        Int                       @default(12)
-  excess_capacity         Int                       @default(0)
-  capex                   Float                     @default(0)
-  opex                    Float                     @default(0)
-  cogs                    Float                     @default(0)
-  tariff                  Float                     @default(0)
-  create_at               DateTime                  @default(now())
-  update_at               DateTime                  @updatedAt
-  delete_at               DateTime?
-  product_id              Int
-  data_package            data_package[]
-  offering_packages       offering_package[]
-  product                 product                   @relation(fields: [product_id], references: [id])
-  project_solution_detail project_solution_detail[]
-  totals                  total[]
+  id                  Int                @id @default(autoincrement())
+  name                String
+  category            category_enum
+  target_sales        Int                @default(10)
+  payback_period      Int                @default(1)
+  operational_time    Int                @default(12)
+  excess_capacity     Int                @default(0)
+  capex               Float              @default(0)
+  opex                Float              @default(0)
+  cogs                Float              @default(0)
+  tariff              Float              @default(0)
+  create_at           DateTime           @default(now())
+  update_at           DateTime           @updatedAt
+  delete_at           DateTime?
+  product_overview_id Int
+  data_package        data_package[]
+  offering_packages   offering_package[]
+  product_overview    product_overview   @relation(fields: [product_overview_id], references: [id])
+  totals              total[]
 }
 
 model offering {
-  id                Int                @id @default(autoincrement())
-  offer_name        String
-  product_id        Int
-  product           product            @relation(fields: [product_id], references: [id])
-  offering_packages offering_package[]
+  id                  Int                @id @default(autoincrement())
+  offer_name          String
+  product_overview_id Int
+  product_overview    product_overview   @relation(fields: [product_overview_id], references: [id])
+  offering_packages   offering_package[]
+  selected_product    selected_product[]
 }
 
 model offering_package {
@@ -498,12 +565,12 @@ model offering_package {
 }
 
 model type {
-  id         String       @id @default(uuid())
-  type       type_enum
-  product_id Int
-  categories categories[]
-  totals     total[]
-  product    product      @relation(fields: [product_id], references: [id])
+  id                  String           @id @default(uuid())
+  type                type_enum
+  product_overview_id Int
+  categories          categories[]
+  totals              total[]
+  product_overview    product_overview @relation(fields: [product_overview_id], references: [id])
 }
 
 model categories {
@@ -591,7 +658,7 @@ enum segment_enum {
 enum helix_enum {
   academy
   business
-  goverment
+  government
   community
   tech_prov
   subsidiary
@@ -605,6 +672,9 @@ enum document_type {
   bast
   report
   nps
+  sph
+  spk
+  kfs
 }
 
 enum progress_enum {

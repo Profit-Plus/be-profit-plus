@@ -9,15 +9,18 @@ ajv.addFormat("date", (data) => {
     return dateRegex.test(data);
 });
 
-function isGetAllCustomersValid() {
+function isGetAllCommentsValid() {
     const dateErrorMessage = 'format should be \'yyyy-mm-dd\'';
 
     const schema = {
         type: 'object',
         properties: {
+            project_id: { type: 'string' },
+            comment_type: { type: 'string', enum: ['comment', 'log'] },
             start_date: { type: 'string', format: 'date', errorMessage: dateErrorMessage },
             end_date: { type: 'string', format: 'date', errorMessage: dateErrorMessage }
         },
+        required: ['project_id'],
         additionalProperties: true
     };
 
@@ -26,13 +29,14 @@ function isGetAllCustomersValid() {
     return validate;
 }
 
-function isDataCustomerValid() {
+function isCreateCommentValid() {
     const schema = {
         type: 'object',
         properties: {
-            name: { type: 'string', minLength: 1, maxLength: 68, nullable: false },
+            message: { type: 'string', minLength: 1, maxLength: 68, nullable: false },
+            project_id: { type: 'string' }
         },
-        required: ['name'],
+        required: ['message', 'project_id'],
         additionalProperties: false
     };
 
@@ -41,4 +45,19 @@ function isDataCustomerValid() {
     return validate;
 }
 
-module.exports = { isDataCustomerValid, isGetAllCustomersValid }
+function isUpdateCommentValid() {
+    const schema = {
+        type: 'object',
+        properties: {
+            message: { type: 'string', minLength: 1, maxLength: 68, nullable: false },
+        },
+        required: ['message'],
+        additionalProperties: false
+    };
+
+    const validate = ajv.compile(schema);
+
+    return validate;
+}
+
+module.exports = { isCreateCommentValid, isUpdateCommentValid, isGetAllCommentsValid }

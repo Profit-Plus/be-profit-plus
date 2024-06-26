@@ -1,14 +1,16 @@
 const { database } = require('../../helpers/utils/db/database');
 
-function createDocument(payload) {
-    return database.document.create({
-        data: payload
+function createComment(payload) {
+    return database.comment.create({
+        data: payload,
     });
 }
 
-async function findAllDocuments(params) {    
+async function findAllComments(params) {
     const condition = {
-        original_name: { contains: params.search },
+        message: { contains: params.search },
+        project_id: params.project_id,
+        comment_type: params.comment_type,
         created_at: {
             gte: params.start_date ? new Date(params.start_date) : undefined,
             lt: params.end_date ? new Date(new Date(params.end_date).getTime() + 24 * 60 * 60 * 1000) : undefined
@@ -16,15 +18,15 @@ async function findAllDocuments(params) {
     };
 
     const [data, total] = await database.$transaction([
-        database.document.findMany({
+        database.comment.findMany({
             skip: params.limit * (params.page - 1),
             take: params.limit,
             orderBy: {
                 [params.sort]: params.order
-            },            
+            },
             where: condition
         }),
-        database.document.count({ where: condition })
+        database.comment.count({ where: condition })
     ]);
 
     return {
@@ -35,33 +37,33 @@ async function findAllDocuments(params) {
     };
 }
 
-function findDocument(documentId) {
-    return database.document.findUnique({        
-        where: { id: documentId }
+function findComment(commentId) {
+    return database.comment.findUnique({
+        where: { id: commentId }
     });
 }
 
-function updateDocument(documentId, payload) {
-    return database.document.update({
+function updateComment(commentId, payload) {
+    return database.comment.update({
         where: {
-            id: documentId
+            id: commentId
         },
         data: payload
     });
 }
 
-function deleteDocument(documentId) {
-    return database.document.delete({
+function deleteComment(commentId) {
+    return database.comment.delete({
         where: {
-            id: documentId
+            id: commentId
         }
     });
 }
 
 module.exports = {
-    createDocument,
-    findAllDocuments,
-    findDocument,
-    updateDocument,
-    deleteDocument
+    createComment,
+    findAllComments,
+    findComment,    
+    updateComment,
+    deleteComment
 }
