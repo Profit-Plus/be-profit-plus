@@ -2,6 +2,24 @@
 require("dotenv").config();
 const express = require('express')
 const bodyParser = require('body-parser');
+const cors = require('cors');
+
+
+// GTOM Route
+const picRouter = require('./routes/projectMonitoring/picRoute');
+const customerRouter = require('./routes/projectMonitoring/customerRoute');
+const documentRouter = require('./routes/projectMonitoring/documentRoute');
+const projectRouter = require('./routes/projectMonitoring/projectRoute');
+const commentRouter = require('./routes/projectMonitoring/commentRoute');
+const notificationRouter = require('./routes/projectMonitoring/notificationRoute');
+const dashboardRouter = require('./routes/projectMonitoring/dashboardRoute');
+
+// Tarif Route  
+const searchRoute = require('./routes/tariffRoutes/searchRoute');
+const sheetRoute = require('./routes/tariffRoutes/searchRoute');
+const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
+const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
+
 
 // Porto Route
 const authRouter = require('./routes/authentication/auth.routes');
@@ -19,8 +37,9 @@ const newSolutionRouter = require('./routes/solutionFormulation/newSolution.rout
 const PORT = process.env.PORT || 3001;
 const main = express();
 
+main.use(cors());
 main.use(bodyParser.json());
-main.use(bodyParser.urlencoded ({
+main.use(bodyParser.urlencoded({
     extended: false
 }));
 

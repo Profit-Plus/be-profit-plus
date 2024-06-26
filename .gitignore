@@ -2,6 +2,7 @@
 .env
 /server_data
 /src/models/migrations
+/prisma
 /src/resources
 /nbproject
 *.swp

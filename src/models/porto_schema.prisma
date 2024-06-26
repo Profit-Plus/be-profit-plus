@@ -10,91 +10,90 @@ datasource db {
 
 //  Authentication Schema
 model users {
-    user_id String @id @default(uuid())
-    units_name String // foreign key of units
-    level_name String  // foreign key of levels
-    access_credentials_id String @unique // foreign key of login_credentials
-    team_name String // foreign key of teams
+    user_id                 String              @id @default(uuid())
+    units_name              String              // foreign key of units
+    level_name              String              // foreign key of levels
+    access_credentials_id   String              @unique  // foreign key of login_credentials
+    team_name               String              //  Foreign key of teams
 
     // Relations section
-    unit_leader unit_leader? // 1 to 1 relation with unit_leader
-    units units @relation(fields: [units_name], references: [units_name]) // 1 to Many relation with units
-    levels levels @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
-    access_credentials access_credentials @relation(fields: [access_credentials_id], references: [access_credentials_id]) // 1 to 1 relation with login_credentials
-    teams teams @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
+    unit_leader          unit_leader?           // 1 to 1 relation with unit_leader
+    units                units                  @relation(fields: [units_name], references: [units_name]) // 1 to Many relation with units
+    levels               levels                 @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
+    access_credentials   access_credentials     @relation(fields: [access_credentials_id], references: [access_credentials_id]) // 1 to 1 relation with login_credentials
+    teams                teams                  @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt   
+    created_at           DateTime               @default(now())
+    updated_at           DateTime               @updatedAt   
 }
 
 model access_credentials {
-    access_credentials_id String @id @default(uuid())
-    user_name String
-    email String @unique
-    password String
+    access_credentials_id   String              @id @default(uuid())
+    user_name               String
+    email                   String              @unique
+    password                String
 
     // Relations section
-    users users?
-    refresh_token refresh_token[]
+    users                users?
+    refresh_token        refresh_token[]
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at           DateTime               @default(now())
+    updated_at           DateTime               @updatedAt
 }
 
 model refresh_token {
-    id String @id @unique @default(uuid())
-    hashed_token String
-    access_credentials_id String
+    id                      String              @id @unique @default(uuid())
+    hashed_token            String
+    access_credentials_id   String
 
     // Relations section
-    access_credentials access_credentials @relation(fields: [access_credentials_id], references: [access_credentials_id], onDelete: Cascade)
+    access_credentials   access_credentials     @relation(fields: [access_credentials_id], references: [access_credentials_id], onDelete: Cascade)
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at           DateTime               @default(now())
+    updated_at           DateTime               @updatedAt
 }
 
 // Insert a default data named '-'
 model units {
-    unit_id String @id @default(uuid())
-    units_name String @unique
-    users users[] // 1 to many relation with users
-    unit_leader unit_leader? // 1 to 1 relation with unit_leader
+    unit_id         String                  @id @default(uuid())
+    units_name      String                  @unique
+    users           users[]                 // 1 to many relation with users
+    unit_leader     unit_leader?            // 1 to 1 relation with unit_leader
 
-    // Relation section
     product_overview product_overview[]
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt   
+    created_at           DateTime           @default(now())
+    updated_at           DateTime           @updatedAt   
 }
 
 model teams {
-    team_id String @id @default(uuid())
-    team_name String @unique
+    team_id     String                      @id @default(uuid())
+    team_name   String                      @unique
 
     // Relations section
-    users users[]                       //   1 to many relation with users
+    users       users[]                     //   1 to many relation with users
 
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    created_at           DateTime           @default(now())
+    updated_at           DateTime           @updatedAt
 }
 
 // Add new entity named unit_leader
 model unit_leader {
-    leader_id String @id @default(uuid())
-    user_id String @unique //  Foreign key of user
-    unit_id String @unique // Foreign key of unit
+    leader_id  String                       @id @default(uuid())
+    user_id    String                       @unique //  Foreign key of user
+    units_name String                       @unique // Foreign key of unit
 
     // Relations section
-    users users @relation(fields: [user_id], references: [user_id])
-    units units @relation(fields: [unit_id], references: [unit_id])
+    users      users                        @relation(fields: [user_id], references: [user_id])
+    units      units                        @relation(fields: [units_name], references: [units_name])
 
-    created_at  DateTime @default(now())
-    updated_at  DateTime @updatedAt
+    created_at           DateTime           @default(now())
+    updated_at           DateTime           @updatedAt
 }
 
 model levels {
-    level_id String @id @default(uuid())
-    level_name String @unique
+    level_id    String                      @id @default(uuid())
+    level_name  String                      @unique
 
     // Relations section
     users users[]
