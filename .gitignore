@@ -4,3 +4,9 @@
 /src/models/migrations
 /prisma
 /src/resources
+/nbproject
+*.swp
+/docs
+/.vs
+/.vscode
+.project

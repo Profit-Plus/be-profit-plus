@@ -23,9 +23,15 @@ const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
 
 // Porto Route
 const authRouter = require('./routes/authentication/auth.routes');
-const stepOneRouter = require('./routes/productGuide/stepOne.routes');
-const stepTwoRouter = require('./routes/productGuide/stepOne.routes');
-const stepThreeRouter = require('./routes/productGuide/stepTwo.routes');
+const productGuideProductTemplate = require('./routes/productGuideEditor/editor/templates.routes');
+const productGuideMiscRouter = require('./routes/productGuideEditor/editor/misc/misc.routes');
+const productGuidestepOneRouter = require('./routes/productGuideEditor/editor/step1/step1.routes');
+const productGuideStepTwoRouter = require('./routes/productGuideEditor/editor/step2/step2.routes');
+const productGuideStepThreeRouter = require('./routes/productGuideEditor/editor/step3/step3.routes');
+const productGuidestepFourRouter = require('./routes/productGuideEditor/editor/step4/step4.routes');
+const productGuidestepFiveRouter = require('./routes/productGuideEditor/editor/step5/step5.routes');
+const productGuideStepSixRouter = require('./routes/productGuideEditor/editor/step6/step6.routes');
+const newSolutionRouter = require('./routes/solutionFormulation/newSolution.routes');
 
 /* Necessary variables */
 const PORT = process.env.PORT || 3001;
@@ -37,26 +43,20 @@ main.use(bodyParser.urlencoded({
     extended: false
 }));
 
-// GTOM Use route
-main.use(picRouter);
-main.use(customerRouter);
-main.use(documentRouter);
-main.use(projectRouter);
-main.use(commentRouter);
-main.use(notificationRouter);
-main.use(dashboardRouter);
+main.use('/profitplus/api', authRouter);
 
-// Tarif Use route
-main.use('/tariff/search', searchRoute);
-main.use('/tariff/sheet', sheetRoute);
-main.use('/tariff/masterPackage', masterPackageRoute);
-main.use('/tariff/offering', offeringRoute);
+/* Product Management routes */
+main.use('/profitplus/api', productGuideMiscRouter);
+main.use('/profitplus/api', productGuideProductTemplate);
+main.use('/profitplus/api', productGuidestepOneRouter);
+main.use('/profitplus/api', productGuideStepTwoRouter)
+main.use('/profitplus/api', productGuideStepThreeRouter);
+main.use('/profitplus/api', productGuidestepFourRouter);
+main.use('/profitplus/api', productGuidestepFiveRouter);
+main.use('/profitplus/api', productGuideStepSixRouter);
 
-// Porto Use route
-main.use(authRouter);
-main.use(stepOneRouter);
-main.use(stepThreeRouter);
-main.use(stepTwoRouter);
+/* Solution formulation */
+main.use('/profitplus/api', newSolutionRouter);
 
 main.listen(PORT, () => {
     console.log('Server is running! port: ' + PORT);

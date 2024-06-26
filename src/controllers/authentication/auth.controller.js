@@ -101,7 +101,7 @@ async function userLogin(req, res, next) {
         res.status(200).json(response.successResponse('Log in success!', { 
             accessToken, 
             refreshToken,
-            userProperties
+            userProperties 
         }));
 
     } catch (error) {
