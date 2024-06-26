@@ -12,6 +12,22 @@ async function getProducts(req, res, next) {
         if (!product.length) {
             /* Get all products from database */
             const products = await productListService.getAllProduct();
+
+            await Promise.all(products.map(async (product) => {
+                if (product.product_logo_dir !== 'undefined') {
+                    const extractedProductLogo = product.product_logo_dir.split('.')[1];
+                    product.product_logo_dir = 'http://localhost:3001/product/logo/' + product.product_name + '.' + extractedProductLogo;
+                }
+                if (product.product_playbook_dir !== 'undefined') {
+                    const extractedProductPlaybook = product.product_playbook_dir.split('.')[1];
+                    product.product_playbook_dir = 'http://localhost:3001/product/playbook/' + product.product_name + '.' + extractedProductPlaybook;
+                }
+                if (product.product_marketing_collateral_dir !== 'undefined') {
+                    const extractedProductMarketing = product.product_marketing_collateral_dir.split('.')[1];
+                    product.product_marketing_collateral_dir = 'http://localhost:3001/product/marketcoll/' + product.product_name + '.' + extractedProductMarketing;
+                }
+            }));
+            
             res.status(200).json(response.successResponse('Fetching all products', products));
         } else {
             /* Get product details by UUID  */
