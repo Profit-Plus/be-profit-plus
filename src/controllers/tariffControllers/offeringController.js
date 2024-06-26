@@ -68,9 +68,23 @@ async function updateStatusOffering (req, res){
     }
 }
 
+async function deleteOffering (req, res){
+    const { query_offer_id } = req.body;
+    console.log(query_offer_id)
+
+    try{
+        const deletedData = await offeringService.deleteOffering(parseInt(query_offer_id));
+        res.json(webResponses.successResponse('Data updated successfully', deletedData));
+    } catch (error){
+        console.error(error);
+        res.status(500).json(webResponses.errorResponse('Failed to update data'));
+    }
+}
+
 module.exports = {
     createOffering,
     getOffering,
     updateOffering,
-    updateStatusOffering
+    updateStatusOffering,
+    deleteOffering
 };

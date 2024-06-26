@@ -1,11 +1,11 @@
+// Database configuration properties
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["omitApi"]
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+    provider = "mysql"
+    url      = env("DATABASE_URL")
 }
 
 //  Authentication Schema
@@ -971,6 +971,13 @@ model type {
     totals     total[]
     sheet      sheet?       @relation(fields: [sheet_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     sheet_id   Int?
+    id   String    @id @default(uuid())
+    type type_enum
+
+    categories categories[]
+    totals     total[]
+    sheet      sheet?       @relation(fields: [sheet_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheet_id   Int?
 }
 
 model categories {
@@ -1050,6 +1057,7 @@ model data_package {
     information String?
 
     @@id([data_id, package_id])
+    @@id([data_id, package_id])
 }
 
 // Total cost for each type (capex/opex/cogs) in a package
@@ -1059,7 +1067,13 @@ model total {
     type       type     @relation(fields: [type_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
     type_id    String
     total      Float
+    package    packages @relation(fields: [package_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    package_id Int
+    type       type     @relation(fields: [type_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    type_id    String
+    total      Float
 
+    @@id([package_id, type_id])
     @@id([package_id, type_id])
 }
 
@@ -1116,6 +1130,8 @@ enum comment_type {
 enum category_enum {
     MAIN_FEATURES
     ADD_ON
+    MAIN_FEATURES
+    ADD_ON
 }
 
 enum type_enum {
@@ -1142,6 +1158,32 @@ enum business_model_enum {
 }
 
 enum unit_target_enum {
+    User
+    Unit
+    Project
+}
+
+enum tariff_status_enum {
+    Accepted
+    Rejected
+    NeedApproval
+    None
+}
+
+enum offering_unit_enum {
+    Unit
+    Package
+}
+
+enum bussines_model_enum {
+    Subscription
+    OTC
+    Licensing
+    Freemium
+    Pay_per_Use
+}
+
+enum satuan_target_enum {
     User
     Unit
     Project

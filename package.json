@@ -2,9 +2,9 @@
   "name": "profit-plus",
   "version": "1.0.0",
   "description": "Before getting started, make sure you have the following prerequisites:",
-  "main": "index.js",
+  "main": "/src/Main.js",
   "scripts": {
-    "start": "node --watch ./src/Main.js",
+    "start": "node --watch src/Main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

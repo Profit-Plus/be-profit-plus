@@ -20,6 +20,7 @@ const searchRoute = require('./routes/tariffRoutes/searchRoute');
 const sheetRoute = require('./routes/tariffRoutes/sheetRoute');
 const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
 const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
+const costStructureRoute = require('./routes/tariffRoutes/costStructureRoute')
 const productRoute = require('./routes/tariffRoutes/productRoute');
 const dashboard = require('./routes/tariffRoutes/dashboardSSORoute');
 const solution = require('./routes/tariffRoutes/solutionTariffRoute');
@@ -42,7 +43,7 @@ const newSolutionRouter = require('./routes/solutionFormulation/newSolution.rout
 const path = require('path');
 
 /* Necessary variables */
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 const main = express();
 
 main.use(cors());
@@ -66,8 +67,9 @@ main.use('/profitplus/api', dashboardRouter);
 // Tarif Use route
 main.use('/tariff/search', searchRoute);
 main.use('/tariff/sheet', sheetRoute);
-main.use('/tariff/masterPackage', masterPackageRoute);
+main.use('/tariff/master-package', masterPackageRoute);
 main.use('/tariff/offering', offeringRoute);
+main.use('/tariff/cost-structure', costStructureRoute);
 main.use('/tariff/product', productRoute);
 main.use('/tariff/dashboard', dashboard);
 main.use('/tariff/solution', solution);
