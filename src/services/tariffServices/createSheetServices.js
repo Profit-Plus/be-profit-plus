@@ -8,7 +8,6 @@ async function createSheet(data) {
             name: data.name,
             product_sheet: {
                 create: {
-                    nomor: Date.now(),
                     taxonomy: {
                         connect: { id: data.taxonomy }
                     }
@@ -35,6 +34,44 @@ async function createSheet(data) {
     return newSheet;
 }
 
+// async function getAllSheets() {
+//     const sheets = await prisma.sheet.findMany({
+//         include: {
+//             product_sheet: true
+//         }
+//     });
+
+//     const sheetIds = sheets.map(sheet => sheet.id);
+
+//     const types = await prisma.type.findMany({
+//         where: {
+//             sheet_id: {
+//                 in: sheetIds
+//             }
+//         }
+//     });
+
+//     // Menggabungkan tipe dengan sheets
+//     const sheetsWithTypes = sheets.map(sheet => {
+//         return {
+//             ...sheet,
+//             types: types.filter(type => type.sheet_id === sheet.id)
+//         };
+//     });
+
+//     return sheetsWithTypes;
+// }
+
+async function getAllSheets() {
+    const sheets = await prisma.sheet.findMany({
+        include: {
+            product_sheet: true,
+        }
+    });
+    return sheets;
+}
+
 module.exports = {
-    createSheet
+    createSheet,
+    getAllSheets
 };

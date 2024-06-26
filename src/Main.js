@@ -4,6 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+
 // GTOM Route
 const picRouter = require('./routes/projectMonitoring/picRoute');
 const customerRouter = require('./routes/projectMonitoring/customerRoute');
@@ -21,6 +22,9 @@ const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
 const productRoute = require('./routes/tariffRoutes/productRoute');
 const dashboard = require('./routes/tariffRoutes/dashboardSSORoute');
 const solution = require('./routes/tariffRoutes/solutionTariffRoute');
+const createSheet = require('./routes/tariffRoutes/createSheetRoute');
+const masterDataRoute = require('./routes/tariffRoutes/componentRoutes');
+const CostCalculation = require('./routes/tariffRoutes/calculationRoute');
 
 
 // Porto Route
@@ -57,6 +61,9 @@ main.use('/tariff/offering', offeringRoute);
 main.use('/tariff/product', productRoute);
 main.use('/tariff/dashboard', dashboard);
 main.use('/tariff/solution', solution);
+main.use('/tariff/createSheet', createSheet);
+main.use('/tariff/component', masterDataRoute);
+main.use('/tariff/calculation', CostCalculation)
 
 // Porto Use route
 main.use(authRouter);
