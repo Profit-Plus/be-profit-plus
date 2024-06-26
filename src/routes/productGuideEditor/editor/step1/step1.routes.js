@@ -7,6 +7,6 @@ productGuidestepOneRouter.put('/product/update-product-overview', stepOneControl
 productGuidestepOneRouter.post('/product/add-services', stepOneController.addServices);
 productGuidestepOneRouter.post('/product/add-main-use', stepOneController.addMainUse);
 productGuidestepOneRouter.get('/product/get-detail', stepOneController.getDetail);
-productGuidestepOneRouter.post('/product/add-gallery', stepOneController.addGallery);
+productGuidestepOneRouter.post('/product/add-gallery', stepOneController.setGallery);
 
 module.exports = productGuidestepOneRouter;

@@ -30,6 +30,14 @@ function addOpGtomHost(operatingModelId, data) {
     });
 }
 
+function getOpGtomHost(operatingModelId) {
+    return database.product_op_gtm_host.findFirst({
+        where: {
+            product_operating_model_uuid: operatingModelId
+        }
+    });
+}
+
 /**
  *  @function addOpSupplier to add suppliers in product's operating model 
  */
@@ -139,6 +147,7 @@ function addManagementSystems(id, operatingModelId, managementSystem) {
 module.exports = {
     updateOperatingModeLocation,
     addOpGtomHost,
+    getOpGtomHost,
     addOpSupplier,
     addOpBusinessProcessHeader,
     addOpBusinessProcessNode,

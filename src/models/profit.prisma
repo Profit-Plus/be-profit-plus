@@ -366,6 +366,7 @@ model product_overview {
     taxonomy_uuid String @default("undefined")   
     product_profile_link String @default("undefined")   
     product_website_link String @default("undefined")   
+    product_logo_dir String @default("undefined")
     product_evidence_product_dir String @default("undefined")   
     product_evidence_tariff_dir String @default("undefined")
     product_marketing_collateral_dir String @default("undefined")   

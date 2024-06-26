@@ -82,10 +82,6 @@ async function updateProductOverviewDetail(req, res, next) {
                                 docFile = files.marketcoll[0];
                                 allowedExtension = ['pdf']
                                 break;
-                                
-                            case 'gallery':
-                                console.log('gallery')
-                                break;
                             default:
                                 throw error;
                         }
@@ -287,7 +283,7 @@ async function addServices(req, res, next) {
 /**
  *  @function addGallery to add gallery of pictures of product 
  */
-async function addGallery(req, res, next) {
+async function setGallery(req, res, next) {
     try {
         /* Initialize the instance of formidable and make allow multiple uploading */
         const form = new formidable.IncomingForm();
@@ -418,6 +414,6 @@ module.exports = {
     addServices,
     addMainUse,
     getMainUse,
-    addGallery,
+    setGallery,
     getDetail
 }

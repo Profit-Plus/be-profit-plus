@@ -49,7 +49,7 @@ async function addProductReadinesStatus(req, res, next) {
 async function getProductReadinessStatus(req, res, next) {
     try {
         /* Initialize query param */
-        const product = String(req.query.product).toLowerCase();
+        const product = String(req.query.product)
 
         /* Get the product Id by its name */
         const productId = (await miscService.getProductIdByName(product)).product_uuid;

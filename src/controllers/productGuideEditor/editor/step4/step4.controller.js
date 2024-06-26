@@ -88,6 +88,21 @@ async function addProductUseCase(req, res, next) {
     }
 }
 
+async function getProductUseCase(req, res, next) {
+    try {
+        const productName = String(req.query.product);
+        const productId = (await miscService.getProductIdByName(productName)).product_uuid;
+
+        const useCases = await stepFourService.getUseCasesByProductId(productId);
+
+        res.status(200).json(response.successResponse('Use cases fetched', useCases));
+    } catch (error) {
+        res.status(500).json(response.errorResponse('Internal Server error'));
+        next(error);
+    }
+}
+
 module.exports = {
-    addProductUseCase
+    addProductUseCase,
+    getProductUseCase
 };

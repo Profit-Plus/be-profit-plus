@@ -94,6 +94,10 @@ async function addOperatingModelGtmHost(req, res, next) {
         const hostName = String(req.query.host).toUpperCase();
 
         /* Generate the ID and get the operating model UUID based on product name query param */
+        if (!productName) {
+            res.status(422).json(response.errorResponse('Product name is required'));
+            next();
+        }
         const operatingModelId = (await miscService.getProductOperatingModelIdByProductName(productName)).product_operating_model.product_operating_model_uuid;
         const gtmHostId = uuidv4();
 
@@ -170,9 +174,13 @@ async function addOperatingModelGtmHost(req, res, next) {
 async function getOperatingModelGtmHost(req, res, next) {
     try {
         const productName = String(req.query.product);
-        const operatingModelId = (await miscService.getProductOperatingModelIdByProductName(productName)).product_operating_model.product_operating_model_uuid;
+        if (!productName) {
+            res.status(422).json(response.errorResponse('Product name is required'));
+            next();
+        }
+        const operatingModelId = (await miscService.getProductOperatingModelIdByProductName(productName)).product_operating_model.product_operating_model_uuid
 
-        const gtmHosts = await stepThreeService.getOpGtmHost(operatingModelId);
+        const gtmHosts = await stepThreeService.getOpGtomHost(operatingModelId);
 
         res.status(200).json(response.successResponse('Operating model GTM Host details successfully retrieved', gtmHosts));
 
