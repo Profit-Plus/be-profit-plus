@@ -28,7 +28,7 @@ model sso {
     time_end                          String?
     createdAt                         DateTime            @default(now())
     updatedAt                         DateTime            @updatedAt
-    business_model                    bussines_model_enum @default(Subscription)
+    business_model                    business_model_enum @default(Subscription)
     year                              Int                 @default(2024)
     status                            String              @default("Draft")
     status_hold                       Boolean             @default(false)
@@ -103,7 +103,7 @@ model product_sheet {
     owner            unit         @relation("owner", fields: [owner_id], references: [id])
     owner_id         Int          @default(1)
     owner_status     Boolean      @default(false)
-    drafer           user         @relation("drafter", fields: [drafter_id], references: [id])
+    drafter          user         @relation("drafter", fields: [drafter_id], references: [id])
     drafter_id       Int          @default(1)
     drafter_status   Boolean      @default(false)
     reviewer         user         @relation("reviewer", fields: [reviewer_id], references: [id])
@@ -166,10 +166,10 @@ model sub_taxonomy {
 model packages {
     id               Int                 @id @default(autoincrement())
     name             String
-    category         category_enum // Main feature/Add on
-    bussines_model   bussines_model_enum @default(Subscription)
+    category         category_enum
+    business_model   business_model_enum @default(Subscription)
     target_sales     Int                 @default(10)
-    satuan_target    satuan_target_enum  @default(User)
+    unit_target      unit_target_enum    @default(User)
     payback_period   Int                 @default(1)
     operational_time Int                 @default(12)
     excess_capacity  Int                 @default(0)
@@ -177,15 +177,15 @@ model packages {
     opex             Float               @default(0)
     cogs             Float               @default(0)
     tariff           Float               @default(0)
-    create_at        DateTime            @default(now())
-    update_at        DateTime            @updatedAt
-    delete_at        DateTime?
+    createdAt        DateTime            @default(now())
+    updatedAt        DateTime            @updatedAt
+    deletedAt        DateTime?
 
-    offering_packages offering_package[]
-    totals            total[]
-    data_package      data_package[]
-    sheet             sheet?             @relation(fields: [sheet_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    sheet_id          Int?
+    offering_package offering_package[]
+    totals           total[]
+    data_package     data_package[]
+    sheet            sheet?             @relation(fields: [sheet_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    sheet_id         Int?
 }
 
 model offering {
@@ -200,12 +200,11 @@ model offering {
 }
 
 model offering_package {
-    package     packages @relation(fields: [package_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    package_id  Int
-    offering    offering @relation(fields: [offering_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    offering_id Int
-    package_status Boolean @default(false)
-
+    package        packages @relation(fields: [package_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    package_id     Int
+    offering       offering @relation(fields: [offering_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    offering_id    Int
+    package_status Boolean  @default(false)
 
     @@id([package_id, offering_id])
 }
@@ -237,13 +236,42 @@ model data {
     code          String?
     grade         String?
     average_price Float?
-    create_at     DateTime  @default(now())
-    update_at     DateTime  @updatedAt
-    delete_at     DateTime?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+    deletedAt     DateTime?
 
-    components    components[]
-    data_package  data_package[]
-    category_data category_data[]
+    components     components[]
+    data_package   data_package[]
+    category_data  category_data[]
+    data_component data_component[]
+}
+
+model component {
+    id             Int       @id @default(autoincrement())
+    name           String
+    code           String?
+    item           String?
+    unit           Int?
+    specs          String?
+    price_per_unit Float?
+    quantity       Int?
+    note           String?
+    createdAt      DateTime  @default(now())
+    updatedAt      DateTime  @updatedAt
+    deletedAt      DateTime?
+
+    data_relation data_component[]
+}
+
+model data_component {
+    data_id      Int
+    component_id Int
+    createdAt    DateTime @default(now())
+
+    data      data      @relation(fields: [data_id], references: [id])
+    component component @relation(fields: [component_id], references: [id])
+
+    @@id([data_id, component_id])
 }
 
 model category_data {
@@ -319,7 +347,7 @@ enum offering_unit_enum {
     Package
 }
 
-enum bussines_model_enum {
+enum business_model_enum {
     Subscription
     OTC
     Licensing
@@ -327,7 +355,7 @@ enum bussines_model_enum {
     Pay_per_Use
 }
 
-enum satuan_target_enum {
+enum unit_target_enum {
     User
     Unit
     Project

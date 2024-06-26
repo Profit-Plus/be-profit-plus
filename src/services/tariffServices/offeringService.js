@@ -34,7 +34,7 @@ async function getOffering(query_sheet_id) {
     const offering = await database.offering.findMany({
             select:{
                 id:true,
-                sheets_id:true,
+                sheet_id:true,
                 offer_name:true,
                 unit:true,
                 user_target:true,
@@ -60,7 +60,7 @@ async function getOffering(query_sheet_id) {
                 },
             },
             where: {
-                sheets_id: query_sheet_id
+                sheet_id: query_sheet_id
             },
     });
 

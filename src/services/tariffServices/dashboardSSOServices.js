@@ -249,5 +249,5 @@ module.exports = {
     getUnit,
     getUser,
     createSso,
-    updateSso
+    updateSso,
 };

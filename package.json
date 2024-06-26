@@ -31,13 +31,13 @@
     "express": "^4.19.2",
     "formidable": "^3.5.1",
     "fs": "^0.0.1-security",
-    "jsonwebtoken": "^9.0.2",    
+    "jsonwebtoken": "^9.0.2",
     "mv": "^2.1.1",
     "mysql": "^2.18.1",
     "uuid": "^9.0.1"
   },
   "prisma": {
-    "schema": "src/models/profit.prisma"
+    "schema": "src/models/master_calculator.prisma"
   },
   "devDependencies": {
     "@prisma/client": "^5.13.0",

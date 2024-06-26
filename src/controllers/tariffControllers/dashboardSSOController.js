@@ -6,6 +6,9 @@ const webResponses = require('../../helpers/web/webResponses');
 async function getSso(req, res) {
     try {
         const sso = await dashboardSSOService.getSso();
+        if (!sso) {
+            return res.status(404).json(webResponses.errorResponse('Sso not found'));
+        }
         res.json(webResponses.successResponse('Sso fetched successfully', sso));
     } catch (error) {
         console.error(error);
@@ -48,6 +51,9 @@ async function createSso(req, res) {
     console.log("product_id: " + product_id);
     try {
         const createdSso = await dashboardSSOService.createSso(product_id);
+        if (!createdSso) {
+            return res.status(404).json(webResponses.errorResponse('Sso not found'));
+        }
         res.json(webResponses.successResponse('Sso created successfully', createdSso));
     } catch (error) {
         console.error(error);
@@ -137,6 +143,6 @@ module.exports = {
     getUnit,
     getUser,
     createSso,
-    updateSso
+    updateSso,
 };
 // Path: src/controllers/tariffControllers/masterPackageController.js
