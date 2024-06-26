@@ -46,34 +46,15 @@ main.use('/profitplus/api', productListRouter);
 /* Solution formulation */
 main.use('/profitplus/api', newSolutionRouter);
 
-main.get('/product-logo/:filename', (req, res) => {
+main.get('/product/:directory/:filename', (req, res) => {
     const fileName = req.params.filename;
+    const dirParam = req.params.directory;
     const dirName = __dirname.split(path.sep).pop();
-    // removing __dirname's src
     const convertedDir = __dirname.split(path.sep).slice(0, -1).join(path.sep);
-    const imagePath = path.join(convertedDir, 'resources', 'uploads', 'logo', fileName);
-    console.log(imagePath);
-    // Check if the file exists
-    if (fs.existsSync(imagePath)) {
-      // Send the file to the client
-      res.sendFile(imagePath);
-    } else {
-      // File not found
-      res.status(404).send('Image not found');
-    }
-});
-
-main.get('/product-marketcollateral/:filename', (req, res) => {
-    const fileName = req.params.filename;
-    const dirName = __dirname.split(path.sep).pop();
-    // removing __dirname's src
-    const convertedDir = __dirname.split(path.sep).slice(0, -1).join(path.sep);
-    const pdfPath = path.join(convertedDir, 'resources', 'uploads', 'marketcoll', fileName);
-    console.log(pdfPath);
-    // Check if the file exists
-    if (fs.existsSync(pdfPath)) {
-      // Send the file to the client
-      res.sendFile(pdfPath);
+    const filePath = path.join(convertedDir, 'resources', 'uploads', dirParam, fileName);
+    console.log(filePath);
+    if (fs.existsSync(filePath)) {
+      res.sendFile(filePath);
     } else {
       // File not found
       res.status(404).send('Image not found');

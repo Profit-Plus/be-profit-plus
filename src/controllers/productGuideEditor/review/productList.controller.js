@@ -20,6 +20,8 @@ async function getProducts(req, res, next) {
                 res.status(404).json(response.errorResponse('Product not found'));
                 return;
             }
+            const extractedProductLogo = productDetails.product_logo_dir.split('.')[1];
+            productDetails.product_logo_dir = 'http://localhost:3001/product/logo/' + productDetails.product_name + '.' + extractedProductLogo;
             res.status(200).json(response.successResponse('Fetching all products', productDetails));
         }
         
