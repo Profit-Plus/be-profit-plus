@@ -1,15 +1,15 @@
 /* Service layer for token authentication */
-const { database } = require('../../helpers/utils/db/database');
-const { hashToken } = require('../../helpers/utils/authentication/hashtoken');
+const { database } = require('../../helpers/configuration/db');
+const { tokenHasher } = require('../../helpers/token/tokenHasher');
 
 /* This method will called when whe create a new refresh token */
-function addRefreshTokenToWhiteList( {jti, refreshToken, loginCredentialsId} ) {
+function addRefreshTokenToWhiteList( {jti, refreshToken, accessCredentialsId} ) {
     return database.refresh_token.create({
         data: {
             id: jti,
-            hashed_token: hashToken(refreshToken),
-            login_credentials: {
-                connect: { login_credentials_id: loginCredentialsId}
+            hashed_token: tokenHasher(refreshToken),
+            access_credentials: {
+                connect: { access_credentials_id: accessCredentialsId}
             }
         }
     });
@@ -26,14 +26,11 @@ function findRefreshTokenById(id) {
 
 /* Delete token after usage */
 function deleteRefreshToken(id) {
-    return database.refresh_token.update({
+    return database.refresh_token.delete({
         where: {
-            id
-        },
-        data: {
-            revoked: true
+            id: id
         }
-    });
+    })
 }
 
 function revokeTokens(userId) {

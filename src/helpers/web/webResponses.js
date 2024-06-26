@@ -15,6 +15,13 @@ function TResponseMetaPage(success, message, page, limit, total) {
   };
 }
 
+function TResponseMetaPageCustom(success, message, pageMeta) {
+  return {
+    ...TResponseMeta(success, message),
+    ...pageMeta
+  };
+}
+
 function TSuccessResponse(meta, results) {
   return {
     meta,
@@ -51,6 +58,13 @@ function successResponsePage(message, page, limit, total, data) {
   );
 }
 
+function successResponsePageCustom(message, meta, data) {
+  return TSuccessResponsePage(
+    TResponseMetaPageCustom(true, message, meta),
+    data
+  );
+}
+
 function errorResponse(message) {
   return TErrorResponse(TResponseMeta(false, message));
 }
@@ -58,5 +72,6 @@ function errorResponse(message) {
 module.exports = {
     successResponse,
     successResponsePage,
+    successResponsePageCustom,
     errorResponse
 }

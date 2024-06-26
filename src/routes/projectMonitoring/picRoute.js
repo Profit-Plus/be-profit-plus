@@ -1,7 +1,7 @@
 const express = require('express');
 const picRouter = express.Router();
 const picController = require('../../controllers/projectMonitoring/picController');
-const { authenticationMiddleware } = require('../../middlewares/authMiddlewares/authMiddleware');
+const authenticationMiddleware = require('../../middlewares/authentication/auth.middleware');
 
 // Use Auth Middleware
 picRouter.use('/pics', authenticationMiddleware.authenticateUser);

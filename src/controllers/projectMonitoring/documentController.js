@@ -1,4 +1,3 @@
-const { Prisma } = require('@prisma/client');
 const documentService = require('../../services/projectMonitoring/documentService');
 const webResponses = require('../../helpers/web/webResponses');
 const documentValidator = require('../../validators/Document.validator');
@@ -15,7 +14,7 @@ async function createDocument(req, res) {
 
         form.parse(req, async function (error, fields, files) {
             const allowedExts = ['pdf', 'docx'];
-            const allowedDocTypes = ['nde', 'mom', 'requirement', 'baa', 'bast', 'report', 'nps'];
+            const allowedDocTypes = ['nde', 'mom', 'requirement', 'baa', 'bast', 'report', 'nps', 'sph', 'spk', 'kfs'];
             let docType;
             let uploadedDoc;
             let fileExt;
@@ -48,7 +47,7 @@ async function createDocument(req, res) {
             const id = uuidv4();
             const newDocName = `${docType.toUpperCase()}_${id}.${fileExt}`;
 
-            const uploadDir = path.join('src\\uploads', 'documents', docType.toUpperCase());
+            const uploadDir = path.join('src\\resources', 'documents', docType.toUpperCase());
             filestream.mkdirSync(uploadDir, { recursive: true });
 
             const oldPath = uploadedDoc.filepath;
@@ -66,7 +65,7 @@ async function createDocument(req, res) {
                     mime_type: uploadedDoc.mimetype,
                     location: newPath,
                     document_type: docType.toLowerCase()
-                }
+                };
 
                 const document = await documentService.createDocument(docData);
 
@@ -91,7 +90,7 @@ async function getAllDocuments(req, res) {
             order: req.query.order ?? 'desc',
             start_date: req.query.start_date,
             end_date: req.query.end_date
-        }
+        };
 
         if (!params.page || params.page < 1) params.page = 1;
         if (!params.limit || params.limit < 1) params.limit = 10;
@@ -150,7 +149,7 @@ async function updateDocument(req, res) {
 
         form.parse(req, async function (error, fields, files) {
             const allowedExts = ['pdf', 'docx'];
-            const allowedDocTypes = ['nde', 'mom', 'requirement', 'baa', 'bast', 'report', 'nps'];
+            const allowedDocTypes = ['nde', 'mom', 'requirement', 'baa', 'bast', 'report', 'nps', 'sph', 'spk', 'kfs'];
             let uploadedDoc;
             let fileExt;
             let docType;
@@ -185,10 +184,10 @@ async function updateDocument(req, res) {
                 let docName = document.document_name;
                 let uploadDir = document.location.split('\\');
                 uploadDir.pop();
-                uploadDir = uploadDir.toString().replaceAll(',', '\\');                
+                uploadDir = uploadDir.toString().replaceAll(',', '\\');
 
                 if (docType && docType != document.document_type) {
-                    uploadDir = path.join('src\\uploads', 'documents', docType.toUpperCase());
+                    uploadDir = path.join('src\\resources', 'documents', docType.toUpperCase());
                     docName = `${docType.toUpperCase()}_${document.id}.${fileExt}`;
                 }
 
@@ -215,7 +214,7 @@ async function updateDocument(req, res) {
                         mime_type: uploadedDoc.mimetype,
                         location: newPath,
                         document_type: docType.toLowerCase()
-                    }
+                    };
 
                     const updatedDoc = await documentService.updateDocument(documentId, docData);
 
@@ -238,19 +237,24 @@ async function deleteDocument(req, res) {
         const document = await documentService.findDocument(documentId);
 
         if (document) {
-            filestream.stat(document.location, function (err) {
-                if (err) {
-                    throw new Error("File not found!");
-                }
+            const deletedDocument = await documentService.deleteDocument(documentId);
 
-                filestream.unlink(document.location, async function (err) {
-                    if (err) throw new Error("Delete file failed!");
+            res.status(200).json(webResponses.successResponse('Document deleted successfully!', deletedDocument));
 
-                    const deletedDocument = await documentService.deleteDocument(documentId);
+            // Delete the file
+            // filestream.stat(document.location, function (err) {
+            //     if (err) {
+            //         throw new Error("File not found!");
+            //     }
 
-                    res.status(200).json(webResponses.successResponse('Document deleted successfully!', deletedDocument));
-                });
-            });
+            //     filestream.unlink(document.location, async function (err) {
+            //         if (err) throw new Error("Delete file failed!");
+
+            //         const deletedDocument = await documentService.deleteDocument(documentId);
+
+            //         res.status(200).json(webResponses.successResponse('Document deleted successfully!', deletedDocument));
+            //     });
+            // });
         }
         else {
             res.status(404).json(webResponses.errorResponse('Document not found!'));
@@ -268,4 +272,4 @@ module.exports = {
     updateDocument,
     deleteDocument,
     downloadDocument
-};
+}
