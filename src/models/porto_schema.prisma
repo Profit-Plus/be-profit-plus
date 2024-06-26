@@ -221,6 +221,7 @@ model segmenting_targeting_penta_helix_properties {
     
     // Relation section
     product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
+    segmenting_targeting_legends_pos segmenting_targeting_legends_pos[]
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt    
@@ -233,6 +234,8 @@ model segmenting_targeting_feature_used {
 
     // Relation section
     product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
+    
+    segmenting_targeting_legends_pos segmenting_targeting_legends_pos[]
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt 
@@ -243,14 +246,29 @@ model segmenting_targeting_legends {
     segmenting_targeting_uuid String
     legend_name String
     legend_color_code String
-    legend_pos_x Int
-    legend_pos_y Int
 
     // Relation section
     product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
+    segmenting_targeting_legends_pos segmenting_targeting_legends_pos[]
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt 
+}
+
+model segmenting_targeting_legends_pos {
+    legends_pos_uuid String @id @default(uuid())
+    legends_uuid String
+    penta_helix_uuid String
+    feature_uuid String
+
+    // Relation section
+    segmenting_targeting_legends segmenting_targeting_legends @relation(fields: [legends_uuid], references: [legends_uuid])
+    segmenting_targeting_penta_helix_properties segmenting_targeting_penta_helix_properties @relation(fields: [penta_helix_uuid], references: [penta_helix_uuid])
+    segmenting_targeting_feature_used segmenting_targeting_feature_used @relation(fields: [feature_uuid], references: [feature_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+
 }
 
 model segmenting_targeting_market_potential {

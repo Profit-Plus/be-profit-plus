@@ -1,3 +1,4 @@
+const { add } = require('winston');
 const { database } = require('../../../../helpers/configuration/db');
 const { get } = require('../../../../routes/authentication/auth.routes');
 
@@ -10,9 +11,9 @@ function addSegmentingTargetingPentaHelixProperties(pentaHelixId, pentaHelix) {
             penta_helix_uuid: pentaHelixId
         },
         data: {
-            penta_helix_desc: pentaHelix.description,
-            penta_helix_user_desc: pentaHelix.userDescription,
-            penta_helix_status: pentaHelix.status
+            penta_helix_desc: pentaHelix.penta_helix_desc,
+            penta_helix_user_desc: pentaHelix.penta_helix_user_desc,
+            penta_helix_status: pentaHelix.penta_helix_status
         },
     });
 }
@@ -26,14 +27,15 @@ function getSegmentingTargetingPentaHelixProperties(segmentingTargetingId) {
 }
 
 function updateSegmentingTargetingPentaHelixProperties(pentaHelixId, pentaHelix) {
+    console.log(pentaHelixId, pentaHelix.penta_helix_desc, pentaHelix.penta_helix_user_desc, pentaHelix.penta_helix_status)
     return database.segmenting_targeting_penta_helix_properties.update({
         where: {
             penta_helix_uuid: pentaHelixId
         },
         data: {
-            penta_helix_desc: pentaHelix.description,
-            penta_helix_user_desc: pentaHelix.userDescription,
-            penta_helix_status: pentaHelix.status
+            penta_helix_desc: pentaHelix.penta_helix_desc,
+            penta_helix_user_desc: pentaHelix.penta_helix_user_desc,
+            penta_helix_status: pentaHelix.penta_helix_status
         }
     });
 }
@@ -46,7 +48,7 @@ function addSegmentingTargetingFeatureUsed(id, segmentingTargetingId, features) 
         data: {
             feature_uuid: id,
             segmenting_targeting_uuid: segmentingTargetingId,
-            feature_desc: features.description
+            feature_desc: features.feature_desc
         }
     });
 }
@@ -75,7 +77,7 @@ function updateSegmentingTargetingFeatureUsed(id, segmentingTargetingId, feature
             segmenting_targeting_uuid: segmentingTargetingId
         },
         data: {
-            feature_desc: features.description
+            feature_desc: features.feature_desc
         }
     });
 }
@@ -97,10 +99,8 @@ function addSegmentingTargetingLegends(id, segmentingTargetingId, legends) {
         data: {
             legends_uuid: id,
             segmenting_targeting_uuid: segmentingTargetingId,
-            legend_name: legends.name,
-            legend_color_code: legends.colorCode,
-            legend_pos_x: legends.posX,
-            legend_pos_y: legends.posY
+            legend_name: legends.legend_name,
+            legend_color_code: legends.legend_color_code,
         }
     });
 }
@@ -130,10 +130,8 @@ function updateSegmentingTargetingLegends(id, segmentingTargetingId, legends) {
             segmenting_targeting_uuid: segmentingTargetingId
         },
         data: {
-            legend_name: legends.name,
-            legend_color_code: legends.colorCode,
-            legend_pos_x: legends.posX,
-            legend_pos_y: legends.posY
+            legend_name: legends.legend_name,
+            legend_color_code: legends.legend_color_code,
         }
     });
 }
@@ -147,6 +145,57 @@ function deleteSegmentingTargetingLegends(id, segmentingTargetingId) {
     });
 }
 
+function addSegmentingTargetingLegendPos(id, legendsId, pentaHelixId, featureId) {
+    console.log(id, legendsId, pentaHelixId, featureId)
+    return database.segmenting_targeting_legends_pos.create({
+        data: {
+            legends_pos_uuid: id,
+            legends_uuid: legendsId,
+            penta_helix_uuid: pentaHelixId,
+            feature_uuid: featureId
+        }
+    });
+}
+
+function getSegmentingTargetingLegendPos(legendId) {
+    return database.segmenting_targeting_legends_pos.findMany({
+        where: {
+            legends_uuid: legendId
+        }
+    });
+}
+
+function getSegmentingTargetingLegendPosById(id, legendsId) {
+    return database.segmenting_targeting_legends_pos.findUnique({
+        where: {
+            legends_pos_uuid: id,
+            legends_uuid: legendsId
+        }
+    });
+}
+
+function updateSegmentingTargetingLegendPos(id, legendsId, pentaHelixId, featureId) {
+    return database.segmenting_targeting_legends_pos.update({
+        where: {
+            legends_pos_uuid: id,
+        },
+        data: {
+            legends_uuid: legendsId,
+            penta_helix_uuid: pentaHelixId,
+            feature_uuid: featureId
+        }
+    });
+}
+
+function deleteSegmentingTargetingLegendPos(id, legendsId) {
+    return database.segmenting_targeting_legends_pos.delete({
+        where: {
+            legend_pos_uuid: id,
+            legends_uuid: legendsId
+        }
+    });
+}
+
 /**
  *  @function addSegmentingTargetingMarketPotential to add a details of market potential in a segmenting-targeting of a product
  */
@@ -156,9 +205,9 @@ function addSegmentingTargetingMarketPotential(segmentingTargetingId, marketPote
             segmenting_targeting_uuid: segmentingTargetingId,
         },
         data: {
-            tam_desc: marketPotential.tam,
-            sam_desc: marketPotential.sam,
-            som_desc: marketPotential.som
+            tam_desc: marketPotential.tam_desc,
+            sam_desc: marketPotential.sam_desc,
+            som_desc: marketPotential.som_desc
         }
     });
 }
@@ -177,9 +226,9 @@ function updateSegmentingTargetingMarketPotential(segmentingTargetingId, marketP
             segmenting_targeting_uuid: segmentingTargetingId
         },
         data: {
-            tam_desc: marketPotential.tam,
-            sam_desc: marketPotential.sam,
-            som_desc: marketPotential.som
+            tam_desc: marketPotential.tam_desc,
+            sam_desc: marketPotential.sam_desc,
+            som_desc: marketPotential.som_desc
         }
     });
 }
@@ -193,10 +242,10 @@ function addPositioningIndicators(positioningId, indicators) {
             positioning_uuid: positioningId
         },
         data: {
-            indicator_one_name: indicators.indicatorOne,
-            indicator_two_name: indicators.indicatorTwo,
-            indicator_three_name: indicators.indicatorThree,
-            indicator_four_name: indicators.indicatorFour
+            indicator_one_name: indicators.indicator_one_name,
+            indicator_two_name: indicators.indicator_two_name,
+            indicator_three_name: indicators.indicator_three_name,
+            indicator_four_name: indicators.indicator_four_name
         }
     });
 }
@@ -215,10 +264,10 @@ function updatePositioningIndicators(positioningId, indicators) {
             positioning_uuid: positioningId
         },
         data: {
-            indicator_one_name: indicators.indicatorOne,
-            indicator_two_name: indicators.indicatorTwo,
-            indicator_three_name: indicators.indicatorThree,
-            indicator_four_name: indicators.indicatorFour
+            indicator_one_name: indicators.indicator_one_name,
+            indicator_two_name: indicators.indicator_two_name,
+            indicator_three_name: indicators.indicator_three_name,
+            indicator_four_name: indicators.indicator_four_name
         }
     });
 }
@@ -232,11 +281,11 @@ function addPositioningStory(positioningId, story) {
             positioning_uuid: positioningId
         },
         data: {
-            sentence_one_market_target: story.marketTarget,
-            sentence_two_use_case: story.useCase,
-            sentence_three_name_product: story.productName,
-            sentence_four_differentiation: story.differentiation,
-            sentence_five_reason: story.reason
+            sentence_one_market_target: story.sentence_one_market_target,
+            sentence_two_use_case: story.sentence_two_use_case,
+            sentence_three_name_product: story.sentence_three_name_product,
+            sentence_four_differentiation: story.sentence_four_differentiation,
+            sentence_five_reason: story.sentence_five_reason
         }
     });
 }
@@ -255,11 +304,11 @@ function updatePositioningStory(positioningId, story) {
             positioning_uuid: positioningId
         },
         data: {
-            sentence_one_market_target: story.marketTarget,
-            sentence_two_use_case: story.useCase,
-            sentence_three_name_product: story.productName,
-            sentence_four_differentiation: story.differentiation,
-            sentence_five_reason: story.reason
+            sentence_one_market_target: story.sentence_one_market_target,
+            sentence_two_use_case: story.sentence_two_use_case,
+            sentence_three_name_product: story.sentence_three_name_product,
+            sentence_four_differentiation: story.sentence_four_differentiation,
+            sentence_five_reason: story.sentence_five_reason
         }
     });
 }
@@ -272,11 +321,11 @@ function addPositioningPictures(id, positioningId, logoProperties) {
         data: {
             positioning_logos_uuid: id,
             positioning_uuid: positioningId,
-            logo_name: logoProperties.name,
-            logo_desc: logoProperties.description,
-            logo_dir: logoProperties.directory,
-            logo_pos_x: logoProperties.posX,
-            logo_pos_y: logoProperties.posY
+            logo_name: logoProperties.logo_name,
+            logo_desc: logoProperties.logo_desc,
+            logo_dir: logoProperties.logo_dir,
+            logo_pos_x: logoProperties.logo_pos_x,
+            logo_pos_y: logoProperties.logo_pos_y
         }
     });
 }
@@ -305,11 +354,11 @@ function updatePositioningPictures(id, positioningId, logoProperties) {
             positioning_uuid: positioningId
         },
         data: {
-            logo_name: logoProperties.name,
-            logo_desc: logoProperties.description,
-            logo_dir: logoProperties.directory,
-            logo_pos_x: logoProperties.posX,
-            logo_pos_y: logoProperties.posY
+            logo_name: logoProperties.logo_name,
+            logo_desc: logoProperties.logo_desc,
+            logo_dir: logoProperties.logo_dir,
+            logo_pos_x: logoProperties.logo_pos_x,
+            logo_pos_y: logoProperties.logo_pos_y
         }
     });
 }
@@ -332,8 +381,8 @@ function addDifferentiationBranding(productId, data) {
             product_uuid: productId
         },
         data: {
-            product_differentiation_desc: data.description,
-            product_differentiation_slogan: data.slogan
+            product_differentiation_desc: data.product_differentiation_desc,
+            product_differentiation_slogan: data.product_differentiation_slogan
         }
     });
 }
@@ -352,8 +401,8 @@ function updateDifferentiationBranding(productId, data) {
             product_uuid: productId
         },
         data: {
-            product_differentiation_desc: data.description,
-            product_differentiation_slogan: data.slogan
+            product_differentiation_desc: data.product_differentiation_desc,
+            product_differentiation_slogan: data.product_differentiation_slogan
         }
     });
 }
@@ -372,6 +421,11 @@ module.exports = {
     getSegmentingTargetingLegendsById,
     updateSegmentingTargetingLegends,
     deleteSegmentingTargetingLegends,
+    addSegmentingTargetingLegendPos,
+    getSegmentingTargetingLegendPos,
+    getSegmentingTargetingLegendPosById,
+    updateSegmentingTargetingLegendPos,
+    deleteSegmentingTargetingLegendPos,
     addSegmentingTargetingMarketPotential,
     getSegmentingTargetingMarketPotential,
     updateSegmentingTargetingMarketPotential,

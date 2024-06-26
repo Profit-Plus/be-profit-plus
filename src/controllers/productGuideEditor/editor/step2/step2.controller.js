@@ -13,10 +13,11 @@ const mv = require('mv');
  *  these controller represents the all datas in the segmenting-targeting graph 
  */
 async function segmentingTargetingController(req, res, next) {
+    console.log('Called here')
     try {
         /* Initialize request body and param */
         const productName = String(req.query.product);
-        const { pentaHelix, features, legends } = req.body;
+        const { pentaHelix, features, featurePoses: legendPoses, legends} = req.body;
         const marketPotential = req.body.marketPotential;
         
         /* Get the segmenting-targeting properties */
@@ -31,45 +32,81 @@ async function segmentingTargetingController(req, res, next) {
 
         const getFeatures = await stepTwoService.getSegmentingTargetingFeatureUsed(segmentingTargetingId);
 
-        await Promise.all(getFeatures.map(async (item) => {
-            if (!features.find(feature => feature.feature_desc === item.feature_desc)) {
-                await stepTwoService.deleteSegmentingTargetingFeatureUsed(item.segmenting_targeting_feature_uuid);
-            }
-        }));
-
-        await Promise.all(features.map(async (item) => {
-            if (!item.segmenting_targeting_feature_uuid) {
-                const id = uuidv4();
-                await stepTwoService.addSegmentingTargetingFeatureUsed(id, segmentingTargetingId, item);
-            } else {
-                const feature = await stepTwoService.getSegmentingTargetingFeatureUsedById(item.segmenting_targeting_feature_uuid, segmentingTargetingId);
-                if (!feature) {
+        if (features && features.length > 0) {
+            await Promise.all(getFeatures.map(async (item) => {
+                if (!features.find(feature => feature.feature_uuid === item.feature_uuid)) {
+                    await stepTwoService.deleteSegmentingTargetingFeatureUsed(item.feature_uuid, segmentingTargetingId);
+                    features.pop(item);
+                }
+            }));
+            await Promise.all(features.map(async (item) => {
+                if (!item.feature_uuid || item.feature_uuid === '') {
                     const id = uuidv4();
                     await stepTwoService.addSegmentingTargetingFeatureUsed(id, segmentingTargetingId, item);
                 } else {
-                    await stepTwoService.updateSegmentingTargetingFeatureUsed(item.segmenting_targeting_feature_uuid, item);
+                    const feature = await stepTwoService.getSegmentingTargetingFeatureUsedById(item.feature_uuid, segmentingTargetingId);
+                    if (!feature) {
+                        const id = uuidv4();
+                        await stepTwoService.addSegmentingTargetingFeatureUsed(id, segmentingTargetingId, item);
+                    } else {
+                        await stepTwoService.updateSegmentingTargetingFeatureUsed(item.feature_uuid, segmentingTargetingId, item);
+                    }
                 }
-            }
-        }));
+            }));
+        }
 
         /* Add legends from segmenting-targeting graph */
-        await Promise.all(legends.map(async (item) => {
-            if (!item.segmenting_targeting_legend_uuid) {
-                const id = uuidv4();
-                await stepTwoService.addSegmentingTargetingLegends(id, segmentingTargetingId, item);
-            } else {
-                const legend = await stepTwoService.getSegmentingTargetingLegendsById(item.segmenting_targeting_legend_uuid, segmentingTargetingId);
-                if (!legend) {
+        if (legends && legends.length > 0) {
+            const getLegends = await stepTwoService.getSegmentingTargetingLegends(segmentingTargetingId);
+            await Promise.all(getLegends.map(async (item) => {
+                if (!legends.find(legend => legend.legends_uuid === item.legends_uuid)) {
+                    await stepTwoService.deleteSegmentingTargetingLegends(item.legends_uuid, segmentingTargetingId);
+                }
+            }));
+
+            await Promise.all(legends.map(async (item) => {
+                if (!item.legends_uuid || item.legends_uuid === '') {
                     const id = uuidv4();
                     await stepTwoService.addSegmentingTargetingLegends(id, segmentingTargetingId, item);
                 } else {
-                    await stepTwoService.updateSegmentingTargetingLegends(item.segmenting_targeting_legend_uuid, item);
+                    const legend = await stepTwoService.getSegmentingTargetingLegendsById(item.legends_uuid, segmentingTargetingId);
+                    if (!legend) {
+                        const id = uuidv4();
+                        await stepTwoService.addSegmentingTargetingLegends(id, segmentingTargetingId, item);
+                    } else {
+                        await stepTwoService.updateSegmentingTargetingLegends(item.legends_uuid, segmentingTargetingId, item);
+                    }
                 }
-            }
-        }));
+            }));
+        }
+        
+        if (legendPoses && legendPoses.length > 0) {
+            const getlegendPoses = await stepTwoService.getSegmentingTargetingLegendPos(segmentingTargetingId);
+            await Promise.all(getlegendPoses.map(async (item) => {
+                if (!legendPos.find(legendPos => legendPos.legends_pos_uuid === item.legends_pos_uuid)) {
+                    await stepTwoService.deleteSegmentingTargetingLegendPos(item.legends_pos_uuid, segmentingTargetingId);
+                }
+            }));
+
+            await Promise.all(legendPoses.map(async (item) => {
+                console.log(item)
+                if (!item.legends_pos_uuid || item.legends_pos_uuid === '') {
+                    const id = uuidv4();
+                    await stepTwoService.addSegmentingTargetingLegendPos(id, item.legends_uuid, item.penta_helix_uuid, item.feature_uuid);
+                } else {
+                    const legendPos = await stepTwoService.getSegmentingTargetingLegendPosById(item.legends_pos_uuid, segmentingTargetingId);
+                    if (!legendPos) {
+                        const id = uuidv4();
+                        await stepTwoService.addSegmentingTargetingLegendPos(id, item.legends_uuid, item.penta_helix_uuid, item.feature_uuid);
+                    } else {
+                        await stepTwoService.updateSegmentingTargetingLegendPos(id, item.legends_uuid, item.penta_helix_uuid, item.feature_uuid);
+                    }
+                }
+            }));
+        }
 
         /* Add market potential */
-        await stepTwoService.addSegmentingTargetingMarketPotential(segmentingTargetingId, marketPotential);
+        // await stepTwoService.addSegmentingTargetingMarketPotential(segmentingTargetingId, marketPotential);
 
         res.status(200).json(response.successResponse('New segmenting targeting updated!'));
 
@@ -108,6 +145,15 @@ async function getSegmentingTargetingController(req, res, next) {
         /* Get the legends */
         const legends = await stepTwoService.getSegmentingTargetingLegends(segmentingTargetingId);
 
+        var sendLegendPoses = [];
+        await Promise.all(legends.map(async (legend) => {
+            const legendPos = await stepTwoService.getSegmentingTargetingLegendPos(legend.legends_uuid);
+            await Promise.all(legendPos.map((item) => {
+                sendLegendPoses.push(item);
+            }))
+        }));
+
+
         /* Get the market potential */
         const marketPotential = await stepTwoService.getSegmentingTargetingMarketPotential(segmentingTargetingId);
 
@@ -115,6 +161,7 @@ async function getSegmentingTargetingController(req, res, next) {
             pentaHelix: pentaHelix,
             features: features,
             legends: legends,
+            legendPoses: sendLegendPoses,
             marketPotential: marketPotential
         }));
 

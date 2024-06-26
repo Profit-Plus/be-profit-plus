@@ -128,7 +128,7 @@ function getSegmentingTargetingPentaHelixId(segmentingTargetingId, helix) {
         where: {
             AND: {
                 segmenting_targeting_uuid: segmentingTargetingId,
-                penta_helix: helix.helix
+                penta_helix: helix.penta_helix
             }
         },
         select: {

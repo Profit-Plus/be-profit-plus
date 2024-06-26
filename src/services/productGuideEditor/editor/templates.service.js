@@ -18,7 +18,7 @@ function addProductOverviewTemplate(id, unitId, taxonomyId, product) {
 /**
  *  @function addProductStpdbTemplate to add a new product STPDB template contains only a name
  */
-function addProductStpdbTemplate(productId, segmentingTargetingId, positioningId, differentiationBrandingId) {
+function addProductStpdbTemplate(productId, segmentingTargetingId, positioningId, differentiationBrandingId, featureId, legendId) {
     return database.$transaction([
         database.product_segmenting_targeting.create({
             data: {
@@ -37,7 +37,22 @@ function addProductStpdbTemplate(productId, segmentingTargetingId, positioningId
                 differentiation_branding_uuid: differentiationBrandingId,
                 product_uuid: productId
             }
-        })
+        }),
+        database.segmenting_targeting_feature_used.create({
+            data: {
+                segmenting_targeting_uuid: segmentingTargetingId,
+                feature_uuid: featureId,
+                feature_desc: "",
+            }
+        }),
+        database.segmenting_targeting_legends.create({
+            data: {
+                segmenting_targeting_uuid: segmentingTargetingId,
+                legends_uuid: legendId,
+                legend_name: "",
+                legend_color_code: "#000000",
+            }
+        }),
     ]);
 }
 

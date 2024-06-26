@@ -21,6 +21,8 @@ async function addNewProduct(req, res, next) {
         const productUuid = uuidv4();
         const segmentingTargetingUuid = uuidv4();
         const positioningUuid = uuidv4();
+        const featureUuid = uuidv4();
+        const legendUuid = uuidv4();
         const differentiationBrandingUuid = uuidv4();
         const operatingModelUuid = uuidv4();
         const readinessUuid = uuidv4();
@@ -58,7 +60,9 @@ async function addNewProduct(req, res, next) {
             productUuid, 
             segmentingTargetingUuid, 
             positioningUuid, 
-            differentiationBrandingUuid
+            differentiationBrandingUuid,
+            featureUuid,
+            legendUuid
         );
         
         /* Add a new template for STPDB sub-services */
