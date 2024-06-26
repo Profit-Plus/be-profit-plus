@@ -26,7 +26,6 @@ const createSheet = require('./routes/tariffRoutes/createSheetRoute');
 const masterDataRoute = require('./routes/tariffRoutes/componentRoutes');
 const CostCalculation = require('./routes/tariffRoutes/calculationRoute');
 
-
 // Porto Route
 const authRouter = require('./routes/authentication/auth.routes');
 const productGuideProductTemplate = require('./routes/productGuideEditor/editor/templates.routes');
@@ -43,13 +42,22 @@ const newSolutionRouter = require('./routes/solutionFormulation/newSolution.rout
 const PORT = process.env.PORT || 3001;
 const main = express();
 
-
 main.use(cors());
 main.use(bodyParser.json());
 main.use(bodyParser.urlencoded({
     extended: false
 }));
 
+// GTOM Use route
+main.use(picRouter);
+main.use(customerRouter);
+main.use(documentRouter);
+main.use(projectRouter);
+main.use(commentRouter);
+main.use(notificationRouter);
+main.use(dashboardRouter);
+
+//Auth Use route
 main.use('/profitplus/api', authRouter);
 
 // Tarif Use route
