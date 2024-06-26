@@ -231,17 +231,17 @@ enum comment_type {
 }
 
 model selected_product {
-  id          String    @id @default(uuid())
-  product_id  Int?
-  offering_id Int?
-  offering    offering? @relation(fields: [offering_id], references: [id])
-  product     product?  @relation(fields: [product_id], references: [id])
-  project     project   @relation(fields: [project_id], references: [id])
-  project_id  String
-  deleted_at  DateTime?
+  id                  String            @id @default(uuid())
+  product_overview_id Int?
+  offering_id         Int?
+  offering            offering?         @relation(fields: [offering_id], references: [id])
+  product_overview    product_overview? @relation(fields: [product_overview_id], references: [id])
+  project             project           @relation(fields: [project_id], references: [id])
+  project_id          String
+  deleted_at          DateTime?
 }
 
-model product {
+model product_overview {
   id                Int                 @id @default(autoincrement())
   category_id       Int
   taxonomy_id       Int
@@ -322,11 +322,11 @@ model refresh_token {
 
 // Insert a default data named '-'
 model units {
-  unit_id     String       @id @default(uuid())
-  units_name  String       @unique
-  users       users[] // 1 to many relation with users
-  unit_leader unit_leader? // 1 to 1 relation with unit_leader
-  product     product[]
+  unit_id          String             @id @default(uuid())
+  units_name       String             @unique
+  users            users[] // 1 to many relation with users
+  unit_leader      unit_leader? // 1 to 1 relation with unit_leader
+  product_overview product_overview[]
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -369,17 +369,17 @@ model levels {
 }
 
 model taxonomy {
-  taxonomy_id   Int       @id @default(autoincrement())
-  name          String
-  taxonomy_desc String
-  product       product[]
+  taxonomy_id      Int                @id @default(autoincrement())
+  name             String
+  taxonomy_desc    String
+  product_overview product_overview[]
 }
 
 model category {
-  category_id   Int       @id @default(autoincrement())
-  name          String
-  category_desc String
-  product       product[]
+  category_id      Int                @id @default(autoincrement())
+  name             String
+  category_desc    String
+  product_overview product_overview[]
 }
 
 model differentiation {
@@ -399,42 +399,42 @@ model dif_enabler_collection {
 
 model stpdb {
   stpdb_id                Int                 @id @default(autoincrement())
-  product_id              Int
+  product_overview_id     Int
   dif_id                  Int
   branding                String
   positioning_description String
   segment_targeting       segment_targeting[]
   st_positioning          st_positioning[]
   differentiation         differentiation     @relation(fields: [dif_id], references: [dif_id])
-  product                 product             @relation(fields: [product_id], references: [id])
+  product_overview        product_overview    @relation(fields: [product_overview_id], references: [id])
 }
 
 model product_services {
-  ps_id       Int     @id @default(autoincrement())
-  product_id  Int
-  name        String
-  description String
-  product     product @relation(fields: [product_id], references: [id])
+  ps_id               Int              @id @default(autoincrement())
+  product_overview_id Int
+  name                String
+  description         String
+  product_overview    product_overview @relation(fields: [product_overview_id], references: [id])
 }
 
 model product_use_case {
-  puc_id     Int     @id @default(autoincrement())
-  product_id Int
-  logo       String
-  desc       String
-  product    product @relation(fields: [product_id], references: [id])
+  puc_id              Int              @id @default(autoincrement())
+  product_overview_id Int
+  logo                String
+  desc                String
+  product_overview    product_overview @relation(fields: [product_overview_id], references: [id])
 }
 
 model operating_model {
-  om_id            Int                @id @default(autoincrement())
-  product_id       Int
-  partnership      String
-  om_business_flow om_business_flow[]
-  om_information   om_information[]
-  om_location      om_location[]
-  om_mgt_systems   om_mgt_systems[]
-  om_supplier      om_supplier[]
-  product          product            @relation(fields: [product_id], references: [id])
+  om_id               Int                @id @default(autoincrement())
+  product_overview_id Int
+  partnership         String
+  om_business_flow    om_business_flow[]
+  om_information      om_information[]
+  om_location         om_location[]
+  om_mgt_systems      om_mgt_systems[]
+  om_supplier         om_supplier[]
+  product_overview    product_overview   @relation(fields: [product_overview_id], references: [id])
 }
 
 model om_business_flow {
@@ -491,14 +491,14 @@ model om_info_node {
 }
 
 model segment_targeting {
-  st_id             Int                 @id @default(autoincrement())
-  product_id        Int
-  stpdb_id          Int
-  desc              String
-  product           product             @relation(fields: [product_id], references: [id])
-  stpdb             stpdb               @relation(fields: [stpdb_id], references: [stpdb_id])
-  st_future_growth  st_future_growth[]
-  st_targeting_user st_targeting_user[]
+  st_id               Int                 @id @default(autoincrement())
+  product_overview_id Int
+  stpdb_id            Int
+  desc                String
+  product_overview    product_overview    @relation(fields: [product_overview_id], references: [id])
+  stpdb               stpdb               @relation(fields: [stpdb_id], references: [stpdb_id])
+  st_future_growth    st_future_growth[]
+  st_targeting_user   st_targeting_user[]
 }
 
 model st_positioning {
@@ -525,34 +525,34 @@ model st_targeting_user {
 }
 
 model packages {
-  id                Int                @id @default(autoincrement())
-  name              String
-  category          category_enum
-  target_sales      Int                @default(10)
-  payback_period    Int                @default(1)
-  operational_time  Int                @default(12)
-  excess_capacity   Int                @default(0)
-  capex             Float              @default(0)
-  opex              Float              @default(0)
-  cogs              Float              @default(0)
-  tariff            Float              @default(0)
-  create_at         DateTime           @default(now())
-  update_at         DateTime           @updatedAt
-  delete_at         DateTime?
-  product_id        Int
-  data_package      data_package[]
-  offering_packages offering_package[]
-  product           product            @relation(fields: [product_id], references: [id])
-  totals            total[]
+  id                  Int                @id @default(autoincrement())
+  name                String
+  category            category_enum
+  target_sales        Int                @default(10)
+  payback_period      Int                @default(1)
+  operational_time    Int                @default(12)
+  excess_capacity     Int                @default(0)
+  capex               Float              @default(0)
+  opex                Float              @default(0)
+  cogs                Float              @default(0)
+  tariff              Float              @default(0)
+  create_at           DateTime           @default(now())
+  update_at           DateTime           @updatedAt
+  delete_at           DateTime?
+  product_overview_id Int
+  data_package        data_package[]
+  offering_packages   offering_package[]
+  product_overview    product_overview   @relation(fields: [product_overview_id], references: [id])
+  totals              total[]
 }
 
 model offering {
-  id                Int                @id @default(autoincrement())
-  offer_name        String
-  product_id        Int
-  product           product            @relation(fields: [product_id], references: [id])
-  offering_packages offering_package[]
-  selected_product  selected_product[]
+  id                  Int                @id @default(autoincrement())
+  offer_name          String
+  product_overview_id Int
+  product_overview    product_overview   @relation(fields: [product_overview_id], references: [id])
+  offering_packages   offering_package[]
+  selected_product    selected_product[]
 }
 
 model offering_package {
@@ -565,12 +565,12 @@ model offering_package {
 }
 
 model type {
-  id         String       @id @default(uuid())
-  type       type_enum
-  product_id Int
-  categories categories[]
-  totals     total[]
-  product    product      @relation(fields: [product_id], references: [id])
+  id                  String           @id @default(uuid())
+  type                type_enum
+  product_overview_id Int
+  categories          categories[]
+  totals              total[]
+  product_overview    product_overview @relation(fields: [product_overview_id], references: [id])
 }
 
 model categories {
