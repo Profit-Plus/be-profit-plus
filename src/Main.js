@@ -13,7 +13,6 @@ const productGuideStepThreeRouter = require('./routes/productGuideEditor/editor/
 const productGuidestepFourRouter = require('./routes/productGuideEditor/editor/step4/step4.routes');
 const productGuidestepFiveRouter = require('./routes/productGuideEditor/editor/step5/step5.routes');
 const productGuideStepSixRouter = require('./routes/productGuideEditor/editor/step6/step6.routes');
-const productListRouter = require('./routes/productGuideEditor/review/productList.routes');
 const newSolutionRouter = require('./routes/solutionFormulation/newSolution.routes');
 
 /* Necessary variables */
@@ -36,7 +35,6 @@ main.use('/profitplus/api', productGuideStepThreeRouter);
 main.use('/profitplus/api', productGuidestepFourRouter);
 main.use('/profitplus/api', productGuidestepFiveRouter);
 main.use('/profitplus/api', productGuideStepSixRouter);
-main.use('/profitplus/api', productListRouter);
 
 /* Solution formulation */
 main.use('/profitplus/api', newSolutionRouter);

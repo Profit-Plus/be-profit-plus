@@ -85,6 +85,31 @@ async function addNewProduct(req, res, next) {
     }
 }
 
+/**
+ *  @function getProducts to get all the products from the list if query param null 
+ */
+async function getProducts(req, res, next) {
+    try {
+        /* Initialize query param */
+        const product = String(req.query.product);
+
+        if (!product.length) {
+            /* Get all products from database */
+            const products = await productTemplateService.getAllProduct();
+            res.status(200).json(responses.successResponse('Fetching all products', products));
+        } else {
+            /* Get product details by UUID  */
+            const productDetails = await productTemplateService.getProductByName(product);
+            res.status(200).json(responses.successResponse(`Fetching ${product}`, productDetails));
+        }
+        
+    } catch (error) {
+        res.status(500).json(responses.errorResponse('Failed to fetch datas'));
+        next(error);
+    }
+}
+
 module.exports = {
-    addNewProduct
+    addNewProduct,
+    getProducts
 }

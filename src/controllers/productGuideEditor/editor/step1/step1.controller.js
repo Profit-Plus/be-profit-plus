@@ -26,7 +26,7 @@ async function updateProductOverviewDetail(req, res, next) {
             } else {
                 /* initialize fields and request params */
                 const productName = req.query.product;
-                const productUnitInCharge = String(fields.unitInCharge);
+                const productUnitInCharge = String(fields.unitIncharge);
                 const productDescription = String(fields.description);
                 const productTaxonomy = String(fields.taxonomy);
                 const productProfile = String(fields.profileLink);
@@ -279,6 +279,21 @@ async function addGallery(req, res, next) {
             res.status(500).json(response.errorResponse('Internal server error'));
         }
         
+        next(error);
+    }
+}
+
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+async function getProductMainUse(req, res, next) {
+    try {
+        
+    } catch (error) {
+        res.status(500).json(response.errorResponse('Internal server error'));
         next(error);
     }
 }
