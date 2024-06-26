@@ -16,10 +16,15 @@ const dashboardRouter = require('./routes/projectMonitoring/dashboardRoute');
 
 // Tarif Route  
 const searchRoute = require('./routes/tariffRoutes/searchRoute');
-const sheetRoute = require('./routes/tariffRoutes/searchRoute');
+const sheetRoute = require('./routes/tariffRoutes/sheetRoute');
 const masterPackageRoute = require('./routes/tariffRoutes/masterPackageRoute');
 const offeringRoute = require('./routes/tariffRoutes/offeringRoute');
-
+const productRoute = require('./routes/tariffRoutes/productRoute');
+const dashboard = require('./routes/tariffRoutes/dashboardSSORoute');
+const solution = require('./routes/tariffRoutes/solutionTariffRoute');
+const createSheet = require('./routes/tariffRoutes/createSheetRoute');
+const masterDataRoute = require('./routes/tariffRoutes/componentRoutes');
+const CostCalculation = require('./routes/tariffRoutes/calculationRoute');
 
 // Porto Route
 const authRouter = require('./routes/authentication/auth.routes');
@@ -43,7 +48,29 @@ main.use(bodyParser.urlencoded({
     extended: false
 }));
 
+// GTOM Use route
+main.use(picRouter);
+main.use(customerRouter);
+main.use(documentRouter);
+main.use(projectRouter);
+main.use(commentRouter);
+main.use(notificationRouter);
+main.use(dashboardRouter);
+
+//Auth Use route
 main.use('/profitplus/api', authRouter);
+
+// Tarif Use route
+main.use('/tariff/search', searchRoute);
+main.use('/tariff/sheet', sheetRoute);
+main.use('/tariff/masterPackage', masterPackageRoute);
+main.use('/tariff/offering', offeringRoute);
+main.use('/tariff/product', productRoute);
+main.use('/tariff/dashboard', dashboard);
+main.use('/tariff/solution', solution);
+main.use('/tariff/createSheet', createSheet);
+main.use('/tariff/component', masterDataRoute);
+main.use('/tariff/calculation', CostCalculation)
 
 /* Product Management routes */
 main.use('/profitplus/api', productGuideMiscRouter);
