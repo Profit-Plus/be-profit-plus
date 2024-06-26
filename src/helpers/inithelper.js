@@ -1,1 +1,0 @@
-// logical helper, ex : encrypt password
