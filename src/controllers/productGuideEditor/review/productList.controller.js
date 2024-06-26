@@ -30,7 +30,7 @@ async function getProducts(req, res, next) {
             }
             if (productDetails.product_marketing_collateral_dir !== 'undefined') {
                 const extractedProductMarketing = productDetails.product_marketing_collateral_dir.split('.')[1];
-                productDetails.product_marketing_collateral_dir = 'http://localhost:3001/product/marketing/' + productDetails.product_name + '.' + extractedProductMarketing;
+                productDetails.product_marketing_collateral_dir = 'http://localhost:3001/product/marketcoll/' + productDetails.product_name + '.' + extractedProductMarketing;
             }
             res.status(200).json(response.successResponse('Fetching all products', productDetails));
         }
