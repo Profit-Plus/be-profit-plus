@@ -167,7 +167,29 @@ async function addOperatingModelGtmHost(req, res, next) {
     }
 }
 
+async function getOperatingModelGtmHost(req, res, next) {
+    try {
+        const productName = String(req.query.product);
+        const operatingModelId = (await miscService.getProductOperatingModelIdByProductName(productName)).product_operating_model.product_operating_model_uuid;
+
+        const gtmHosts = await stepThreeService.getOpGtmHost(operatingModelId);
+
+        res.status(200).json(response.successResponse('Operating model GTM Host details successfully retrieved', gtmHosts));
+
+    } catch (error) {
+        if (error.message.includes(`Cannot read properties of null (reading 'product_operating_model')`)) {
+            res.status(404).json(response.errorResponse('Invalid name of product'));  
+
+        } else {
+            res.status(500).json(response.errorResponse('Internal Server error'));
+        }
+        
+        next(error);
+    }
+}
+
 module.exports = {
     updateOperatingModelDetails,
-    addOperatingModelGtmHost
+    addOperatingModelGtmHost,
+    getOperatingModelGtmHost
 }
