@@ -1,4 +1,4 @@
-const { CLIENT_RENEG_LIMIT } = require('tls');
+
 const { database } = require('../../helpers/utils/db/database');
 
 async function getSso() {
@@ -23,33 +23,38 @@ async function getSso() {
             archivement: true,
             description: true,
             sheet_id: true,
-            product:{
+            product_overview:{
                 select: {
-                    id: true,
-                    name: true,
-                    description: true,
+                    product_uuid: true,
+                    product_name: true
                 }
             },
             requester:{
-                select: {
-                    id: true,
-                    name: true,
+                select:{
+                    unit_id:true,
+                    units_name:true
                 }
             },
             pic:{
-                select: {
-                    id: true,
-                    username: true,
+                select:{
+                    user_id:true,
+                    access_credentials:{
+                        select:{
+                            user_name:true
+                        }
+                    }
                 }
             },
             owner:{
-                select: {
-                    id: true,
-                    name: true,
+                select:{
+                    unit_id:true,
+                    units_name:true
                 }
             },
         }
     });
+
+    console.log(ssoResult);
     const result = []
 
     for (ssoKey in ssoResult){
@@ -73,10 +78,10 @@ async function getSso() {
             archivement:sso.archivement,
             description:sso.description,
             sheet_id:sso.sheet_id,
-            product:sso.product.name,
-            requester:sso.requester.name,
-            pic:sso.pic.username,
-            owner:sso.owner.name,
+            product:sso.product_overview.product_name,
+            requester:sso.requester.units_name,
+            pic:sso.pic.access_credentials.user_name,
+            owner:sso.owner.units_name,
         });    
         }
 

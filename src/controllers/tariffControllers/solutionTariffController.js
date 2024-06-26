@@ -3,7 +3,7 @@ const webResponses = require('../../helpers/web/webResponses');
 
 async function getSolutionGTOMTariff(req, res) {
     try {
-        const params = parseInt(req.params.id);
+        const params = req.params.id;
         const products = await solutionService.getSolutionGTOMTariff(params);
         res.json(webResponses.successResponse('Products fetched successfully', products));
     } catch (error) {

@@ -5,7 +5,7 @@ const { equal } = require('assert');
 async function getSolutionGTOMTariff(query_product_id) {
     const solutionSheet = await database.sso.findFirst({
         where: {
-            product_id:query_product_id
+            product_overview_id:query_product_id
         },
         select : {
             id: true,
@@ -14,7 +14,6 @@ async function getSolutionGTOMTariff(query_product_id) {
                     offering:{
                         select: {
                             offer_name:true,
-                            total_price:true,
                             offering_packages:{
                                 select:{
                                     package:{

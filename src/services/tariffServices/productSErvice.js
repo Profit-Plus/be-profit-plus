@@ -57,7 +57,7 @@ async function createProductSheet(query_sheet_id, query_product_id, query_taxono
 }
 
 async function getProductSheet(query_sheet_id) {
-    const product = await database.product_sheet.findUnique({
+    const product = await database.product_sheet.findFirst({
         select:{
             id:true,
             nomor:true,
@@ -65,8 +65,8 @@ async function getProductSheet(query_sheet_id) {
             recommendation:true,
             taxonomy: {
                 select: {
-                    id: true,
-                    name: true
+                    taxonomy_uuid: true,
+                    taxonomy_name: true
                 }
             },
             sub_taxonomy:{
@@ -75,44 +75,56 @@ async function getProductSheet(query_sheet_id) {
                     name:true
                 }
             },
-            product:{
+            product_overview:{
                 select:{
-                    id:true,
-                    name:true
+                    product_uuid:true,
+                    product_name:true
                 } 
             },
             owner:{
                 select:{
-                    id:true,
-                    name:true
+                    unit_id:true,
+                    units_name:true
                 }
             },
             owner_status:true,
             requester:{
                 select:{
-                    id:true,
-                    name:true
+                    unit_id:true,
+                    units_name:true
                 }
             },
             requester_status:true,
             reviewer:{
                 select:{
-                    id:true,
-                    username:true
+                    user_id:true,
+                    access_credentials:{
+                        select:{
+                            user_name:true
+                        }
+                    }
                 }
             },
             reviewer_status:true,
-            drafer:{
+            drafter:{
                 select:{
-                    id:true,
-                    username:true
+                    user_id:true,
+                    access_credentials:{
+                        select:{
+                            user_name:true
+                        }
+                    }
                 }
             },
             drafter_status:true,
             approver:{
                 select:{
-                    id:true,
-                   username:true
+                    user_id:true,
+                    access_credentials:{
+                        select:{
+                            user_name:true
+                        }
+                    }
                 }
             },
             approver_status:true,
@@ -125,8 +137,60 @@ async function getProductSheet(query_sheet_id) {
         }
     });
 
+    let product_id = 0;
+    let product_name = "";
 
-    return product;
+    if (product.product_overview !== null){
+        product_id = product.product_overview.product_uuid;
+        product_name = product.product_overview.product_name;
+    }
+
+    const result = {
+        id: product.id,
+        nomor: product.nomor,
+        limitation: product.limitation,
+        recommendation: product.recommendation,
+        taxonomy: {
+            id:product.taxonomy.taxonomy_uuid,
+            name:product.taxonomy.taxonomy_name
+        },
+        sub_taxonomy: {
+            id: product.sub_taxonomy.id,
+            name: product.sub_taxonomy.name
+        },
+        product_overview:{
+            id:product_id,
+            name:product_name
+        } ,
+        owner: {
+            id:product.owner.unit_id,
+            name:product.owner.units_name
+        },
+        owner_status: product.owner_status,
+        requester: {
+            id:product.requester.unit_id,
+            name:product.requester.units_name
+        },
+        requester_status: product.requester_status,
+        reviewer: {
+            id:product.reviewer.user_id,
+            username:product.reviewer.access_credentials.user_name
+        },
+        reviewer_status: product.reviewer_status,
+        drafter: {
+            id:product.reviewer.user_id,
+            username:product.reviewer.access_credentials.user_name
+        },
+        drafter_status: product.drafter_status,
+        approver: {
+            id:product.reviewer.user_id,
+            username:product.reviewer.access_credentials.user_name
+        },
+        approver_status: product.approver_status,
+        updatedAt: product.updatedAt
+    }
+
+    return result;
 }
 
 async function updateProductSheet(query_sheet_id, req) {
@@ -145,31 +209,31 @@ async function updateProductSheet(query_sheet_id, req) {
             },
             owner: {
                 connect: {
-                    id: req.owner_id
+                    unit_id: req.owner_id
                 }
             },
             owner_status: req.owner_status,
             requester: {
                 connect: {
-                    id: req.requester_id
+                    unit_id: req.requester_id
                 }
             },
             requester_status: req.requester_status,
             reviewer: {
                 connect: {
-                    id: req.reviewer_id
+                    user_id: req.reviewer_id
                 }
             },
             reviewer_status: req.reviewer_status,
-            drafer: {
+            drafter: {
                 connect: {
-                    id: req.drafter_id,
+                    user_id: req.drafter_id,
                 }
             },
             drafter_status: req.drafter_status,
             approver: {
                 connect: {
-                    id: req.approver_id
+                    user_id: req.approver_id
                 }
             },
             approver_status: req.approver_status
@@ -180,8 +244,8 @@ async function updateProductSheet(query_sheet_id, req) {
 async function getTaxonomy(){
     return await database.taxonomy.findMany({
         select: {
-            id: true,
-            name: true
+            taxonomy_uuid: true,
+            taxonomy_name: true
         }
     });
 }
@@ -199,21 +263,45 @@ async function getSubTaxonomy(query_taxonomy_id){
 }
 
 async function getUser(){
-    return await database.user.findMany({
+    const user = await database.users.findMany({
         select: {
-            id: true,
-            username: true
+            user_id: true,
+            access_credentials:{
+                select:{
+                    user_name: true
+                }
+            }
         },
     });
+
+    let result = [];
+    for (let i = 0; i < user.length; i++){
+        result.push({
+            id: user[i].user_id,
+            username: user[i].access_credentials.user_name
+        });
+    }
+
+    return result;
 }
 
 async function getUnit(){
-    return await database.unit.findMany({
+    const unit = await database.units.findMany({
         select: {
-            id: true,
-            name: true
+            unit_id: true,
+            units_name: true
         }
     });
+
+    const result = [];
+    for (let i = 0; i < unit.length; i++){
+        result.push({
+            id: unit[i].unit_id,
+            name: unit[i].units_name
+        });
+    }
+
+    return result;
 }
 
 async function updateUnit(query_unit_id, query_unit_name){

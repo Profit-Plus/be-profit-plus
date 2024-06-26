@@ -8,7 +8,6 @@ const webResponses = require('../../helpers/web/webResponses');
 async function createSheet(req, res) {
     const validate = ajv.compile(sheetValidator.createSheetSchema);
     const isValid = validate(req.body);
-
     if (!isValid) {
         return res.status(400).json(webResponses.errorResponse('Invalid data', validate.errors));
     }
