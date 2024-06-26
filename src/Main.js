@@ -4,8 +4,6 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-const cors = require('cors');
-
 // GTOM Route
 const picRouter = require('./routes/projectMonitoring/picRoute');
 const customerRouter = require('./routes/projectMonitoring/customerRoute');
@@ -35,8 +33,6 @@ const stepThreeRouter = require('./routes/productGuide/stepTwo.routes');
 const PORT = process.env.PORT || 3001;
 const main = express();
 
-/* Use express */
-main.use(cors());
 
 main.use(cors());
 main.use(bodyParser.json());
