@@ -1,4 +1,3 @@
-const { Prisma } = require('@prisma/client');
 const customerService = require('../../services/projectMonitoring/customerService');
 const webResponses = require('../../helpers/web/webResponses');
 const customerValidator = require('../../validators/Customer.validator');
@@ -14,17 +13,18 @@ async function createCustomer(req, res) {
 
         const { name } = req.body;
 
+        const isNameExist = await customerService.findUniqueName(name);
+        if (isNameExist) {
+            return res.status(409).json(webResponses.errorResponse('Customer name has been used!'));
+        }
+
         const customer = await customerService.createCustomer({
             name: name
         });
 
-        res.status(200).json(webResponses.successResponse('Customer created successfully!', customer));
+        res.status(201).json(webResponses.successResponse('Customer created successfully!', customer));
     } catch (e) {
-        if (e instanceof Prisma.PrismaClientKnownRequestError) {
-            if (e.code === "P2002") {
-                return res.status(400).json(webResponses.errorResponse('There is a unique constraint violation on the constraint \'name\''));
-            }
-        }
+        console.log(e);
         throw e;
     }
 }
@@ -41,7 +41,7 @@ async function getAllCustomers(req, res) {
             order: req.query.order ?? 'desc',
             start_date: req.query.start_date,
             end_date: req.query.end_date
-        }
+        };
 
         if (!params.page || params.page < 1) params.page = 1;
         if (!params.limit || params.limit < 1) params.limit = 10;
@@ -60,7 +60,7 @@ async function getAllCustomers(req, res) {
 
 async function getCustomer(req, res) {
     try {
-        const customerId = Number(req.params.id);
+        const customerId = req.params.id;
 
         const customer = await customerService.findCustomer(customerId);
 
@@ -86,7 +86,12 @@ async function updateCustomer(req, res) {
 
         const { name } = req.body;
 
-        const customerId = Number(req.params.id);
+        const customerId = req.params.id;
+
+        const isNameExist = await customerService.findUniqueName(name);
+        if (isNameExist) {
+            return res.status(409).json(webResponses.errorResponse('Customer name has been used!'));
+        }
 
         const customer = await customerService.updateCustomer(customerId, { name: name });
 
@@ -97,18 +102,14 @@ async function updateCustomer(req, res) {
             res.status(404).json(webResponses.errorResponse('Customer not found!'));
         }
     } catch (e) {
-        if (e instanceof Prisma.PrismaClientKnownRequestError) {
-            if (e.code === "P2002") {
-                return res.status(400).json(webResponses.errorResponse('There is a unique constraint violation on the constraint \'name\''));
-            }
-        }
+        console.log(e);
         throw e;
     }
 }
 
 async function deleteCustomer(req, res) {
     try {
-        const customerId = Number(req.params.id);
+        const customerId = req.params.id;
 
         const customer = await customerService.findCustomer(customerId);
 
@@ -132,4 +133,4 @@ module.exports = {
     getAllCustomers,
     updateCustomer,
     deleteCustomer
-};
+}

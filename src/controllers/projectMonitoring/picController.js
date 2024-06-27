@@ -1,42 +1,38 @@
-const { Prisma } = require('@prisma/client');
 const picService = require('../../services/projectMonitoring/picService');
 const webResponses = require('../../helpers/web/webResponses');
-const { v4: uuidv4 } = require('uuid');
 const picValidator = require('../../validators/PIC.validator');
 const { formatErrorMessage } = require('../../helpers/utils/validator/formatError');
 
 async function createPIC(req, res) {
-    try {                        
+    try {
         const isCreatePICValid = picValidator.isCreatePICValid();
 
-        if (!isCreatePICValid(req.body)) {                 
+        if (!isCreatePICValid(req.body)) {
             return res.status(400).json(webResponses.errorResponse(formatErrorMessage(isCreatePICValid.errors[0])));
         }
 
         const { name, phone, role } = req.body;
 
-        const id = uuidv4();
+        const isPhoneExist = await picService.findUniquePhone(phone);
+        if (isPhoneExist) {
+            return res.status(409).json(webResponses.errorResponse('Phone has been used!'));
+        }
 
         const pic = await picService.createPIC({
-            id: id,
             name: name,
             phone: phone,
-            role: role,
+            role: role
         });
 
-        res.status(200).json(webResponses.successResponse('PIC created successfully!', pic));
+        res.status(201).json(webResponses.successResponse('PIC created successfully!', pic));
     } catch (e) {
-        if (e instanceof Prisma.PrismaClientKnownRequestError) {
-            if (e.code === "P2002") {
-                return res.status(400).json(webResponses.errorResponse('There is a unique constraint violation on the constraint \'phone\''));
-            }
-        }
+        console.log(e);
         throw e;
     }
 }
 
 async function getAllPICs(req, res) {
-    try {        
+    try {
         const isGetAllPICValid = picValidator.isGetAllPICValid();
 
         const params = {
@@ -45,13 +41,13 @@ async function getAllPICs(req, res) {
             search: req.query.search ?? '',
             sort: req.query.sort ?? 'created_at',
             order: req.query.order ?? 'desc',
-            role: req.query.role,            
+            role: req.query.role,
             start_date: req.query.start_date,
             end_date: req.query.end_date
-        }        
+        };
 
         if (!params.page || params.page < 1) params.page = 1;
-        if (!params.limit || params.limit < 1) params.limit = 10;        
+        if (!params.limit || params.limit < 1) params.limit = 10;
         if (!isGetAllPICValid(params)) {
             return res.status(400).json(webResponses.errorResponse(formatErrorMessage(isGetAllPICValid.errors[0])));
         }
@@ -93,15 +89,20 @@ async function updatePIC(req, res) {
 
         const picId = req.params.id;
 
-        const pic = await picService.findPIC(picId);        
+        const pic = await picService.findPIC(picId);
 
         if (pic) {
             const { name, phone, role } = req.body;
 
+            const isPhoneExist = await picService.findUniquePhone(phone);
+            if (isPhoneExist) {
+                return res.status(409).json(webResponses.errorResponse('Phone has been used!'));
+            }
+
             const updatedPIC = await picService.updatePIC(picId, {
                 name: name,
                 phone: phone,
-                role: role            
+                role: role
             });
 
             res.status(200).json(webResponses.successResponse('PIC updated successfully!', updatedPIC));
@@ -110,11 +111,7 @@ async function updatePIC(req, res) {
             res.status(404).json(webResponses.errorResponse('PIC not found!'));
         }
     } catch (e) {
-        if (e instanceof Prisma.PrismaClientKnownRequestError) {
-            if (e.code === "P2002") {
-                return res.status(400).json(webResponses.errorResponse('There is a unique constraint violation on the constraint \'phone\''));
-            }
-        }
+        console.log(e);
         throw e;
     }
 }
@@ -145,4 +142,4 @@ module.exports = {
     getAllPICs,
     updatePIC,
     deletePIC
-};
+}

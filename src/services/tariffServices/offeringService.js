@@ -34,7 +34,7 @@ async function getOffering(query_sheet_id) {
     const offering = await database.offering.findMany({
             select:{
                 id:true,
-                sheets_id:true,
+                sheet_id:true,
                 offer_name:true,
                 unit:true,
                 user_target:true,
@@ -60,7 +60,7 @@ async function getOffering(query_sheet_id) {
                 },
             },
             where: {
-                sheets_id: query_sheet_id
+                sheet_id: query_sheet_id
             },
     });
 
@@ -130,12 +130,20 @@ async function updateStatusOffering(query_offer_id, query_package_id, query_stat
         }
     });
     return offering;
+}
 
+async function deleteOffering (query_offer_id){
+    return await database.offering.delete({
+        where:{
+            id: query_offer_id
+        }
+    });
 }
 
 module.exports = {
     createOffer,
     getOffering,
     updateOffer,
-    updateStatusOffering
+    updateStatusOffering,
+    deleteOffering
 };

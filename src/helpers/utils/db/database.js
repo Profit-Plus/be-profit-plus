@@ -6,7 +6,13 @@ const now = new Date();
 const models = [
   'pic',
   'customer',
-  'project'
+  'project',
+  'project_init',
+  'project_ongoing',
+  'project_drop',
+  'project_close_out',
+  'selected_product',
+  'document'  
 ];
 
 database.$use(async (params, next) => {

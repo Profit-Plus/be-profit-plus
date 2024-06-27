@@ -8,7 +8,7 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model product {
+model product_overview {
     id          Int      @id @default(autoincrement())
     name        String
     description String?
@@ -54,8 +54,8 @@ model sso {
 
     sheet_id     Int     @default(1)
     sheet        sheet   @relation(fields: [sheet_id], references: [id])
-    product_id   Int     @default(1)
-    product      product @relation(fields: [product_id], references: [id])
+    product_overview_id   Int     @default(1)
+    product_overview      product_overview @relation(fields: [product_overview_id], references: [id])
     requester_id Int     @default(1)
     requester    unit    @relation("requester", fields: [requester_id], references: [id])
     drafter_id   Int     @default(1)
@@ -67,7 +67,7 @@ model sso {
 model sheet {
     id          Int      @id @default(autoincrement())
     name        String
-    description String
+    description String?
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
@@ -95,8 +95,8 @@ model product_sheet {
     taxonomy_id      Int
     sub_taxonomy     sub_taxonomy @relation(fields: [sub_taxonomy_id], references: [id])
     sub_taxonomy_id  Int          @default(1)
-    product          product      @relation(fields: [product_id], references: [id])
-    product_id       Int          @default(1)
+    product_overview          product_overview      @relation(fields: [product_overview_id], references: [id])
+    product_overview_id       Int          @default(1)
     requester        unit         @relation("requester", fields: [requester_id], references: [id])
     requester_id     Int          @default(1)
     requester_status Boolean      @default(false)
@@ -114,54 +114,6 @@ model product_sheet {
     approver_status  Boolean      @default(false)
 }
 
-model unit {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    product_sheets_requested product_sheet[] @relation("requester")
-    product_sheets_owned     product_sheet[] @relation("owner")
-    sso_requested            sso[]           @relation("requester")
-    sso_owned                sso[]           @relation("owner")
-}
-
-model taxonomy {
-    id          Int      @id @default(autoincrement())
-    name        String
-    description String?
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-
-    product_sheet product_sheet[]
-    sub_taxonomy  sub_taxonomy[]
-}
-
-model user {
-    id        Int      @id @default(autoincrement())
-    username  String   @unique @default("-")
-    role      String   @default("")
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    drafter  product_sheet[] @relation("drafter")
-    reviewer product_sheet[] @relation("reviewer")
-    approver product_sheet[] @relation("approver")
-    pic_sso  sso[]           @relation("pic")
-}
-
-model sub_taxonomy {
-    id          Int      @id @default(autoincrement())
-    name        String
-    description String?
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-
-    taxonomy    taxonomy @relation(fields: [taxonomy_id], references: [id])
-    taxonomy_id Int
-
-    product_sheet product_sheet[]
-}
 
 model packages {
     id               Int                 @id @default(autoincrement())

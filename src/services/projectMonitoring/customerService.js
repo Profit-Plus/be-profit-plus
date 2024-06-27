@@ -1,8 +1,8 @@
 const { database } = require('../../helpers/utils/db/database');
 
-function createCustomer(data) {
+function createCustomer(payload) {
     return database.customer.create({
-        data: data
+        data: payload
     });
 }
 
@@ -41,12 +41,26 @@ function findCustomer(customerId) {
     });
 }
 
-function updateCustomer(customerId, data) {
+async function findUniqueName(customerName) {
+    const customer = await database.customer.findUnique({
+        where: {
+            AND: [
+                { name: customerName },
+                { deleted_at: null }
+            ]
+        }
+    });
+
+    if (customer) return true;
+    else return false;
+}
+
+function updateCustomer(customerId, payload) {
     return database.customer.update({
         where: {
             id: customerId
         },
-        data: data
+        data: payload
     });
 }
 
@@ -62,6 +76,7 @@ module.exports = {
     createCustomer,
     findAllCustomers,
     findCustomer,
+    findUniqueName,
     updateCustomer,
     deleteCustomer
-};
+}

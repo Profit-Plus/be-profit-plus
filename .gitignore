@@ -3,4 +3,10 @@
 /server_data
 /src/models/migrations
 /prisma
-/src/uploads
+/src/resources
+/nbproject
+*.swp
+/docs
+/.vs
+/.vscode
+.project

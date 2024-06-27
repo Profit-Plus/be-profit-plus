@@ -1,11 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -13,163 +8,569 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// --------------- Schema of Product Guide --------------- 
-model product {
-    // Keys section
-    product_name                String      @id
-    taxonomy_name               String    //  Foreign key of taxonomy
-
-    // ordinary fields section
-    product_year                Int
-    product_description         String
-    product_features            String
-    product_profile_link        String
-    product_website_label       String
-
-    // Relations section
-    taxonomy                taxonomy              @relation(fields: [taxonomy_name], references: [taxonomy_name])
-    product_main_use        product_main_use[]
-    product_service         product_service[]
-    product_gallery         product_gallery[]
-    product_tariff_evidence product_tariff_evidence?
-    product_evidence        product_evidence?
-    product_playbook        product_playbook?
-    product_logo            product_logo?
-    unit_in_charge          unit_in_charge?
-}
-
-model taxonomy {
-    taxonomy_name   String      @id 
-    product         product[]
-}
-
-model unit_in_charge {
-    unit_in_charge_name     String      @id
-    units_name              String
-    product_name            String      @unique
-    unit                    units       @relation(fields: [units_name], references: [units_name])
-    product                 product     @relation(fields: [product_name], references: [product_name])
-}
-
-model main_use {
-    main_use_name           String      @id
-    product_main_use        product_main_use[]
-}
-
-model product_main_use {
-    product_main_use_id         Int         @id @default(autoincrement())
-    product                     product     @relation(fields: [product_name], references: [product_name])
-    main_use                    main_use    @relation(fields: [main_use_name], references: [main_use_name])
-    product_name                String //  Foreign key of product
-    main_use_name               String //  Foreign key of main_use
-}
-
-model product_service {
-    product_service_id          Int         @id @default(autoincrement())
-    product                     product     @relation(fields: [product_name], references: [product_name])
-    product_name                String //  Foreign key of product
-    product_service_name        String
-    product_service_description String
-}
-
-model product_gallery {
-    product_gallery             Int         @id @default(autoincrement())
-    product                     product     @relation(fields: [product_name], references: [product_name])
-    product_name                String //  Foreign key of product
-    product_gallery_dir         String
-}
-
-model product_logo {
-    product_logo_id             Int         @id @default(autoincrement())
-    product_name                String      @unique
-    product_logo_dir            String
-
-    // Relations section
-    product                     product     @relation(fields: [product_name], references: [product_name])
-}
-
-model product_evidence {
-    product_evidence_id  Int         @id @default(autoincrement())
-    product_name         String      @unique
-    product_evidence_dir String
-
-    // Relations section
-    product              product     @relation(fields: [product_name], references: [product_name])
-}
-
-model product_tariff_evidence {
-    product_tariff_evidence_id  Int         @id @default(autoincrement())
-    product_name                String      @unique
-    product_tariff_evidence_dir String
-
-    // Relations section
-    product                     product     @relation(fields: [product_name], references: [product_name])
-}
-
-model product_playbook {
-    product_playbook_id     Int         @id @default(autoincrement())
-    product_name            String      @unique
-    product_playbook_dir    String
-
-    // Relations section
-    product                     product     @relation(fields: [product_name], references: [product_name])
-}
-
-// --------------- Schema of Authentication --------------- 
+//  Authentication Schema
 model users {
-    user_id              Int               @id @default(autoincrement())
-    unit_leader          unit_leader? // 1 to 1 relation with unit_leader
-    units                units             @relation(fields: [units_name], references: [units_name]) // 1 to Many relation with units
-    levels               levels            @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
-    login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id]) // 1 to 1 relation with login_credentials
-    teams                teams             @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
-    units_name           String // foreign key of units
-    level_name           String // foreign key of levels
-    login_credentials_id String            @unique // foreign key of login_credentials
-    team_name            String //  Foreign key of teams
+    user_id                 String              @id @default(uuid())
+    units_name              String              // foreign key of units
+    level_name              String              // foreign key of levels
+    access_credentials_id   String              @unique  // foreign key of login_credentials
+    team_name               String              //  Foreign key of teams
+
+    // Relations section
+    unit_leader          unit_leader?           // 1 to 1 relation with unit_leader
+    units                units                  @relation(fields: [units_name], references: [units_name]) // 1 to Many relation with units
+    levels               levels                 @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
+    access_credentials   access_credentials     @relation(fields: [access_credentials_id], references: [access_credentials_id]) // 1 to 1 relation with login_credentials
+    teams                teams                  @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
+
+    created_at           DateTime               @default(now())
+    updated_at           DateTime               @updatedAt   
 }
 
-model login_credentials {
-    login_credentials_id String          @id @default(uuid())
+model access_credentials {
+    access_credentials_id   String              @id @default(uuid())
+    user_name               String
+    email                   String              @unique
+    password                String
+
+    // Relations section
     users                users?
     refresh_token        refresh_token[]
-    user_name            String
-    email                String          @unique
-    password             String
+
+    created_at           DateTime               @default(now())
+    updated_at           DateTime               @updatedAt
 }
 
 model refresh_token {
-    id                   String            @id @unique @default(uuid())
-    hashed_token         String
-    login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id], onDelete: Cascade)
-    login_credentials_id String
-    revoked              Boolean           @default(false)
-    created_at           DateTime          @default(now())
-    updated_at           DateTime          @updatedAt
+    id                      String              @id @unique @default(uuid())
+    hashed_token            String
+    access_credentials_id   String
+
+    // Relations section
+    access_credentials   access_credentials     @relation(fields: [access_credentials_id], references: [access_credentials_id], onDelete: Cascade)
+
+    created_at           DateTime               @default(now())
+    updated_at           DateTime               @updatedAt
 }
 
+// Insert a default data named '-'
 model units {
-    units_name      String       @id @unique
-    unit_in_charge  unit_in_charge[]
-    users           users[] // 1 to many relation with users
-    unit_leader     unit_leader? // 1 to 1 relation with unit_leader
+    unit_id         String                  @id @default(uuid())
+    units_name      String                  @unique
+    users           users[]                 // 1 to many relation with users
+    unit_leader     unit_leader?            // 1 to 1 relation with unit_leader
+
+    product_overview product_overview[]
+
+    created_at           DateTime           @default(now())
+    updated_at           DateTime           @updatedAt   
 }
 
 model teams {
-    team_name String  @id @unique
-    users     users[] //   1 to many relation with users
+    team_id     String                      @id @default(uuid())
+    team_name   String                      @unique
+
+    // Relations section
+    users       users[]                     //   1 to many relation with users
+
+    created_at           DateTime           @default(now())
+    updated_at           DateTime           @updatedAt
 }
 
 // Add new entity named unit_leader
 model unit_leader {
-    leader_id  Int    @id @default(autoincrement())
-    user_id    Int    @unique //  Foreign key of user
-    units_name String @unique // Foreign key of unit
-    users      users  @relation(fields: [user_id], references: [user_id])
-    units      units  @relation(fields: [units_name], references: [units_name])
+    leader_id  String                       @id @default(uuid())
+    user_id    String                       @unique //  Foreign key of user
+    units_name String                       @unique // Foreign key of unit
+
+    // Relations section
+    users      users                        @relation(fields: [user_id], references: [user_id])
+    units      units                        @relation(fields: [units_name], references: [units_name])
+
+    created_at           DateTime           @default(now())
+    updated_at           DateTime           @updatedAt
 }
 
 model levels {
-    level_name String  @id @unique
-    users      users[]
+    level_id    String                      @id @default(uuid())
+    level_name  String                      @unique
+
+    // Relations section
+    users users[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+// Product Overview Schema
+model taxonomy {
+    taxonomy_uuid String @id @default(uuid())
+    taxonomy_name String @unique
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt  
+
+    product_overview product_overview[]      
+}
+
+model product_overview {
+    product_uuid String @id @default(uuid())
+    unit_id String @default("undefined")   // Unit in charge
+    product_name String @unique
+    product_description String @default("undefined")   
+    taxonomy_uuid String @default("undefined")   
+    product_profile_link String @default("undefined")   
+    product_website_link String @default("undefined")   
+    product_logo_dir String @default("undefined")   
+    product_evidence_product_dir String @default("undefined")   
+    product_evidence_tariff_dir String @default("undefined")
+    product_marketing_collateral_dir String @default("undefined")   
+
+    //  Relation section
+    units units @relation(fields: [unit_id], references: [unit_id])
+    taxonomy taxonomy @relation(fields: [taxonomy_uuid], references: [taxonomy_uuid])
+    product_main_use product_main_use[]
+    product_gallery product_gallery[]
+    product_service product_service[]
+    product_use_case product_use_case[]
+    product_tariffing_packets product_tariffing_packets[]
+    product_readiness_description product_readiness_description[]
+    solution_product solution_product[]
+    product_positioning product_positioning?
+    product_segmenting_targeting product_segmenting_targeting?
+    product_differentiation_branding product_differentiation_branding?
+    product_operating_model product_operating_model?
+    product_readiness_status product_readiness_status?
+    
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_service {
+    product_service_uuid String @id @default(uuid())
+    product_uuid String
+    product_service_name String
+    product_service_desc String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_main_use {
+    product_main_use_uuid String @id @default(uuid())
+    product_uuid String
+    product_main_use_name String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_gallery {
+    product_overview_gallery_uuid String @id @default(uuid())
+    product_uuid String
+    product_picture_dir String @unique
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+// Product STPDB Schema
+
+//  Segmenting-Targeting
+model product_segmenting_targeting {
+    segmenting_targeting_uuid String @id @default(uuid())
+    product_uuid String @unique
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+    segmenting_targeting_feature_used segmenting_targeting_feature_used[]
+    segmenting_targeting_legends segmenting_targeting_legends[]
+    product_penta_helix_properties segmenting_targeting_penta_helix_properties[]
+    segmenting_targeting_market_potential segmenting_targeting_market_potential?
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+enum penta_helix {
+    BUSINESS
+    ACADEMY
+    TECH_PROVIDER
+    GOVERNMENT
+    COMMUNITY
+    SUBDIARIES
+}
+
+model segmenting_targeting_penta_helix_properties {
+    penta_helix_uuid String @id @default(uuid())
+    segmenting_targeting_uuid String
+
+    penta_helix penta_helix
+    penta_helix_desc String @default("undefined")
+    penta_helix_user_desc String @default("undefined")
+    penta_helix_status Boolean @default(true)
+    
+    // Relation section
+    product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
+    segmenting_targeting_legends_pos segmenting_targeting_legends_pos[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt    
+}
+
+model segmenting_targeting_feature_used {
+    feature_uuid String @id @default(uuid())
+    segmenting_targeting_uuid String
+    feature_desc String
+
+    // Relation section
+    product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
+    segmenting_targeting_legends_pos segmenting_targeting_legends_pos[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+model segmenting_targeting_legends {
+    legends_uuid String @id @default(uuid())
+    segmenting_targeting_uuid String
+    legend_name String
+    legend_color_code String
+
+    // Relation section
+    product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
+    segmenting_targeting_legends_pos segmenting_targeting_legends_pos[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+model segmenting_targeting_legends_pos {
+    legends_pos_uuid String @id @default(uuid())
+    legends_uuid String
+    penta_helix_uuid String
+    feature_uuid String
+
+    // Relation section
+    segmenting_targeting_legends segmenting_targeting_legends @relation(fields: [legends_uuid], references: [legends_uuid])
+    segmenting_targeting_penta_helix_properties segmenting_targeting_penta_helix_properties @relation(fields: [penta_helix_uuid], references: [penta_helix_uuid])
+    segmenting_targeting_feature_used segmenting_targeting_feature_used @relation(fields: [feature_uuid], references: [feature_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+model segmenting_targeting_market_potential {
+    market_potential_uuid String @id @default(uuid())
+    segmenting_targeting_uuid String @unique
+    tam_desc String @default("undefined")
+    sam_desc String @default("undefined")
+    som_desc String @default("undefined")
+
+    // Relation section
+    product_segmenting_targeting product_segmenting_targeting @relation(fields: [segmenting_targeting_uuid], references: [segmenting_targeting_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+//  Positioning
+model product_positioning {
+    positioning_uuid String @id @default(uuid())
+    product_uuid String @unique
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+    positioning_logos positioning_logos[]
+    product_positioning_story product_positioning_story[]
+    positioning_indicators positioning_indicators?
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+model positioning_indicators {
+    positioning_indicators_uuid String @id @default(uuid())
+    positioning_uuid String @unique
+    indicator_one_name String @default("undefined")
+    indicator_two_name String @default("undefined")
+    indicator_three_name String @default("undefined")
+    indicator_four_name String @default("undefined")
+
+    // Relation Section
+    product_positioning product_positioning @relation(fields: [positioning_uuid], references: [positioning_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+model positioning_logos {
+    positioning_logos_uuid String @id @default(uuid())
+    positioning_uuid String
+    logo_name String
+    logo_desc String
+    logo_pos_x Int
+    logo_pos_y Int
+    logo_dir String
+
+    // Relation Section
+    product_positioning product_positioning @relation(fields: [positioning_uuid], references: [positioning_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt   
+}
+
+model product_positioning_story {
+    product_positioning_story_uuid String @id @default(uuid())
+    positioning_uuid String @unique
+    sentence_one_market_target String @default("undefined")
+    sentence_two_use_case String @default("undefined")
+    sentence_three_name_product String @default("undefined")
+    sentence_four_differentiation String @default("undefined")
+    sentence_five_reason String @default("undefined")
+
+    // Relation section
+    product_positioning product_positioning @relation(fields: [positioning_uuid], references: [positioning_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+//  Differentiation Branding
+model product_differentiation_branding {
+    differentiation_branding_uuid String @id @default(uuid())
+    product_uuid String @unique
+    product_differentiation_slogan String @default("undefined")
+    product_differentiation_desc String @default("undefined")
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt 
+}
+
+// Product Operating Model Schema
+model product_operating_model {
+    product_operating_model_uuid String @id @default(uuid())
+    product_uuid String @unique
+    product_location String @default("undefined")
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+    product_op_gtm_host product_op_gtm_host?
+    product_op_organization_header product_op_organization_header?
+    product_op_supplier product_op_supplier[]
+    product_op_business_process_header product_op_business_process_header[]
+    product_op_information_internal product_op_information_internal[]
+    product_op_information_external product_op_information_external[]
+    product_op_management_systems product_op_management_systems[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+enum gtm_host_option {
+    PARTNERSHIP
+    IBL
+    OBL
+}
+
+model product_op_gtm_host {
+    product_gtm_host_uuid String @id @default(uuid())
+    product_operating_model_uuid String @unique
+    host_option gtm_host_option @default(PARTNERSHIP)
+    host_description String @default("undefined")
+    host_file_dir String @default("undefined")
+
+    // Relation Section
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_op_supplier {
+    product_op_supplier_uuid String @id @default(uuid())
+    product_operating_model_uuid String
+    product_supplier_description String
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid]) 
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+// Business process section in operating model split into two different entities, header and nodes
+model product_op_business_process_header {
+    product_op_business_process_header_uuid String @id @default(uuid())
+    product_operating_model_uuid String
+    header_description String
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
+    product_op_business_process_nodes product_op_business_process_nodes[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_op_business_process_nodes {
+    product_op_business_process_nodes_uuid String @id @default(uuid())
+    product_op_business_process_header_uuid String
+    node_description String
+
+    product_op_business_process_header product_op_business_process_header @relation(fields: [product_op_business_process_header_uuid], references: [product_op_business_process_header_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+// Information section in operating model split into two different entities, internal and external
+model product_op_information_internal {
+    product_op_information_internal_uuid String @id @default(uuid())
+    product_operating_model_uuid String
+    information_description String
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid]) 
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_op_information_external {
+    product_op_information_external_uuid String @id @default(uuid())
+    product_operating_model_uuid String
+    information_description String
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid]) 
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+// Organization section in operating model split into two different entities, header and nodes
+model product_op_organization_header {
+    product_op_organization_header_uuid String @id @default(uuid())
+    product_operating_model_uuid String @unique
+    header_description String @default("undefined")
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
+    product_op_organization_nodes product_op_organization_nodes[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_op_organization_nodes {
+    product_op_organization_nodes_uuid String @id @default(uuid())
+    product_op_organization_header_uuid String
+    node_description String
+
+    product_op_organization_header product_op_organization_header @relation(fields: [product_op_organization_header_uuid], references: [product_op_organization_header_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_op_management_systems {
+    product_op_management_systems_uuid String @id @default(uuid())
+    product_operating_model_uuid String
+    management_system_description String
+
+    product_operating_model product_operating_model @relation(fields: [product_operating_model_uuid], references: [product_operating_model_uuid])
+    
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+// Product Use Case Schema
+model product_use_case {
+    use_case_uuid String @id @default(uuid())
+    product_uuid String
+    company_name String
+    company_description String
+    company_logo_dir String
+    product_for_company_description String
+    use_case_description String
+    use_case_features String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+// Product Tariffing
+model product_tariffing_packets {
+    product_tariffing_packets_uuid String @id @default(uuid())
+    product_uuid String
+    feature String
+    tariff String
+    payment_schema String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt   
+}
+
+// Product Readiness schema
+enum product_status {
+    DEFINE
+    DESIGN
+    DEVELOP
+    DEPLOY
+    DELIVER
+}
+
+model product_readiness_status {
+    product_readiness_status_uuid String @id @default(uuid())
+    product_uuid String @unique
+    product_status product_status @default(DEFINE)
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+}
+
+model product_readiness_description {
+    product_readiness_description_uuid String @id @default(uuid())
+    product_uuid String
+    product_status product_status
+    analysis_description String
+    next_step_description String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+}
+
+// Product Solution (dummy)
+model solution_formulation {
+    solution_formulation_uuid String @id @default(uuid())
+    solution_name String @unique
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    solution_product solution_product[]
+}
+
+model solution_product {
+    solution_product_uuid String @id @default(uuid())
+    solution_formulation_uuid String
+    product_uuid String
+
+    // Relation section
+    product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+    solution_formulation solution_formulation @relation(fields: [solution_formulation_uuid], references: [solution_formulation_uuid])
 }

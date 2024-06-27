@@ -144,6 +144,5 @@ module.exports = {
     getUser,
     createSso,
     updateSso,
-    getSsoById
 };
 // Path: src/controllers/tariffControllers/masterPackageController.js

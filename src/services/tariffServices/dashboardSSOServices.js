@@ -1,6 +1,5 @@
-const { CLIENT_RENEG_LIMIT } = require('tls');
-const { database } = require('../../helpers/utils/db/database');
 
+const { database } = require('../../helpers/utils/db/database');
 
 async function getSso() {
     const ssoResult = await database.sso.findMany({
@@ -39,38 +38,33 @@ async function getSso() {
                     name: true
                 }
             },
-            product_id: true,
-            product:{
+            product_overview_id: true,
+            product_overview:{
                 select: {
-                    name: true,
-                    description: true,                
-                    product_sheet: {
-                        select: {
-                            taxonomy: {
-                                select: {
-                                    name: true
-                                }
-                            }
+                    product_uuid: true,
+                    product_name: true
+                }
+            },
+            requester:{
+                select:{
+                    unit_id:true,
+                    units_name:true
+                }
+            },
+            pic:{
+                select:{
+                    user_id:true,
+                    access_credentials:{
+                        select:{
+                            user_name:true
                         }
                     }
                 }
             },
-            requester:{
-                select: {
-                    id: true,
-                    name: true,
-                }
-            },
-            pic:{
-                select: {
-                    id: true,
-                    username: true,
-                }
-            },
             owner:{
-                select: {
-                    id: true,
-                    name: true,
+                select:{
+                    unit_id:true,
+                    units_name:true
                 }
             },
         }
@@ -250,5 +244,4 @@ module.exports = {
     getUser,
     createSso,
     updateSso,
-    getSsoById
 };
