@@ -60,7 +60,7 @@ async function getProductSheet(query_sheet_id) {
     const product = await database.product_sheet.findFirst({
         select:{
             id:true,
-            nomor:true,
+            nomor: true,
             limitation:true,
             recommendation:true,
             taxonomy: {
@@ -129,8 +129,6 @@ async function getProductSheet(query_sheet_id) {
             },
             approver_status:true,
             updatedAt: true,
-
-
         },
         where: {
             sheet_id: query_sheet_id

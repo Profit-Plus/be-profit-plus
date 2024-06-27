@@ -42,7 +42,12 @@ async function getSso() {
             product_overview:{
                 select: {
                     product_uuid: true,
-                    product_name: true
+                    product_name: true,
+                    taxonomy: {
+                        select: {
+                            taxonomy_name: true
+                        }
+                    }
                 }
             },
             requester:{
@@ -99,17 +104,17 @@ async function getSso() {
             achievement:sso.achievement,
             progress:sso.progress,
             description:sso.description,            
-            sheet:sso.sheet.name,
+            sheet:sso.sheet?.name,
             sheet_id:sso.sheet_id,
-            product:sso.product.name,
-            product_id:sso.product_id,
-            requester:sso.requester.name,
-            requester_id:sso.requester.id,
-            pic:sso.pic.username,
-            pic_id:sso.pic.id,
-            owner:sso.owner.name,
-            owner_id:sso.owner.id,
-            taxonomy: sso.product.product_sheet[0]?.taxonomy.name || null,
+            product:sso.product_overview?.product_name,
+            product_id:sso.product_overview?.product_uuid,
+            requester:sso.requester.units_name,
+            requester_id:sso.requester.unit_id,
+            pic:sso.pic.access_credentials.user_name,
+            pic_id:sso.pic.user_id,
+            owner:sso.owner.units_name,
+            owner_id:sso.owner.unit_id,
+            taxonomy: sso.product_overview?.taxonomy.taxonomy_name || null,
             evidence_tariff_link:sso.evidence_tariff_link,
             evidence_tariff_text:sso.evidence_tariff_text
         });    
@@ -119,10 +124,10 @@ async function getSso() {
 }
 
 async function getUnit() {
-    return database.unit.findMany({
+    return database.units.findMany({
         select: {
-            id: true,
-            name: true
+            unit_id: true,
+            units_name: true
         }
     })
 }
@@ -137,10 +142,14 @@ async function getSheet() {
 }
 
 async function getUser() {
-    return database.user.findMany({
+    return database.users.findMany({
         select: {
-            id: true,
-            username: true
+            user_id: true,
+            access_credentials: {
+                select: {
+                    user_name: true
+                }
+            }
         }
     })
 }
@@ -193,19 +202,18 @@ async function updateSso(
             sheet: {
                 connect: { id: sheet_id }
             },
-            product: {
-                connect: { id: product_id }
+            product_overview: {
+                connect: { product_uuid: product_id }
             },
             owner: {
-                connect: { id: owner_id }
+                connect: { unit_id: owner_id }
             },
             pic: {
-                connect: { id: pic_id }
+                connect: { user_id: pic_id }
             },
             requester: {
-                connect: { id: requester_id }
+                connect: { unit_id: requester_id }
             },
-
             NDE_determination_tariff,
             NDE_determination_tariff_boolean,
             achievement,
