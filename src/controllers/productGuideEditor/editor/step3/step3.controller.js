@@ -16,17 +16,31 @@ async function updateOperatingModelDetails(req, res, next) {
         /* Initialize request body and body param */
         const productName = String(req.query.product);
         const details = req.body;
+        console.log(details)
 
         /* Get the operating model UUID based on product name query param */
         const operatingModelId = (await miscService.getProductOperatingModelIdByProductName(productName)).product_operating_model.product_operating_model_uuid;
 
         /* Update the location */
+
+        const operatingModelDetails = await stepThreeService.getOperatingModelDetails(operatingModelId);
+
         await stepThreeService.updateOperatingModeLocation(operatingModelId, details.location);
 
+        await Promise.all(operatingModelDetails.product_op_supplier.map(async (supplier) => {
+            await stepThreeService.deleteOpSupplier(supplier.product_op_supplier_uuid);
+        }));
         /* Add suppliers */
         await Promise.all(details.suppliers.map(async (supplier) => {
             const supplierId = uuidv4();
             await stepThreeService.addOpSupplier(supplierId, operatingModelId, supplier);
+        }));
+
+        await Promise.all(operatingModelDetails.product_op_business_process_header.map(async (process) => {
+            await Promise.all(process.product_op_business_process_nodes.map(async (node) => {
+                await stepThreeService.deleteOpBusinessProcessNode(node.product_op_business_process_nodes_uuid);
+            }));
+            await stepThreeService.deleteOpBusinessProcessHeader(process.product_op_business_process_header_uuid);
         }));
 
         /* Add business process for each heads and nodes */
@@ -42,16 +56,29 @@ async function updateOperatingModelDetails(req, res, next) {
             }));
         }));
 
+        await Promise.all(operatingModelDetails.product_op_information_internal.map(async (information) => {
+            await stepThreeService.deleteInternalInformation(information.product_op_information_internal_uuid);
+        }));
+
         /* Add internal informations */
+
         await Promise.all(details.information.internal.map(async (information) => {
             const internalInformationId = uuidv4();
             await stepThreeService.addInternalInformation(internalInformationId, operatingModelId, information);
+        }));
+
+        await Promise.all(operatingModelDetails.product_op_information_external.map(async (information) => {
+            await stepThreeService.deleteExternalInformation(information.product_op_information_external_uuid);
         }));
 
         /* Add external informations */
         await Promise.all(details.information.external.map(async(information) => {
             const externalInformationId = uuidv4();
             await stepThreeService.addExternalInformation(externalInformationId, operatingModelId, information);
+        }));
+
+        await Promise.all(operatingModelDetails.product_op_organization_header.product_op_organization_nodes.map(async (organization) => {
+            await stepThreeService.deleteOpOrganizationNodes(organization.product_op_organization_nodes_uuid);
         }));
 
         /* Add organization head */
@@ -62,6 +89,10 @@ async function updateOperatingModelDetails(req, res, next) {
         await Promise.all(details.organization.nodes.map(async (node) => {
             const nodeId = uuidv4();
             await stepThreeService.addOpOrganizationNodes(nodeId, organizationHeadId, node.name);
+        }));
+
+        await Promise.all(operatingModelDetails.product_op_management_systems.map(async (mgt) => {
+            await stepThreeService.deleteManagementSystems(mgt.product_op_management_systems_uuid);
         }));
 
         /* Add management systems */
@@ -84,10 +115,44 @@ async function updateOperatingModelDetails(req, res, next) {
     }
 }
 
+async function getOperatingModelDetails(req, res, next) {
+    try {
+        const productName = String(req.query.product);
+        if (!productName) {
+            res.status(422).json(response.errorResponse('Product name is required'));
+            next();
+        }
+        const operatingModelId = (await miscService.getProductOperatingModelIdByProductName(productName)).product_operating_model.product_operating_model_uuid
+
+        const operatingModelDetails = await stepThreeService.getOperatingModelDetails(operatingModelId);
+        
+        if (operatingModelDetails.product_op_supplier.length === 0) {
+            operatingModelDetails.product_op_supplier = [{
+                product_supplier_uuid: '',
+                product_operating_model_uuid: operatingModelId,
+                product_supplier_description: ''
+            }]
+        }
+
+        res.status(200).json(response.successResponse('Operating model details successfully retrieved', operatingModelDetails));
+
+    } catch (error) {
+        if (error.message.includes(`Cannot read properties of null (reading 'product_operating_model')`)) {
+            res.status(404).json(response.errorResponse('Invalid name of product'));  
+
+        } else {
+            res.status(500).json(response.errorResponse('Internal Server error'));
+        }
+        
+        next(error);
+    }
+}
+
 /**
  *  @function addOperatingModelGtmHost to add the details of GTM Host in a product's operating model 
  */
 async function addOperatingModelGtmHost(req, res, next) {
+    console.log('called')
     try {
         /* Initialize request query param and formidable instance */
         const productName = String(req.query.product);
@@ -99,13 +164,14 @@ async function addOperatingModelGtmHost(req, res, next) {
             next();
         }
         const operatingModelId = (await miscService.getProductOperatingModelIdByProductName(productName)).product_operating_model.product_operating_model_uuid;
+        
         const gtmHostId = uuidv4();
 
         const form = new formidable.IncomingForm();
 
         form.parse(req, async function(error, fields, files) {
             if (error) {
-                res.status(422).json(response.errorResponse('Failed to parse data'));
+                res.status(422).json(response.errorResponse ('Failed to parse data'));
                 next();
 
             } else {
@@ -115,8 +181,10 @@ async function addOperatingModelGtmHost(req, res, next) {
 
                 /* Determine the host to perform another operation */
                 /* Perform file uploading if the host name is partnership */
+
                 if (hostName === 'PARTNERSHIP') {
                     /* Get the properties of the uploaded file */
+                    
                     const oldPath = files.file[0].filepath;
                     const fileExtension = files.file[0].originalFilename.split('.').pop();
 
@@ -133,7 +201,14 @@ async function addOperatingModelGtmHost(req, res, next) {
                         const newPath = directory + '\\' + productName + '.' + fileExtension.toString();
                         fileDirectory = 'profit-plus-api\\src\\resources\\' + newPath; 
                         
+                        /* delete if the file is already exist */
+                        
+                        if (filestream.existsSync(newPath)) {
+                            filestream.unlinkSync(newPath);
+                        }
+
                         /* Perform file uploading and store the directory to temporary variables */
+
                         mv(oldPath, newPath, async function (error) {
                             if (error) {
                                 res.status(409).json(response.errorResponse(`Uploading failed for id ${gtmHostId}`));
@@ -154,7 +229,7 @@ async function addOperatingModelGtmHost(req, res, next) {
                     fileDir: fileDirectory
                 }
 
-                await stepThreeService.addOpGtomHost(gtmHostId, operatingModelId, details);
+                await stepThreeService.addOpGtomHost(operatingModelId, details);
 
                 res.status(200).json(response.successResponse('Operating model GTM Host details successfully updated'));
             }
@@ -198,6 +273,7 @@ async function getOperatingModelGtmHost(req, res, next) {
 
 module.exports = {
     updateOperatingModelDetails,
+    getOperatingModelDetails,
     addOperatingModelGtmHost,
     getOperatingModelGtmHost
 }

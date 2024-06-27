@@ -358,6 +358,39 @@ async function positioningFormDataController(req, res, next) {
     }
 }
 
+async function updatePositioningController(req, res, next) {
+    try {
+        const productName = String(req.query.product);
+        const productPositioning = req.body.positioningPicutres;
+
+        const positioningId = (await miscService.getProductPositioningIdByProductName(productName)).product_positioning.positioning_uuid;
+
+        const oldPositioningPictures = await stepTwoService.getPositioningPictures(positioningId);
+
+        await Promise.all(oldPositioningPictures.map(async (item) => {
+            if (!productPositioning.find(logo => logo.positioning_logos_uuid === item.positioning_logos_uuid)) {
+                await stepTwoService.deletePositioningPictures(item.positioning_logos_uuid);
+            }
+        }));
+        
+        await Promise.all(productPositioning.map(async (item) => {
+            await stepTwoService.updatePositioningPictures(item.positioning_logos_uuid, positioningId, item);
+        }
+        ));
+
+        res.status(200).json(response.successResponse('Positioning pictures successfully updated'));
+    } catch (error) {
+        if (error.message.includes(`Cannot read properties of null (reading 'product_positioning')`)) {
+            res.status(404).json(response.errorResponse('Invalid name of product'));  
+
+        } else {
+            res.status(500).json(response.errorResponse('Internal Server error'));
+        }
+        
+        next(error);
+    }
+}
+
 /**
  *  @function differentiationBrandingController update and and add some details in a segmenting-targeting of a product 
  */
@@ -392,5 +425,6 @@ module.exports = {
     getSTPDBController,
     positioningRawDataController,
     positioningFormDataController,
+    updatePositioningController,
     differentiationBrandingController
 }

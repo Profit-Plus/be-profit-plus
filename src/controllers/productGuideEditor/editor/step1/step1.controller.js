@@ -15,129 +15,91 @@ const mv = require('mv');
  */
 async function updateProductOverviewDetail(req, res, next) {
     try {
-        /* Initialize the instance of formidable */
         const form = new formidable.IncomingForm();
 
-        /* Parse the file to server */
         form.parse(req, async function (error, fields, files) {
             if (error) {
                 res.status(422).json(response.errorResponse('File parsing system failed'));
-                next();
+                return; // Exit early to prevent further execution
+            }
 
-            } else {
-                /* initialize fields and request params */
-                console.log(fields)
-                const productName = req.query.product;
-                const productUnitInCharge = String(fields.unitInCharge);
-                const productDescription = String(fields.description);
-                const productTaxonomy = String(fields.taxonomy);
-                const productProfile = String(fields.profileLink);
-                const productWeb = String(fields.webLink);
+            const productName = req.query.product;
+            const productUnitInCharge = String(fields.unitInCharge);
+            const productDescription = String(fields.description);
+            const productTaxonomy = String(fields.taxonomy);
+            const productProfile = String(fields.profileLink);
+            const productWeb = String(fields.webLink);
 
-                /* Generate UUID for product ID */
-                const productId = uuidv4();
+            const productId = uuidv4();
+            const unitInCharge = await miscService.getUnitIDByName(productUnitInCharge);
+            const taxonomy = await miscService.getTaxonomyIdByName(productTaxonomy);
 
-                /* Get unit ID and taxonomy ID based on the their names */
-                const unitInCharge = await miscService.getUnitIDByName(productUnitInCharge);
-                const taxonomy = await miscService.getTaxonomyIdByName(productTaxonomy);
+            const properties = {
+                uuid: productId,
+                unitId: unitInCharge.unit_id,
+                description: productDescription,
+                taxonomyId: taxonomy.taxonomy_uuid,
+                profileLink: productProfile,
+                websiteLink: productWeb,
+            };
 
-                /* Store the properties to database */
-                const properties = {
-                    uuid: productId,
-                    unitId: unitInCharge.unit_id,
-                    description: productDescription,
-                    taxonomyId: taxonomy.taxonomy_uuid,
-                    profileLink: productProfile,
-                    websiteLink: productWeb,
-                }
+            await stepOneService.updateProductOverview(productName, properties);
+            console.log(form)
+            try {
+                const uploadPromises = Object.keys(files).map(async (documentType) => {
+                    let docFile;
+                    let allowedExtension;
 
-                /* Update product overview except the files directory */
-                await stepOneService.updateProductOverview(productName, properties);
+                    switch (documentType.toString()) {
+                        case 'logo':
+                            docFile = files.logo[0];
+                            allowedExtension = ['jpg', 'jpeg', 'png', 'pjpeg', 'pjp'];
+                            break;
+                        case 'evidenceProduct':
+                        case 'evidenceTariff':
+                        case 'marketcoll':
+                            docFile = files[documentType][0];
+                            allowedExtension = ['pdf'];
+                            break;
+                        default:
+                            throw new Error('Unsupported document type');
+                    }
 
-                try {
-                    /* Iterate each files and perform file upload */
-                    const uploadPromises = Object.keys(files).map(async (documentType) => {
-                        /* Properties to transferring the file */
-                        var docFile;
-                        var allowedExtension;
+                    const oldPath = docFile.filepath;
+                    const extension = docFile.originalFilename.split('.').pop();
 
-                        /* Set the extension and old path of the document based on the documentType */
-                        switch (documentType.toString()) {
-                            case 'logo':
-                                docFile = files.logo[0];
-                                allowedExtension = ['jpg', 'jpeg', 'png', 'pjpeg', 'pjp'];
-                                break;
+                    if (!allowedExtension.includes(extension)) {
+                        throw new Error('Unsupported media type');
+                    }
 
-                            case 'evidenceProduct':
-                                docFile = files.evidence_product[0];
-                                allowedExtension = ['pdf']
-                                break;
+                    const uploadFolder = path.join('resources', 'uploads', documentType.toString());
+                    filestream.mkdirSync(uploadFolder, { recursive: true });
 
-                            case 'evidenceTariff':
-                                docFile = files.evidence_tariff[0];
-                                allowedExtension = ['pdf']
-                                break;
+                    const newPath = path.join(uploadFolder, `${productName}.${extension}`);
+                    await filestream.promises.copyFile(oldPath, newPath);
 
-                            case 'marketcoll':
-                                docFile = files.marketcoll[0];
-                                allowedExtension = ['pdf']
-                                break;
-                            default:
-                                throw error;
-                        }
+                    const completePath = 'profit-plus-api\\src\\resources\\' + newPath;
+                    await stepOneService.updateFileDirProductOverview(productName, documentType, completePath);
+                });
 
-                        /* Get the properties of uploaded file */
-                        var oldPath = docFile.filepath;
-                        var extension = docFile.originalFilename.split('.').pop();
-
-                        /* Check if the uploaded file has appropriate extension */              
-                        if (allowedExtension.includes(extension)) {
-                            /* Set the folder for uploaded file */
-                            const uploadFolder =  path.join('resources', 'uploads', documentType.toString());
-
-                            /* Make a new directory if doesn't exist before */
-                            filestream.mkdirSync(uploadFolder, { recursive: true });
-
-                            /* Set the new path for uploaded file */
-                            const newPath = uploadFolder + '\\' + productName + '.' + extension.toString();
-                            const completePath = 'profit-plus-api\\src\\resources\\' + newPath; 
-                            
-                            /* Perform file uploading and store the directory to temporary variables */
-                            await filestream.promises.copyFile(oldPath, newPath);
-                            const updateDocumentDir = stepOneService.updateFileDirProductOverview(productName, documentType, completePath);
-                            updateDocumentDir().catch(error => {
-                                throw(error);
-                            });
-                            
-                        } else {
-                            res.status(415).json(response.errorResponse('Unsupported media type'));
-                            next();
-                        }
-                    });
-
-                    /* Store all files to corresponding directory */
-                    await Promise.all(uploadPromises);
-                    
-                } catch (error) {
-                    res.status(400).json(response.errorResponse('Bad request'));
-                    next();
-                } 
-
+                await Promise.all(uploadPromises);
                 res.status(200).json(response.successResponse('Product successfully updated!'));
+
+            } catch (uploadError) {
+                res.status(400).json(response.errorResponse('File upload failed'));
             }
         });
-        
-    } catch (error) {
-        if (error.code === 'P2003') {
-            res.status(400).json(response.errorResponse('Bad request'));  
 
+    } catch (err) {
+        if (err.code === 'P2003') {
+            res.status(400).json(response.errorResponse('Bad request'));
         } else {
             res.status(500).json(response.errorResponse('Internal Server error!'));
         }
-        
-        next(error);
     }
 }
+
+
 
 /**
  *  @function uploadMainUse to add main uses of a product  

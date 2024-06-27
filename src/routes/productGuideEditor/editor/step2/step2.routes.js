@@ -7,6 +7,7 @@ productGuidestepTwoRouter.patch('/product/add-segmenting-targeting', stepTwoCont
 productGuidestepTwoRouter.get('/product/get-segmenting-targeting', stepTwoController.getSTPDBController);
 productGuidestepTwoRouter.patch('/product/add-positioning-raw', stepTwoController.positioningRawDataController);
 productGuidestepTwoRouter.post('/product/add-positioning-form-data', stepTwoController.positioningFormDataController);
+productGuidestepTwoRouter.put('/product/update-product-positioning-data', stepTwoController.updatePositioningController);
 productGuidestepTwoRouter.patch('/product/add-differentiation-branding', stepTwoController.differentiationBrandingController);
 
 module.exports = productGuidestepTwoRouter;
