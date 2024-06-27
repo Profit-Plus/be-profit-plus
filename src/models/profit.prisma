@@ -996,11 +996,11 @@ model data {
     updatedAt     DateTime  @updatedAt
     deletedAt     DateTime?
 
-    category      categories?      @relation(fields: [category_id], references: [id])
-    category_id   Int?
-    components    data_component[]
-    data_package  data_package[]
-    category_data category_data[]
+    category                categories?         @relation(fields: [category_id], references: [id])  
+    category_id             Int?
+    components              data_component[]
+    data_package            data_package[]
+    category_data           category_data[]
 }
 
 model component {
