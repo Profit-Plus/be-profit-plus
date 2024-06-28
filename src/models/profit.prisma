@@ -881,6 +881,7 @@ model sheet {
 model product_sheet {
     id             Int      @id @default(autoincrement())
     nomor          Int      @default(0)
+    nomor          Int      @default(0)
     limitation     String   @default("")
     recommendation String   @default("")
     description    String   @default("")

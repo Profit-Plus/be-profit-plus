@@ -244,8 +244,8 @@ async function getTaxonomy(){
         select: {
             taxonomy_uuid: true,
             taxonomy_name: true
-        }
-    });
+        }
+    });
 }
 
 async function getSubTaxonomy(query_taxonomy_id){
