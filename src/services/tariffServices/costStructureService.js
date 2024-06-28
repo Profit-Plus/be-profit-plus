@@ -58,59 +58,67 @@ const { database } = require('../../helpers/utils/db/database');
 
 
 async function getCostStructure(sheetId) {
-    const [listPackage, costStructureData] = await database.$transaction([
-      database.packages.findMany({
-        select:{
-          name: true,
-          category: true,
-          id: true,
-        },
-        where: {
-          sheet_id: sheetId
-      }}),
-      database.type.findMany({
-        include: {
+  const listPackage = await database.packages.findMany({
+    select: {
+        name: true,
+        category: true,
+        id: true,
+    },
+    where: {
+        sheet_id: sheetId
+    }
+  });
+
+  const packageIds = listPackage.map(pkg => pkg.id);
+
+  const costStructureData = await database.type.findMany({
+      include: {
           categories: {
-            select: {
-              id: true,
-              category: true,
-              category_data: {
-                select: {
-                  data: {
-                    select: {
-                      id: true,
-                      event_module: true,
-                      unit: true,
-                      average_price: true,
-                      data_package: {
-                        select: {
-                          data_id: true,
-                          package_id: true,
-                          quantity: true,
-                          frequency: true,
-                          excess: true,
-                          total: true,
-                          information: true,
-                          package: {
-                            select: {
-                              name: true
-                            }
+              select: {
+                  id: true,
+                  category: true,
+                  category_data: {
+                      select: {
+                          data: {
+                              select: {
+                                  id: true,
+                                  event_module: true,
+                                  unit: true,
+                                  average_price: true,
+                                  data_package: {
+                                      where: {
+                                          package_id: {
+                                              in: packageIds
+                                          }
+                                      },
+                                      select: {
+                                          data_id: true,
+                                          package_id: true,
+                                          quantity: true,
+                                          frequency: true,
+                                          excess: true,
+                                          total: true,
+                                          information: true,
+                                          package: {
+                                              select: {
+                                                  name: true
+                                              }
+                                          }
+                                      }
+                                  }
+                              }
                           }
-                        }
                       }
-                    }
                   }
-                }
               }
-            }
           }
-        },
-        where: {
+      },
+      where: {
           sheet_id: sheetId
-        },
-      })
-    ])
-    return {listPackage, costStructureData}
+      }
+  });
+
+  return {listPackage, costStructureData}
 }
 
 
