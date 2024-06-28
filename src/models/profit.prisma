@@ -749,10 +749,22 @@ model product_use_case {
     company_logo_dir String
     product_for_company_description String
     use_case_description String
-    use_case_features String
 
     // Relation section
     product_overview product_overview @relation(fields: [product_uuid], references: [product_uuid])
+    product_use_case_features product_use_case_features[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model product_use_case_features {
+    use_case_features_uuid String @id @default(uuid())
+    use_case_uuid String
+    feature_description String
+
+    // Relation section
+    product_use_case product_use_case @relation(fields: [use_case_uuid], references: [use_case_uuid])
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt

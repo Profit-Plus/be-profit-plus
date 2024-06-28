@@ -510,6 +510,8 @@ model product_use_case {
     updated_at DateTime @updatedAt
 }
 
+model product
+
 // Product Tariffing
 model product_tariffing_packets {
     product_tariffing_packets_uuid String @id @default(uuid())
